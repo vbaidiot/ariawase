@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <package>
-<comment>Please visit the project site at http://tsukeawase.codeplex.com/.</comment>
+<comment>Tukeawase frees VBA code from binary files.</comment>
 
 <job id="Help">
 <runtime>
