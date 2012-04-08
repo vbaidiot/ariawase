@@ -3,7 +3,7 @@ Option Explicit
 Option Private Module
 
 ''' @seealso Scripting.FileSystemObject http://msdn.microsoft.com/ja-jp/library/cc409798.aspx
-''' @seealso ADODB.Stream               http://msdn.microsoft.com/ja-jp/library/cc364272.aspx
+''' @seealso ADODB.Stream http://msdn.microsoft.com/ja-jp/library/cc364272.aspx
 
 Public Enum TristateEnum
     UseDefault = -2
@@ -228,14 +228,14 @@ Public Sub ChangeFileLineSeparator( _
     strm.Close
 End Sub
 
-Public Function GetTempPath( _
+Public Function GetTempFilePath( _
     Optional ByVal tdir As String, Optional extName As String = ".tmp" _
     ) As String
     
     If StrPtr(tdir) = 0 Then tdir = Fso.GetSpecialFolder(TemporaryFolder)
     Do
-        GetTempPath = Fso.BuildPath(tdir, Replace(Fso.GetTempName(), ".tmp", extName))
-    Loop While Fso.FileExists(GetTempPath)
+        GetTempFilePath = Fso.BuildPath(tdir, Replace(Fso.GetTempName(), ".tmp", extName))
+    Loop While Fso.FileExists(GetTempFilePath)
 End Function
 
 Public Function GetUniqueFileName(ByVal fpath As String, Optional delim As String = "_") As String

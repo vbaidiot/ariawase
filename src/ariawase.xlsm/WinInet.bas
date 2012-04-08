@@ -96,10 +96,9 @@ Private Function FileDownloadImpl( _
         If Len(fname) > 0 Then
             svPath = Fso.BuildPath(svPath, fname)
         Else
-            svPath = GetTempPath(svPath, ".html")
+            svPath = GetTempFilePath(svPath, ".html")
         End If
     End If
-    
     
     Dim hConn As Long, succ As Boolean
     hConn = InternetOpenUrl(hOpen, dlUrl, vbNullString, 0, INTERNET_FLAG_RELOAD, 0)

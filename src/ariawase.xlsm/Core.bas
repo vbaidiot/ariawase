@@ -138,9 +138,9 @@ End Function
 '''     ArrLen(Array("V", "B", "A")) '3
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Long
-Public Function ArrLen(ByVal arr As Variant) As Long
+Public Function ArrLen(ByVal arr As Variant, Optional ByVal dimen As Integer = 1) As Long
     If Not IsArray(arr) Then Err.Raise 13
-    ArrLen = UBound(arr) - LBound(arr) + 1
+    ArrLen = UBound(arr, dimen) - LBound(arr, dimen) + 1
 End Function
 
 ''' @usage
@@ -373,7 +373,7 @@ End Function
 ''' @param clct as As Collection(Of T)
 ''' @return As Variant(Of Array(Of T))
 Public Function ClctToArr(ByVal clct As Collection) As Variant
-    Dim arr() As Variant: arr = Array()
+    Dim arr As Variant: arr = Array()
     Dim clen As Long: clen = clct.Count
     If clen < 1 Then GoTo Ending
     
@@ -393,36 +393,42 @@ End Function
 ''' @param jagArr As Variant(Of Array(Of Array(Of T))
 ''' @return As Variant(Of Array(Of T, T))
 Public Function JagArrToArr2D(ByVal jagArr As Variant) As Variant
-    Dim arr2D() As Variant: arr2D = Array()
+    Dim arr2D As Variant: arr2D = Array()
     
-    Dim i As Long, j As Long
-    Dim m As Long, n As Long, n0 As Long
+    Dim ixOut As Long, ixInn As Long
+    Dim lbOut As Long, lbInn As Long, lbInnFst As Long
+    Dim ubOut As Long, ubInn As Long, ubInnFst As Long
     
     If Not IsArray(jagArr) Then Err.Raise 13
-    m = UBound(jagArr)
-    If m < 0 Then GoTo Ending
+    lbOut = LBound(jagArr)
+    ubOut = UBound(jagArr)
+    If ubOut - lbOut < 0 Then GoTo Ending
     
-    If Not IsArray(jagArr(0)) Then Err.Raise 13
-    n0 = UBound(jagArr(0))
-    If n0 < 0 Then
-        For i = 1 To m
-            If UBound(jagArr(i)) >= 0 Then Err.Raise 5
+    If Not IsArray(jagArr(lbOut)) Then Err.Raise 13
+    
+    lbInnFst = LBound(jagArr(lbOut))
+    ubInnFst = UBound(jagArr(lbOut))
+    If ubInnFst - lbInnFst < 0 Then
+        For ixOut = lbOut + 1 To ubOut
+            If ArrLen(jagArr(ixOut)) > 0 Then Err.Raise 5
         Next
         GoTo Ending
     End If
     
-    ReDim arr2D(m, n0)
-    If IsObject(arr2D(0, 0)) Then
-        For i = 0 To m
-            n = UBound(jagArr(i))
-            If n <> n0 Then Err.Raise 5
-            For j = 0 To n: Set arr2D(i, j) = jagArr(i)(j): Next
+    ReDim arr2D(lbOut To ubOut, lbInnFst To ubInnFst)
+    If IsObject(jagArr(lbOut)(lbInnFst)) Then
+        For ixOut = lbOut To ubOut
+            lbInn = LBound(jagArr(ixOut))
+            ubInn = UBound(jagArr(ixOut))
+            If lbInn <> lbInnFst Or ubInn <> ubInnFst Then Err.Raise 5
+            For ixInn = lbInn To ubInn: Set arr2D(ixOut, ixInn) = jagArr(ixOut)(ixInn): Next
         Next
     Else
-        For i = 0 To m
-            n = UBound(jagArr(i))
-            If n <> n0 Then Err.Raise 5
-            For j = 0 To n: Let arr2D(i, j) = jagArr(i)(j): Next
+        For ixOut = lbOut To ubOut
+            lbInn = LBound(jagArr(ixOut))
+            ubInn = UBound(jagArr(ixOut))
+            If lbInn <> lbInnFst Or ubInn <> ubInnFst Then Err.Raise 5
+            For ixInn = lbInn To ubInn: Let arr2D(ixOut, ixInn) = jagArr(ixOut)(ixInn): Next
         Next
     End If
     
@@ -430,11 +436,40 @@ Ending:
     JagArrToArr2D = arr2D
 End Function
 
+''' @param arr2D As Variant(Of Array(Of T, T))
+''' @return As Variant(Of Array(Of Array(Of T))
+Public Function Arr2DToJagArr(ByVal arr2D As Variant) As Variant
+    Dim jagArr As Variant: jagArr = Array()
+    
+    Dim lb1 As Long, ub1 As Long: lb1 = LBound(arr2D, 1): ub1 = UBound(arr2D, 1)
+    If ub1 - lb1 < 0 Then GoTo Ending
+    ReDim jagArr(lb1 To ub1)
+    
+    Dim lb2 As Long, ub2 As Long: lb2 = LBound(arr2D, 2): ub2 = UBound(arr2D, 2)
+    Dim ix1 As Long, ix2 As Long
+    Dim arr As Variant: ReDim arr(lb2 To ub2)
+    
+    If IsObject(arr2D(lb1, lb2)) Then
+        For ix1 = lb1 To ub1
+            jagArr(ix1) = arr
+            For ix2 = lb2 To ub2: Set jagArr(ix1)(ix2) = arr2D(ix1, ix2): Next
+        Next
+    Else
+        For ix1 = lb1 To ub1
+            jagArr(ix1) = arr
+            For ix2 = lb2 To ub2: Let jagArr(ix1)(ix2) = arr2D(ix1, ix2): Next
+        Next
+    End If
+    
+Ending:
+    Arr2DToJagArr = jagArr
+End Function
+
 Public Function CreateAssocArray(ParamArray arr() As Variant) As Variant
     Dim alen As Long: alen = UBound(arr)
     If Abs(alen Mod 2) = 0 Then Err.Raise 5
     
-    Dim aarr() As Variant: aarr = Array()
+    Dim aarr As Variant: aarr = Array()
     If alen < 0 Then GoTo Ending
     
     ReDim aarr(Fix(UBound(arr) / 2))
@@ -463,7 +498,7 @@ End Function
 
 Public Function DictToAssocArr(ByVal dict As Object) As Variant
     If TypeName(dict) <> "Dictionary" Then Err.Raise 13
-    Dim arr() As Variant: arr = Array()
+    Dim arr As Variant: arr = Array()
     
     Dim ks As Variant: ks = dict.Keys
     Dim dlen As Long: dlen = UBound(ks)
@@ -493,6 +528,22 @@ Public Function ARound( _
     End If
     
 Escape:
+End Function
+
+Public Function BeginOfMonth(ByVal dt As Date) As Date
+    BeginOfMonth = DateAdd("d", -Day(dt) + 1, dt)
+End Function
+
+Public Function EndOfMonth(ByVal dt As Date) As Date
+    EndOfMonth = DateAdd("d", -1, BeginOfMonth(DateAdd("m", 1, dt)))
+End Function
+
+Public Function BeginOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
+    BeginOfWeek = DateAdd("d", 1 - Weekday(dt, fstDayOfWeek), dt)
+End Function
+
+Public Function EndOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
+    EndOfWeek = DateAdd("d", 7 - Weekday(dt, fstDayOfWeek), dt)
 End Function
 
 ''' @param str As String Is Char
@@ -543,20 +594,4 @@ Public Function SepA(ByVal str As String, ByVal byteLen As Long) As Tuple2
     
     Dim n As Long: n = ixStr - (ixByte - byteLen)
     SepA = Init(New Tuple2, Left(str, n), Mid(str, n + 1, strLen))
-End Function
-
-Public Function BeginOfMonth(ByVal dt As Date) As Date
-    BeginOfMonth = DateAdd("d", -Day(dt) + 1, dt)
-End Function
-
-Public Function EndOfMonth(ByVal dt As Date) As Date
-    EndOfMonth = DateAdd("d", -1, BeginOfMonth(DateAdd("m", 1, dt)))
-End Function
-
-Public Function BeginOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
-    BeginOfWeek = DateAdd("d", 1 - Weekday(dt, fstDayOfWeek), dt)
-End Function
-
-Public Function EndOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
-    EndOfWeek = DateAdd("d", 7 - Weekday(dt, fstDayOfWeek), dt)
 End Function
