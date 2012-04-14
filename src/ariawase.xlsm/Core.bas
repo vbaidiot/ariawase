@@ -370,7 +370,39 @@ Public Function ArrToClct(ByVal arr As Variant) As Collection
     For Each v In arr: ArrToClct.Add v: Next
 End Function
 
-''' @param clct as As Collection(Of T)
+''' @param clct As As Collection(Of T)
+''' @param val As Variant(Of T)
+Public Sub Push(ByVal clct As Collection, ByVal val As Variant)
+    clct.Add val
+End Sub
+
+''' @param clct As As Collection(Of T)
+''' @return As Variant(Of T)
+Public Function Pop(ByVal clct As Collection) As Variant
+    Dim i As Long: i = clct.Count
+    If IsObject(clct.Item(i)) Then Set Pop = clct.Item(i) Else Let Pop = clct.Item(i)
+    clct.Remove i
+End Function
+
+''' @param clct As As Collection(Of T)
+''' @param val As Variant(Of T)
+Public Sub Shift(ByVal clct As Collection, ByVal val As Variant)
+    If clct.Count < 1 Then
+        clct.Add val
+    Else
+        clct.Add val, , 1
+    End If
+End Sub
+
+''' @param clct As As Collection(Of T)
+''' @return As Variant(Of T)
+Public Function Unshift(ByVal clct As Collection) As Variant
+    Dim i As Long: i = 1
+    If IsObject(clct.Item(i)) Then Set Unshift = clct.Item(i) Else Let Unshift = clct.Item(i)
+    clct.Remove i
+End Function
+
+''' @param clct As Collection(Of T)
 ''' @return As Variant(Of Array(Of T))
 Public Function ClctToArr(ByVal clct As Collection) As Variant
     Dim arr As Variant: arr = Array()
