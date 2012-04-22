@@ -2,6 +2,7 @@ Attribute VB_Name = "Util"
 Option Explicit
 Option Private Module
 
+''' @seealso WScript.Shell http://msdn.microsoft.com/ja-jp/library/cc364436.aspx
 ''' @seealso WbemScripting.SWbemLocator http://msdn.microsoft.com/en-us/library/windows/desktop/aa393719.aspx
 ''' @seealso VBScript.RegExp http://msdn.microsoft.com/ja-jp/library/cc392403.aspx
 
@@ -15,7 +16,14 @@ Public Enum HKeyEnum
     'HKEY_DYN_DATA = &H80000006
 End Enum
 
+Private xxWsh As Object 'Is WScript.Shell
 Private xxWmi As Object 'Is WbemScripting.SWbemLocator
+
+'@return As Object Is WScript.Shell
+Public Property Get Wsh() As Object
+    If xxWsh Is Nothing Then Set xxWsh = CreateObject("WScript.Shell")
+    Set Wsh = xxWsh
+End Property
 
 '@return As Object Is WbemScripting.SWbemLocator
 Public Property Get Wmi() As Object
