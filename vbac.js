@@ -22,6 +22,7 @@ var acQuery  = 1;
 var acForm   = 2;
 var acReport = 3;
 var acMacro  = 4;
+var acModule = 5;
 
 var fso = WScript.CreateObject("Scripting.FileSystemObject");
 
@@ -290,7 +291,7 @@ Access.prototype.createImportDocument = function (acProj) {
                : (xname == 'rpt') ? acReport
                : (xname == 'mcr') ? acMacro
                : null;
-        acApp.LoadFrom(ty, bname, path);
+        acApp.LoadFromText(ty, bname, path);
     };
 };
 Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
@@ -318,7 +319,9 @@ Access.prototype.combine = function(tsrc, tbin) {
     this.loanOfAcProj(tbin, true, function(acProj) {
         var acApp = acProj.Application;
         self.cleanupBinary(acApp.VBE.ActiveVBProject.VBComponents);
-        self.importComponents(acProj, tsrc, self.createImportDocument(acProj));
+        self.importComponents(
+            acApp.VBE.ActiveVBProject.VBComponents, tsrc,
+            self.createImportDocument(acProj));
     });
 };
 Access.prototype.exportDocuments = function(acProj, expdir) {
@@ -338,12 +341,16 @@ Access.prototype.decombine = function(tbin, tsrc) {
     
     var self = this;
     this.loanOfAcProj(tbin, true, function(acProj) {
+        var acApp = acProj.Application;
+        
         self.cleanupSource(tsrc);
-        self.exportComponents(acProj, tsrc, function(compo, expdir) { /* dummy */ });
+        self.exportComponents(
+            acApp.VBE.ActiveVBProject.VBComponents, tsrc,
+            function(compo, expdir) { /* dummy */ });
         self.exportDocuments(acProj, tsrc);
     });
 };
-Access.prototype.clear = function() {
+Access.prototype.clear = function(tbin) {
     println("\n  Target: " + fso.GetFileName(tbin));
     
     var self = this;
