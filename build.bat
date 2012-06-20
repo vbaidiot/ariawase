@@ -1,2 +1,2 @@
 cd %~dp0
-cscript  //nologo //job:pull tsukeawase.wsf
+cscript  vbac.wsf combine
