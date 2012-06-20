@@ -1,3 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<package>
+<comment>vbac is not VBA compiler. Instead, this tiny script frees VBA code from binary files.</comment>
+<job id="">
+<?job error="true" debug="false" ?>
+<runtime>
+<description></description>
+<example></example>
+</runtime>
+<resource id="HelpMessage">
+vbac
+
+Usage:
+  cscript vbac.wsf [combine|decombine|clear|help]
+
+Command:
+  combine     Import all VBComponents.
+  decombine   Export all VBComponents.
+  clear       Remove all VBComponents.
+  help        Display this help message.
+</resource>
+<script language="JScript">
+<![CDATA[
+
 // XlFileFormat
 var xlExcel9795 = 43; //.xls 97-2003 format in Excel 2003 or prev
 var xlExcel8    = 56; //.xls 97-2003 format in Excel 2007
@@ -33,6 +57,10 @@ var args = (function () {
     for (var i = 0; i < a.length; i++) a[i] = WScript.Arguments.item(i);
     return a;
 }());
+
+var getResource = function(str) {
+    return scriptlet.getResource(str).replace(/^\s+|\s+$/g, "");
+};
 
 var println = function(str) {
     WScript.Echo(str);
@@ -436,18 +464,21 @@ var Command = function(helper) {
     this.helper = helper;
 };
 Command.prototype.helper = null;
+Command.prototype.help = function() {
+    println(getResource('HelpMessage'));
+};
 Command.prototype.combine = function() {
     this.helper.combineImpl(
-        "combine", conf.src, conf.bin,
+        'combine', conf.src, conf.bin,
         function() { return conf.getSrcs(); });
 };
 Command.prototype.decombine = function() {
     this.helper.combineImpl(
-        "decombine", conf.bin, conf.src,
+        'decombine', conf.bin, conf.src,
         function() { return conf.getBins(); });
 };
 Command.prototype.clear = function clear() {
-    var prop = "clear", getPaths = function() { return conf.getBins(); };
+    var prop = 'clear', getPaths = function() { return conf.getBins(); };
     var self = this;
     this.helper.iterTarget(getPaths, function(path) {
         self.helper.createOffice(path)[prop](path);
@@ -493,17 +524,26 @@ CommandHelper.prototype.getCommand = function(prop) {
 };
 
 function main(args) {
-    var prop = args.shift();
+    var prop = (args.length > 0) ? args.shift() : 'help';
     var cmd  = new CommandHelper().getCommand(prop);
     if (cmd == undefined) {
         println("command '" + prop + "' is undefined.");
         return;
     }
     
-    println("begin " + prop + "\n");
-    cmd();
-    println("end");
+    if (prop == 'help') {
+        cmd();
+    }
+    else {
+        println("begin " + prop + "\n");
+        cmd();
+        println("end");
+    }
 }
 
 main(args);
 
+]]>
+</script>
+</job>
+</package>
