@@ -105,6 +105,9 @@ Office.prototype.isDirectiveOnly = function(codeModule) {
     }
     return true;
 };
+Office.prototype.isValidFileName = function(fname) {
+    return fname.match(/[\\/:\*\?"<>\|]/) == null;
+};
 Office.prototype.combine   = function() { /* blank */ };
 Office.prototype.decombine = function() { /* blank */ };
 Office.prototype.clear     = function() { /* blank */ };
@@ -413,17 +416,23 @@ Access.prototype.exportSource = function(acProj, expdir) {
     var compos = acApp.VBE.ActiveVBProject.VBComponents;
     var self   = this;
     this.iterAllObjects(acProj, function(obj) {
+        var bname = obj.Name;
+        if (!self.isValidFileName(bname)) {
+            println("! Warning: skip export. object '" + bname + "' is invalid file name");
+            return false;
+        }
+        
         var xname = self.typeExtensionTable[obj.Type.toString()];
         if (obj.Type == acModule) {
-            switch (compos.item(obj.Name).Type) {
+            switch (compos.item(bname).Type) {
             case vbext_ct_StdModule:   xname = 'bas'; break;
             case vbext_ct_ClassModule: xname = 'cls'; break;
             default: break;
             }
         }
         
-        var fname = obj.Name + "." + xname;
-        acApp.SaveAsText(obj.Type, obj.Name, fso.BuildPath(expdir, fname));
+        var fname = bname + "." + xname;
+        acApp.SaveAsText(obj.Type, bname, fso.BuildPath(expdir, fname));
         println("- Export: " + fname);
     });
 };
