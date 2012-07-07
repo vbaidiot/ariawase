@@ -93,6 +93,61 @@ Config.prototype.getSrcs = function() { return fso.GetFolder(this.src).SubFolder
 
 var conf = new Config();
 
+var VBAProjFile = function(vbproj, srcdir) {
+    this.vbproj = vbproj;
+    this.path   = fso.BuildPath(srcdir, 'App.vbaproj');
+};
+VBAProjFile.prototype.propName = {
+    'Name': 1, 'Description': 1, 'HelpFile': 1, 'HelpContextID': 1
+};
+VBAProjFile.prototype.write = function() {
+    var fl = fso.OpenTextFile(this.path, 2, true);
+    
+    fl.WriteLine('[General]');
+    for (var prop in this.propName)
+        fl.WriteLine(prop + "=" + this.vbproj[prop]);
+    
+    fl.WriteLine('[Reference]');
+    foreachEnum(this.vbproj.References, function(ref) {
+        if (ref.BuiltIn) return false;
+        fl.WriteLine(ref.GUID + " " + ref.Major + " " + ref.Minor);
+    });
+    
+    fl.Close();
+};
+VBAProjFile.prototype.read = function() {
+    if (!fso.FileExists(this.path)) return;
+    
+    var fl = fso.OpenTextFile(this.path, 1);
+    var line = "";
+    while (!fl.AtEndOfStream) {
+        while (!fl.AtEndOfStream && (line.match(/^\[.*\]$/) == null))
+            line = fl.ReadLine();
+        
+        var section = line;
+        switch (section) {
+        case '[General]':
+            line = fl.ReadLine();
+            while (!fl.AtEndOfStream && (line.match(/^\[.*\]$/) == null)) {
+                var keyval = line.split("=");
+                this.vbproj[keyval[0]] = keyval[1];
+                line = fl.ReadLine();
+            }
+            break;
+        case '[Reference]':
+            line = fl.ReadLine();
+            while (!fl.AtEndOfStream && (line.match(/^\[.*\]$/) == null)) {
+                var refinf = line.split(" ");
+                this.vbproj.References.AddFromGuid(refinf[0], refinf[1], refinf[2]);
+                line = fl.ReadLine();
+            }
+            break;
+        default:
+            break;
+        }
+    }
+};
+
 var Office = function() {};
 Office.prototype.isDirectiveOnly = function(codeModule) {
     var ml = codeModule.CountOfLines;
@@ -107,6 +162,10 @@ Office.prototype.isDirectiveOnly = function(codeModule) {
 };
 Office.prototype.isValidFileName = function(fname) {
     return fname.match(/[\\/:\*\?"<>\|]/) == null;
+};
+Office.prototype.importVBAProj = function(impdir, vbproj) {
+};
+Office.prototype.exportVBAProj = function(vbproj, expdir) {
 };
 Office.prototype.combine   = function() { /* blank */ };
 Office.prototype.decombine = function() { /* blank */ };
@@ -295,6 +354,7 @@ Excel.prototype.decombine = function(tbin, tsrc) {
     var self = this;
     this.loanOfXlBook(tbin, false, function(xlBook) {
         self.cleanupSource(tsrc);
+        self.exportVBAProj(xlBook.VBProject, tsrc);
         self.exportSource(xlBook, tsrc);
     });
     
