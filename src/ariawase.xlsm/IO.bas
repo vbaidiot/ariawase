@@ -103,10 +103,13 @@ Public Property Get Fso() As Object
     Set Fso = xxFso
 End Property
 
-Public Property Get MyDir() As String
-    Err.Raise 17 'FIXME: implement the following code.
-    '!Excel'  MyDir = ThisWorkbook.Path
-    '!Access' MyDir = CurrentProject.Path
+''' @return As String
+Public Property Get ExecPath() As String
+    Select Case Application.Name
+        Case "Microsoft Excel":  ExecPath = Application.ThisWorkbook.Path
+        Case "Microsoft Access": ExecPath = Application.CurrentProject.Path
+        Case Else: Err.Raise 17
+    End Select
 End Property
 
 ''' @return As Variant(Of Array(Of String))
@@ -227,6 +230,16 @@ Public Sub ChangeFileLineSeparator( _
     strm.SaveToFile fpath, adSaveCreateOverWrite
     strm.Close
 End Sub
+
+Public Function GetSpecialFolder(ByVal spFolder As Variant) As String
+    If IsNumeric(spFolder) Then
+        GetSpecialFolder = Fso.GetSpecialFolder(spFolder)
+    ElseIf VarType(spFolder) = vbString Then
+        GetSpecialFolder = Wsh.SpecialFolders(spFolder)
+    Else
+        Err.Raise 13
+    End If
+End Function
 
 Public Function GetTempFilePath( _
     Optional ByVal tdir As String, Optional extName As String = ".tmp" _
