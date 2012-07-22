@@ -8,7 +8,7 @@
 <example></example>
 </runtime>
 <resource id="HelpMessage">
-vbac (version 2.0)
+vbac (version 0.3)
 
 Usage:
   cscript vbac.wsf [combine|decombine|clear|help]
