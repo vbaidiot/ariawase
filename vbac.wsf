@@ -54,6 +54,10 @@ var acReport = 3;
 var acMacro  = 4;
 var acModule = 5;
 
+var forReading   = 1;
+var forWriting   = 2;
+var forAppending = 8;
+
 var fso = WScript.CreateObject("Scripting.FileSystemObject");
 
 var scriptPath = WScript.ScriptFullName;
@@ -103,55 +107,71 @@ var VBAProjFile = function(vbproj, srcdir) {
     this.vbproj = vbproj;
     this.path   = fso.BuildPath(srcdir, 'App.vbaproj');
 };
-VBAProjFile.prototype.propName = {
+VBAProjFile.prototype.projPropName = {
     'Name': 1, 'Description': 1, 'HelpFile': 1, 'HelpContextID': 1
 };
-VBAProjFile.prototype.write = function() {
-    var fl = fso.OpenTextFile(this.path, 2, true);
-    
-    fl.WriteLine('[General]');
-    for (var prop in this.propName)
-        fl.WriteLine(prop + "=" + this.vbproj[prop]);
-    
-    fl.WriteLine('[Reference]');
+VBAProjFile.prototype.removeAllRefs = function() {
+    var self = this;
     foreachEnum(this.vbproj.References, function(ref) {
         if (ref.BuiltIn) return false;
-        fl.WriteLine(ref.GUID + " " + ref.Major + " " + ref.Minor);
+        self.vbproj.References.Remove(ref);
     });
-    
-    fl.Close();
 };
 VBAProjFile.prototype.read = function() {
+    var isSection = function(line) { return line.match(/^\[.*\]$/) != null; };
+    var getParam  = function(line) {
+        var i = line.indexOf('=');
+        return (i > -1) ? { key: line.substring(0, i), val: line.substring(i+1) } : null;
+    };
+    
     if (!fso.FileExists(this.path)) return;
     
-    var fl = fso.OpenTextFile(this.path, 1);
-    var line = "";
+    var fl = fso.OpenTextFile(this.path, forReading);
     while (!fl.AtEndOfStream) {
-        while (!fl.AtEndOfStream && (line.match(/^\[.*\]$/) == null))
-            line = fl.ReadLine();
-        
+        var line    = fl.ReadLine();
         var section = line;
+        
         switch (section) {
         case '[General]':
-            line = fl.ReadLine();
-            while (!fl.AtEndOfStream && (line.match(/^\[.*\]$/) == null)) {
-                var keyval = line.split("=");
-                this.vbproj[keyval[0]] = keyval[1];
+            while (!fl.AtEndOfStream) {
                 line = fl.ReadLine();
+                if (isSection(line)) break;
+                
+                var p = getParam(line);
+                this.vbproj[p.key] = p.val;
             }
             break;
         case '[Reference]':
-            line = fl.ReadLine();
-            while (!fl.AtEndOfStream && (line.match(/^\[.*\]$/) == null)) {
-                var refinf = line.split(" ");
-                this.vbproj.References.AddFromGuid(refinf[0], refinf[1], refinf[2]);
+            this.removeAllRefs();
+            
+            while (!fl.AtEndOfStream) {
                 line = fl.ReadLine();
+                if (isSection(line)) break;
+                
+                var p = getParam(line);
+                var refinf = p.key.split(" ");
+                this.vbproj.References.AddFromGuid(refinf[0], refinf[1], refinf[2]);
             }
             break;
         default:
             break;
         }
     }
+};
+VBAProjFile.prototype.write = function() {
+    var fl = fso.OpenTextFile(this.path, forWriting, true);
+    
+    fl.WriteLine('[General]');
+    for (var prop in this.projPropName)
+        fl.WriteLine(prop + "=" + this.vbproj[prop]);
+    
+    fl.WriteLine('[Reference]');
+    foreachEnum(this.vbproj.References, function(ref) {
+        if (ref.BuiltIn) return false;
+        fl.WriteLine(ref.GUID + " " + ref.Major + " " + ref.Minor + "=" + ref.Description);
+    });
+    
+    fl.Close();
 };
 
 var Office = function() {};
@@ -261,6 +281,9 @@ Office.prototype.importSource = function(impdir, ofDoc) {
         if (xname == 'frm') println("- Import: " + bname + ".frx");
     });
 };
+Office.prototype.importProject = function(impdir, vbproj) {
+    new VBAProjFile(vbproj, impdir).read();
+};
 Office.prototype.exportSource = function(ofDoc, expdir) {
     var self = this;
     foreachEnum(ofDoc.VBProject.VBComponents, function(compo) {
@@ -275,12 +298,16 @@ Office.prototype.exportSource = function(ofDoc, expdir) {
         if (xname == 'frm') println("- Export: " + bname + ".frx");
     });
 };
+Office.prototype.exportProject = function(vbproj, expdir) {
+    new VBAProjFile(vbproj, expdir).write();
+};
 Office.prototype.combine = function(tsrc, tbin) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
     this.loanOfOfficeDocument(tbin, true, function(ofDoc) {
         self.cleanupBinary(ofDoc);
+        self.importProject(tsrc, ofDoc.VBProject);
         self.importSource(tsrc, ofDoc);
         ofDoc.Save();
     });
@@ -293,6 +320,7 @@ Office.prototype.decombine = function(tbin, tsrc) {
     var self = this;
     this.loanOfOfficeDocument(tbin, false, function(ofDoc) {
         self.cleanupSource(tsrc);
+        self.exportProject(ofDoc.VBProject, tsrc);
         self.exportSource(ofDoc, tsrc);
     });
     
@@ -619,6 +647,7 @@ Access.prototype.combine = function(tsrc, tbin) {
     var self = this;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupBinary(acProj);
+        self.importProject(tsrc, acProj);
         self.importSource(tsrc, acProj);
     });
     
@@ -630,6 +659,7 @@ Access.prototype.decombine = function(tbin, tsrc) {
     var self = this;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupSource(tsrc);
+        self.exportProject(acProj, tsrc);
         self.exportSource(acProj, tsrc);
     });
     
