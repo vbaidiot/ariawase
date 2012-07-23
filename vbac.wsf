@@ -543,6 +543,7 @@ Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
             this.createOpenFile(acApp, path);
         else
             acApp.OpenCurrentDatabase(path);
+        acApp.DoCmd.Close(); // for StartUpForm
         
         ret = callback(acApp.CurrentProject);
     } finally { if (acApp.CurrentDB() != null) acApp.CurrentDB().Close(); }
