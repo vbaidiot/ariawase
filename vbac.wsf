@@ -104,8 +104,9 @@ Config.prototype.getSrcs = function() { return fso.GetFolder(this.src).SubFolder
 var conf = new Config();
 
 var VBAProjFile = function(vbproj, srcdir) {
-    this.vbproj = vbproj;
-    this.path   = fso.BuildPath(srcdir, 'App.vbaproj');
+    this.vbproj   = vbproj;
+    this.fileName = 'App.vbaproj';
+    this.path     = fso.BuildPath(srcdir, this.fileName);
 };
 VBAProjFile.prototype.projPropName = {
     'Name': 1, 'Description': 1, 'HelpFile': 1, 'HelpContextID': 1
@@ -282,7 +283,9 @@ Office.prototype.importSource = function(impdir, ofDoc) {
     });
 };
 Office.prototype.importProject = function(impdir, vbproj) {
-    new VBAProjFile(vbproj, impdir).read();
+    var proj = new VBAProjFile(vbproj, impdir);
+    proj.read();
+    println("- Import: " + proj.fileName);
 };
 Office.prototype.exportSource = function(ofDoc, expdir) {
     var self = this;
@@ -299,7 +302,9 @@ Office.prototype.exportSource = function(ofDoc, expdir) {
     });
 };
 Office.prototype.exportProject = function(vbproj, expdir) {
-    new VBAProjFile(vbproj, expdir).write();
+    var proj = new VBAProjFile(vbproj, expdir)
+    proj.write();
+    println("- Export: " + proj.fileName);
 };
 Office.prototype.combine = function(tsrc, tbin) {
     println("> Target: " + fso.GetFileName(tbin));
@@ -543,7 +548,8 @@ Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
             this.createOpenFile(acApp, path);
         else
             acApp.OpenCurrentDatabase(path);
-        acApp.DoCmd.Close(); // for StartUpForm
+        
+        acApp.DoCmd.Close(acForm, acApp.CurrentDb().Properties("StartUpForm").Value);
         
         ret = callback(acApp.CurrentProject);
     } finally { if (acApp.CurrentDB() != null) acApp.CurrentDB().Close(); }
@@ -648,7 +654,7 @@ Access.prototype.combine = function(tsrc, tbin) {
     var self = this;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupBinary(acProj);
-        self.importProject(tsrc, acProj);
+        self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject);
         self.importSource(tsrc, acProj);
     });
     
@@ -660,7 +666,7 @@ Access.prototype.decombine = function(tbin, tsrc) {
     var self = this;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupSource(tsrc);
-        self.exportProject(acProj, tsrc);
+        self.exportProject(acProj.Application.VBE.ActiveVBProject, tsrc);
         self.exportSource(acProj, tsrc);
     });
     
