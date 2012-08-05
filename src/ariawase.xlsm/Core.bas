@@ -2,6 +2,24 @@ Attribute VB_Name = "Core"
 Option Explicit
 Option Private Module
 
+Public Property Get Missing() As Variant
+    Missing = GetMissing()
+End Property
+
+Private Function GetMissing(Optional ByVal mss As Variant) As Variant
+    GetMissing = mss
+End Function
+
+Public Function ToStr(ByVal x As Variant) As String
+    If IsObject(x) Then
+        On Error Resume Next
+        ToStr = TypeName(x)
+        ToStr = x.ToStr()
+    Else
+        ToStr = x
+    End If
+End Function
+
 ''' @usage
 '''     Init(New Tuple2, "A", 4) 'Tuple2 { Item1 = "A", Item2 = 4 }
 ''' @param obj As Object Is T
@@ -176,21 +194,24 @@ End Function
 '''     ArrIndexOf(Array("I", "I", "f"), "f", 1, 9) ' 2
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param val As Variant(Of T)
-''' @param ixStart As Variant(Of Empty Or Long)
-''' @param cnt As Long
+''' @param ixStart As Variant(Of Long)
+''' @param cnt As Variant(Of Long)
 ''' @return As Long
 Public Function ArrIndexOf( _
     ByVal arr As Variant, ByVal val As Variant, _
-    Optional ByVal ixStart As Variant = Empty, Optional ByVal cnt As Long = -1 _
+    Optional ByVal ixStart As Variant, Optional ByVal cnt As Variant _
     ) As Long
     
     If Not IsArray(arr) Then Err.Raise 13
     
-    Dim ix0 As Long: ix0 = LBound(arr)
-    If IsEmpty(ixStart) Then ixStart = ix0
+    Dim ix0 As Long:  ix0 = LBound(arr)
+    Dim alen As Long: alen = ArrLen(arr)
+    If IsMissing(ixStart) Then ixStart = ix0
     If IsNumeric(ixStart) Then ixStart = CLng(ixStart) Else Err.Raise 13
     If ixStart < ix0 Then Err.Raise 5
-    If cnt < 0 Then cnt = ArrLen(arr) Else cnt = Min(cnt, ArrLen(arr))
+    If IsMissing(cnt) Then cnt = alen
+    If IsNumeric(cnt) Then cnt = CLng(cnt) Else Err.Raise 13
+    cnt = Min(cnt, alen)
     
     ArrIndexOf = ixStart - 1
     
@@ -206,6 +227,55 @@ Escape:
 End Function
 
 ''' @usage
+'''     ArrConcat(Array(1, 2, 3), Array(4, 5)) ' Array(1, 2, 3, 4, 5)
+''' @param arr1 As Variant(Of Array(Of T))
+''' @param arr2 As Variant(Of Array(Of T))
+''' @return As Variant(Of Array(Of T))
+Public Function ArrConcat(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
+    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
+    
+    Dim lb2 As Long: lb2 = LBound(arr2)
+    Dim ub2 As Long: ub2 = UBound(arr2)
+    Dim alen2 As Long: alen2 = ub2 - lb2 + 1
+    If alen2 < 1 Then GoTo Ending
+    
+    Dim isObj2 As Boolean: isObj2 = IsObject(arr2(lb2))
+    
+    Dim lb1 As Long: lb1 = LBound(arr1)
+    Dim ub1 As Long: ub1 = UBound(arr1)
+    Dim alen1 As Long: alen1 = ub1 - lb1 + 1
+    If alen1 > 0 Then If IsObject(arr1(lb1)) <> isObj2 Then Err.Raise 13
+    
+    ReDim Preserve arr1(lb1 To ub1 + alen2)
+    
+    Dim i As Integer
+    If isObj2 Then
+        For i = 0 To alen2 - 1: Set arr1(ub1 + 1 + i) = arr2(lb2 + i): Next
+    Else
+        For i = 0 To alen2 - 1: Let arr1(ub1 + 1 + i) = arr2(lb2 + i): Next
+    End If
+    
+Ending:
+    ArrConcat = arr1
+End Function
+
+''' @usage
+'''     ArrFlatten(Array(Array(1, 2), Array(3), Array(4, 5))) ' Array(1, 2, 3, 4, 5)
+''' @param jagArray As Variant(Of Array(Of Array(Of T)))
+''' @return As Variant(Of Array(Of T))
+Public Function ArrFlatten(ByVal jagArr As Variant) As Variant
+    If Not IsArray(jagArr) Then Err.Raise 13
+    Dim ret As Variant: ret = Array()
+    If ArrLen(jagArr) < 1 Then GoTo Ending
+    
+    Dim arr As Variant
+    For Each arr In jagArr: ret = ArrConcat(ret, arr): Next
+    
+Ending:
+    ArrFlatten = ret
+End Function
+
+''' @usage
 '''     Dim arr As Variant: arr = Array("S", "O", "R", "T")
 '''     ArrSort arr
 '''     arr 'Array("O", "R", "S", "T")
@@ -216,19 +286,20 @@ Public Sub ArrSort(ByRef arr As Variant)
     
     Dim ix0 As Long: ix0 = LBound(arr)
     If IsObject(arr(ix0)) Then
-        ObjArrSort arr, ix0
+        ObjArrMSort arr, ix0
     Else
-        ValArrSort arr, ix0
+        ValArrMSort arr, ix0
     End If
     
 Escape:
 End Sub
-Private Sub ObjArrSort(arr As Variant, lb As Long)
+Private Sub ObjArrMSort(arr As Variant, lb As Long)
     Dim alen As Long: alen = ArrLen(arr)
     If alen <= 1 Then GoTo Escape
     
+    '' optimization
     If alen <= 8 Then
-        ObjArrSortI arr, lb
+        ObjArrISort arr, lb
         GoTo Escape
     End If
     
@@ -239,12 +310,12 @@ Private Sub ObjArrSort(arr As Variant, lb As Long)
     Dim ub1 As Long:   ub1 = lb + l1 - 1
     Dim a1 As Variant: ReDim a1(lb To ub1)
     For i = lb To ub1: Set a1(i) = arr(i): Next
-    ObjArrSort a1, lb
+    ObjArrMSort a1, lb
     
     Dim ub2 As Long:   ub2 = lb + l2 - 1
     Dim a2 As Variant: ReDim a2(lb To ub2)
     For i = lb To ub2: Set a2(i) = arr(l1 + i): Next
-    ObjArrSort a2, lb
+    ObjArrMSort a2, lb
     
     Dim i1 As Long: i1 = lb
     Dim i2 As Long: i2 = lb
@@ -258,12 +329,13 @@ Private Sub ObjArrSort(arr As Variant, lb As Long)
     
 Escape:
 End Sub
-Private Sub ValArrSort(arr As Variant, lb As Long)
+Private Sub ValArrMSort(arr As Variant, lb As Long)
     Dim alen As Long: alen = ArrLen(arr)
     If alen <= 1 Then GoTo Escape
     
+    '' optimization
     If alen <= 8 Then
-        ValArrSortI arr, lb
+        ValArrISort arr, lb
         GoTo Escape
     End If
     
@@ -274,12 +346,12 @@ Private Sub ValArrSort(arr As Variant, lb As Long)
     Dim ub1 As Long:   ub1 = lb + l1 - 1
     Dim a1 As Variant: ReDim a1(lb To ub1)
     For i = lb To ub1: Let a1(i) = arr(i): Next
-    ValArrSort a1, lb
+    ValArrMSort a1, lb
     
     Dim ub2 As Long:   ub2 = lb + l2 - 1
     Dim a2 As Variant: ReDim a2(lb To ub2)
     For i = lb To ub2: Let a2(i) = arr(l1 + i): Next
-    ValArrSort a2, lb
+    ValArrMSort a2, lb
     
     Dim i1 As Long: i1 = lb
     Dim i2 As Long: i2 = lb
@@ -293,7 +365,7 @@ Private Sub ValArrSort(arr As Variant, lb As Long)
     
 Escape:
 End Sub
-Private Sub ObjArrSortI(arr As Variant, lb As Long)
+Private Sub ObjArrISort(arr As Variant, lb As Long)
     Dim i As Long, j As Long, x As Variant
     For i = lb + 1 To UBound(arr)
         j = i
@@ -304,7 +376,7 @@ Private Sub ObjArrSortI(arr As Variant, lb As Long)
         Loop
     Next
 End Sub
-Private Sub ValArrSortI(arr As Variant, lb As Long)
+Private Sub ValArrISort(arr As Variant, lb As Long)
     Dim i As Long, j As Long, x As Variant
     For i = lb + 1 To UBound(arr)
         j = i
@@ -328,6 +400,7 @@ End Function
 ''' @usage
 '''     ArrUniq(Array(6, 5, 5, 3, 6)) ' Array(6, 5, 3)
 ''' @param arr As Variant(Of Array(Of T))
+''' @return As Variant(Of Array(Of T))
 Public Function ArrUniq(ByVal arr As Variant) As Variant
     If Not IsArray(arr) Then Err.Raise 13
     Dim ret As Variant: ret = Array()
@@ -338,8 +411,7 @@ Public Function ArrUniq(ByVal arr As Variant) As Variant
     ReDim ret(lbA To ubA)
     
     Dim ixA As Long, ixR As Long: ixR = lbA
-    Dim isObj As Boolean: isObj = IsObject(arr(lbA))
-    If isObj Then
+    If IsObject(arr(lbA)) Then
         For ixA = lbA To ubA
             If ArrIndexOf(ret, arr(ixA), lbA, ixR - lbA) < lbA Then
                 Set ret(ixR) = arr(ixA)
@@ -362,6 +434,27 @@ Ending:
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
+''' @param f As Func
+''' @return As Variant(Of Array(Of T))
+Public Function ArrMap(ByVal arr As Variant, ByVal f As Func) As Variant
+    If Not IsArray(arr) Then Err.Raise 13
+    Dim i As Long
+    For i = LBound(arr) To UBound(arr): f.Apply Array(arr(i)), arr(i): Next
+    ArrMap = arr
+End Function
+
+''' @param arr As Variant(Of Array(Of T))
+''' @param f As Func
+''' @param x As Variant(Of U)
+''' @return As Variant(Of U)
+Public Function ArrFold(ByVal arr As Variant, ByVal f As Func, ByVal x As Variant) As Variant
+    If Not IsArray(arr) Then Err.Raise 13
+    Dim i As Long
+    For i = LBound(arr) To UBound(arr): f.Apply Array(x, arr(i)), x: Next
+    If IsObject(x) Then Set ArrFold = x Else Let ArrFold = x
+End Function
+
+''' @param arr As Variant(Of Array(Of T))
 ''' @return As Collection(Of T)
 Public Function ArrToClct(ByVal arr As Variant) As Collection
     If Not IsArray(arr) Then Err.Raise 13
@@ -370,13 +463,13 @@ Public Function ArrToClct(ByVal arr As Variant) As Collection
     For Each v In arr: ArrToClct.Add v: Next
 End Function
 
-''' @param clct As As Collection(Of T)
+''' @param clct As Collection(Of T)
 ''' @param val As Variant(Of T)
 Public Sub Push(ByVal clct As Collection, ByVal val As Variant)
     clct.Add val
 End Sub
 
-''' @param clct As As Collection(Of T)
+''' @param clct As Collection(Of T)
 ''' @return As Variant(Of T)
 Public Function Pop(ByVal clct As Collection) As Variant
     Dim i As Long: i = clct.Count
@@ -384,7 +477,7 @@ Public Function Pop(ByVal clct As Collection) As Variant
     clct.Remove i
 End Function
 
-''' @param clct As As Collection(Of T)
+''' @param clct As Collection(Of T)
 ''' @param val As Variant(Of T)
 Public Sub Shift(ByVal clct As Collection, ByVal val As Variant)
     If clct.Count < 1 Then
@@ -394,7 +487,7 @@ Public Sub Shift(ByVal clct As Collection, ByVal val As Variant)
     End If
 End Sub
 
-''' @param clct As As Collection(Of T)
+''' @param clct As Collection(Of T)
 ''' @return As Variant(Of T)
 Public Function Unshift(ByVal clct As Collection) As Variant
     Dim i As Long: i = 1
@@ -544,6 +637,22 @@ Ending:
     DictToAssocArr = arr
 End Function
 
+''' @usage
+'''     BitFlag(False, True)                '1
+'''     BitFlag(True, False, False, False)  '8
+'''     BitFlag(1, 0, 0, 0)                 '8
+''' @param flgs() As Variant(Of Boolean)
+''' @return As Long
+Public Function BitFlag(ParamArray flgs() As Variant) As Long
+    BitFlag = 0
+    Dim ub As Integer: ub = UBound(flgs)
+    
+    Dim i As Integer
+    For i = 0 To ub
+        BitFlag = BitFlag + IIf(flgs(i), 1, 0) * 2 ^ (ub - i)
+    Next
+End Function
+
 Public Function ARound( _
     ByVal num As Variant, Optional ByVal digits As Integer = 0, Optional rndup As Integer = 5 _
     ) As Variant
@@ -577,6 +686,10 @@ End Function
 Public Function EndOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
     EndOfWeek = DateAdd("d", 7 - Weekday(dt, fstDayOfWeek), dt)
 End Function
+
+'''
+''' following functions for japanese only.
+'''
 
 ''' @param str As String Is Char
 ''' @return As Integer

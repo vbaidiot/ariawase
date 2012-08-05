@@ -1,4 +1,4 @@
-Attribute VB_Name = "CdoResg"
+Attribute VB_Name = "Resx"
 Option Explicit
 Option Private Module
 

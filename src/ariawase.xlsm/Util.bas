@@ -2,6 +2,7 @@ Attribute VB_Name = "Util"
 Option Explicit
 Option Private Module
 
+''' @seealso WScript.Shell http://msdn.microsoft.com/ja-jp/library/cc364436.aspx
 ''' @seealso WbemScripting.SWbemLocator http://msdn.microsoft.com/en-us/library/windows/desktop/aa393719.aspx
 ''' @seealso VBScript.RegExp http://msdn.microsoft.com/ja-jp/library/cc392403.aspx
 
@@ -15,7 +16,14 @@ Public Enum HKeyEnum
     'HKEY_DYN_DATA = &H80000006
 End Enum
 
+Private xxWsh As Object 'Is WScript.Shell
 Private xxWmi As Object 'Is WbemScripting.SWbemLocator
+
+'@return As Object Is WScript.Shell
+Public Property Get Wsh() As Object
+    If xxWsh Is Nothing Then Set xxWsh = CreateObject("WScript.Shell")
+    Set Wsh = xxWsh
+End Property
 
 '@return As Object Is WbemScripting.SWbemLocator
 Public Property Get Wmi() As Object
@@ -122,13 +130,39 @@ End Function
 ''' @param vals() As Variant
 ''' @return As String
 Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Variant) As String
-    Dim ms As Variant: ms = RegExpGMatchs(strTemplate, "[^{]?({(\d)(:(.*?[^}]?))?})")
-    Formats = Replace(Replace(strTemplate, "{{", "{"), "}}", "}")
+    Dim re As Object: Set re = CreateRegExp("(?:[^\{])?(\{(\d+)(:(.*?[^\}]?))?\})", "g")
+    Dim ms As Object: Set ms = re.Execute(strTemplate)
     
-    Dim m As Variant
+    Dim ret As Variant: ret = Array()
+    If ms.Count < 1 Then GoTo Ending
+    
+    ReDim ret(2 * ms.Count)
+    Dim ix0 As Long: ix0 = 1
+    Dim ix1 As Long: ix1 = 1
+    
+    Dim i As Long: i = 0
+    Dim m As Object, s As String
     For Each m In ms
-        Formats = Replace(Formats, m(1), Format(vals(m(2)), m(4)))
+        ix1 = m.FirstIndex + IIf(Left(m.Value, 1) <> "{", 1, 0)
+        s = Mid(strTemplate, ix0, ix1 - ix0 + 1)
+        Dim mbrc As Variant: mbrc = RegExpMatch(s, "{+$")
+        Dim brcs As String:  If ArrLen(mbrc) > 0 Then brcs = mbrc(0) Else brcs = ""
+        
+        ret(i + 0) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
+        If Len(brcs) Mod 2 = 0 Then
+            ret(i + 1) = vals(m.SubMatches(1))
+        Else
+            ret(i + 1) = m.SubMatches(1)
+        End If
+        
+        i = i + 2
+        ix0 = ix1 + Len(m.SubMatches(0)) + 1
     Next
+    s = Mid(strTemplate, ix0)
+    ret(i) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
+    
+Ending:
+    Formats = Join(ret, "")
 End Function
 
 ''' @param vbsExpr As String

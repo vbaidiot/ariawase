@@ -37,3 +37,7 @@ Public Function Compare(ByVal tpl As Tuple2) As Integer
     Compare = Core.Compare(xxItem1, tpl.Item1)
     If Compare = 0 Then Compare = Core.Compare(xxItem2, tpl.Item2)
 End Function
+
+Public Function ToStr() As String
+    ToStr = "Tuple2 { Item1 = " & Core.ToStr(xxItem1) & ", Item2 = " & Core.ToStr(xxItem2) & " }"
+End Function

@@ -9,14 +9,14 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-''' seealso http://msdn.microsoft.com/en-us/library/ms526266.aspx
+''' @seealso http://msdn.microsoft.com/en-us/library/ms526266.aspx
 
 Private Enum CdoSendUsing
     cdoSendUsingPickup = 1
     cdoSendUsingPort = 2
 End Enum
 
-''' seealso http://msdn.microsoft.com/en-us/library/ms872853.aspx
+''' @seealso http://msdn.microsoft.com/en-us/library/ms872853.aspx
 Private Const uriCdoConf As String = "http://schemas.microsoft.com/cdo/configuration/"
 Private Const cdoSendUsingMethod  As String = uriCdoConf & "sendusing"
 Private Const cdoSMTPServer       As String = uriCdoConf & "smtpserver"
