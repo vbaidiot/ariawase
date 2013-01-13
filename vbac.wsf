@@ -27,6 +27,12 @@ Command:
 //   Excel  - http://msdn.microsoft.com/en-us/library/office/ff838815.aspx
 //   Access - http://msdn.microsoft.com/en-us/library/office/jj713155.aspx
 
+// WdSaveFormat
+var wdFormatDocument97 = 0 //.doc
+var wdFormatTemplate97 = 1 //.dot
+var wdFormatXMLDocumentMacroEnabled = 13 //.docm
+var wdFormatXMLTemplateMacroEnabled = 15 //.dotm
+
 // XlFileFormat
 var xlExcel9795 = 43; //.xls 97-2003 format in Excel 2003 or prev
 var xlExcel8    = 56; //.xls 97-2003 format in Excel 2007
@@ -36,18 +42,6 @@ var xlOpenXMLWorkbookMacroEnabled = 52; //.xlsm
 var acNewDatabaseFormatAccess2000 =  9; //.mdb
 var acNewDatabaseFormatAccess2002 = 10; //.mdb
 var acNewDatabaseFormatAccess2007 = 12; //.accdb
-
-// vbext_ct_* (ref: http://msdn.microsoft.com/en-us/library/office/gg264162.aspx)
-var vbext_ct_StdModule   = 1;
-var vbext_ct_ClassModule = 2;
-var vbext_ct_MSForm      = 3;
-var vbext_ct_Document    = 100;
-
-// WdSaveFormat
-var wdFormatDocument97 = 0 //.doc
-var wdFormatTemplate97 = 1 //.dot
-var wdFormatXMLDocumentMacroEnabled = 13 //.docm
-var wdFormatXMLTemplateMacroEnabled = 15 //.dotm
 
 // AcSysCmdAction
 var acSysCmdAccessVer = 7;
@@ -60,12 +54,18 @@ var acReport = 3;
 var acMacro  = 4;
 var acModule = 5;
 
-var forReading   = 1;
-var forWriting   = 2;
-var forAppending = 8;
+// vbext_ct_* (ref: http://msdn.microsoft.com/en-us/library/office/gg264162.aspx)
+var vbext_ct_StdModule   = 1;
+var vbext_ct_ClassModule = 2;
+var vbext_ct_MSForm      = 3;
+var vbext_ct_Document    = 100;
 
 // FileSystemObject (ref: http://msdn.microsoft.com/en-us/library/hww8txat%28v=vs.84%29.aspx)
 var fso = WScript.CreateObject("Scripting.FileSystemObject");
+
+var forReading   = 1;
+var forWriting   = 2;
+var forAppending = 8;
 
 var scriptPath = WScript.ScriptFullName;
 
