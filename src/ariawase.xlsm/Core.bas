@@ -145,7 +145,7 @@ Public Function Min(ParamArray arr() As Variant) As Variant
 End Function
 
 ''' @usage
-'''     Min(3, 6, 5) '6
+'''     Max(3, 6, 5) '6
 ''' @param arr() As Variant(Of T)
 ''' @return As Variant(Of T)
 Public Function Max(ParamArray arr() As Variant) As Variant
