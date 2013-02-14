@@ -165,20 +165,22 @@ Ending:
     Formats = Join(ret, "")
 End Function
 
+Private Function EvalScript(ByVal expr As String, ByVal lang As String) As Variant
+    Dim doc As Object: Set doc = CreateObject("HtmlFile")
+    doc.parentWindow.execScript "document.write(" & expr & ");", lang
+    EvalScript = doc.body.innerHTML
+End Function
+
 ''' @param vbsExpr As String
 ''' @return As Variant
 Public Function EvalVBS(ByVal vbsExpr As String) As Variant
-    Dim sc As Object: Set sc = CreateObject("MSScriptControl.ScriptControl")
-    sc.Language = "VBScript"
-    EvalVBS = sc.Eval(vbsExpr)
+    EvalVBS = EvalScript(vbsExpr, "VBScript")
 End Function
 
 ''' @param jsExpr As String
 ''' @return As Variant
 Public Function EvalJS(ByVal jsExpr As String) As Variant
-    Dim sc As Object: Set sc = CreateObject("MSScriptControl.ScriptControl")
-    sc.Language = "JScript"
-    EvalJS = sc.Eval(jsExpr)
+    EvalJS = EvalScript(jsExpr, "JScript")
 End Function
 
 ''' @return As Object Is StdRegProv
