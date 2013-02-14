@@ -1,8 +1,0 @@
-[General]
-Name=VBAProject
-Description=
-HelpFile=
-HelpContextID=0
-[Reference]
-{00020430-0000-0000-C000-000000000046} 2 0=OLE Automation
-{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52} 2 5=Microsoft Office 14.0 Object Library
