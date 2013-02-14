@@ -23,13 +23,25 @@ Private Const INTERNET_FLAG_RELOAD = &H80000000
 '''@param  IN LPCTSTR ProxyName
 '''@param  IN LPCSTR  ProxyBypass
 '''@param  IN DWORD   Flags
-Private Declare Function InternetOpen Lib "wininet.dll" Alias "InternetOpenA" ( _
+#If VBA7 And Win64 Then
+Private Declare PtrSafe _
+Function InternetOpen Lib "wininet.dll" Alias "InternetOpenA" ( _
     ByVal lpAgent As String, _
     ByVal dwAccessType As Long, _
     ByVal lpProxyName As String, _
     ByVal lpProxyBypass As String, _
     ByVal dwFlags As Long _
     ) As Long
+#Else
+Private Declare _
+Function InternetOpen Lib "wininet.dll" Alias "InternetOpenA" ( _
+    ByVal lpAgent As String, _
+    ByVal dwAccessType As Long, _
+    ByVal lpProxyName As String, _
+    ByVal lpProxyBypass As String, _
+    ByVal dwFlags As Long _
+    ) As Long
+#End If
 
 '''@return HINTERNET
 '''@param  IN HINTERNET hInternet
@@ -38,7 +50,19 @@ Private Declare Function InternetOpen Lib "wininet.dll" Alias "InternetOpenA" ( 
 '''@param  IN DWORD     HeadersSize
 '''@param  IN DWORD     Flags
 '''@param  IN DWORD     Context
-Private Declare Function InternetOpenUrl Lib "wininet.dll" Alias "InternetOpenUrlA" ( _
+#If VBA7 And Win64 Then
+Private Declare PtrSafe _
+Function InternetOpenUrl Lib "wininet.dll" Alias "InternetOpenUrlA" ( _
+    ByVal hInternet As LongPtr, _
+    ByVal lpUrl As String, _
+    ByVal lpHeaders As String, _
+    ByVal dwHeadersLength As Long, _
+    ByVal dwFlags As Long, _
+    ByVal dwContext As Long _
+    ) As Long
+#Else
+Private Declare _
+Function InternetOpenUrl Lib "wininet.dll" Alias "InternetOpenUrlA" ( _
     ByVal hInternet As Long, _
     ByVal lpUrl As String, _
     ByVal lpHeaders As String, _
@@ -46,24 +70,44 @@ Private Declare Function InternetOpenUrl Lib "wininet.dll" Alias "InternetOpenUr
     ByVal dwFlags As Long, _
     ByVal dwContext As Long _
     ) As Long
+#End If
 
 '''@return BOOL
 '''@param  IN  HINTERNET hFile
 '''@param  IN  LPVOID    Buf
 '''@param  IN  DWORD     BufSize
 '''@param  OUT LPDWORD   ReadSize
-Private Declare Function InternetReadFile Lib "wininet.dll" ( _
+#If VBA7 And Win64 Then
+Private Declare PtrSafe _
+Function InternetReadFile Lib "wininet.dll" ( _
+    ByVal hFile As LongPtr, _
+    ByRef lpBuffer As Byte, _
+    ByVal dwBufSize As Long, _
+    ByRef lpReadSize As Long _
+    ) As Long
+#Else
+Private Declare _
+Function InternetReadFile Lib "wininet.dll" ( _
     ByVal hFile As Long, _
     ByRef lpBuffer As Byte, _
     ByVal dwBufSize As Long, _
     ByRef lpReadSize As Long _
     ) As Long
+#End If
 
 '''@return BOOL
 '''@param  IN HINTERNET hInternet
-Private Declare Function InternetCloseHandle Lib "wininet.dll" ( _
+#If VBA7 And Win64 Then
+Private Declare PtrSafe _
+Function InternetCloseHandle Lib "wininet.dll" ( _
+    ByVal hInternet As LongPtr _
+    ) As Long
+#Else
+Private Declare _
+Function InternetCloseHandle Lib "wininet.dll" ( _
     ByVal hInternet As Long _
     ) As Long
+#End If
 
 Private Const AGENT_NAME = "Excel VBA"
 Private Const DL_BUFFER_SIZE = 10240
