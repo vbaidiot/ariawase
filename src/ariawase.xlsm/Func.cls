@@ -69,7 +69,7 @@ Public Sub Init(ByVal addr As Long, ByVal retrunType As VbVarType, ParamArray pa
     xxParamTypes = paramTypes
 End Sub
 
-Public Sub Apply(ByRef ret As Variant, ParamArray params() As Variant)
+Public Sub Apply(ByRef returnValue As Variant, ParamArray params() As Variant)
     Dim ubParam As Long: ubParam = UBound(params)
 #If VBA7 And Win64 Then
     Dim ps() As LongPtr: ReDim ps(ubParam)
@@ -90,9 +90,15 @@ Public Sub Apply(ByRef ret As Variant, ParamArray params() As Variant)
     
     For i = 0 To UBound(ps): ps(i) = VarPtr(params(i)): Next
     
-    Dim stat As Long
+    Dim stat As Long, ret As Variant
     stat = DispCallFunc( _
         0, xxAddr, tagCALLCONV.CC_STDCALL, xxReturnType, _
         ubParam + 1, xxParamTypes(0), ps(0), ret)
     If stat <> S_OK Then Err.Raise 5
+    
+    If IsObject(ret) Then
+        Set returnValue = ret
+    Else
+        Let returnValue = ret
+    End If
 End Sub
