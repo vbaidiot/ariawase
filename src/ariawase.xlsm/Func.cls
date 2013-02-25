@@ -71,11 +71,6 @@ End Sub
 
 Public Sub Apply(ByRef returnValue As Variant, ParamArray params() As Variant)
     Dim ubParam As Long: ubParam = UBound(params)
-#If VBA7 And Win64 Then
-    Dim ps() As LongPtr: ReDim ps(ubParam)
-#Else
-    Dim ps() As Long: ReDim ps(ubParam)
-#End If
     
     Dim i As Integer
     Select Case UBound(xxParamTypes)
@@ -88,6 +83,11 @@ Public Sub Apply(ByRef returnValue As Variant, ParamArray params() As Variant)
         ' DO NOTHING
     End Select
     
+#If VBA7 And Win64 Then
+    Dim ps() As LongPtr: ReDim ps(ubParam)
+#Else
+    Dim ps() As Long: ReDim ps(ubParam)
+#End If
     For i = 0 To UBound(ps): ps(i) = VarPtr(params(i)): Next
     
     Dim stat As Long, ret As Variant
