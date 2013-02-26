@@ -51,12 +51,12 @@ End Enum
 
 Private Const S_OK = &H0
 
+Private xxReturnType As VbVarType
 #If VBA7 And Win64 Then
 Private xxAddr As LongPtr
 #Else
 Private xxAddr As Long
 #End If
-Private xxReturnType As VbVarType
 
 Private xxParamTypeBinding As Boolean
 Private xxUbParam As Long
@@ -98,9 +98,8 @@ Public Sub Init(ByVal retrunType As VbVarType, ByVal addr As LongPtr, ParamArray
 #Else
 Public Sub Init(ByVal retrunType As VbVarType, ByVal addr As Long, ParamArray paramTypes() As Variant)
 #End If
-    xxAddr = addr
     xxReturnType = retrunType
-    
+    xxAddr = addr
     EarlyBindParamTypes paramTypes
 End Sub
 
