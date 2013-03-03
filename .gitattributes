@@ -1,11 +1,12 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-*.bas   text    eol=crlf
-*.cls   text    eol=crlf
-*.frm   text    eol=crlf
-*.frx   text    eol=crlf
-*.dcm   text    eol=crlf
+*.bas       text    eol=crlf
+*.cls       text    eol=crlf
+*.frm       text    eol=crlf
+*.frx       text    eol=crlf
+*.dcm       text    eol=crlf
+*.vbaproj   text    eol=crlf
 
-*.wsf   text    eol=crlf
-*.bat   text    eol=crlf
+*.wsf       text    eol=crlf
+*.bat       text    eol=crlf
