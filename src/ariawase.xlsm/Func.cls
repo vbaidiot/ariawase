@@ -94,10 +94,15 @@ Private Sub LateBindParamTypes(ByVal params As Variant)
 End Sub
 
 #If VBA7 And Win64 Then
-Public Sub Init(ByVal retrunType As VbVarType, ByVal addr As LongPtr, ParamArray paramTypes() As Variant)
+Public Sub Init( _
+    ByVal retrunType As VbVarType, ByVal addr As LongPtr, ParamArray paramTypes() As Variant _
+    )
 #Else
-Public Sub Init(ByVal retrunType As VbVarType, ByVal addr As Long, ParamArray paramTypes() As Variant)
+Public Sub Init( _
+    ByVal retrunType As VbVarType, ByVal addr As Long, ParamArray paramTypes() As Variant _
+    )
 #End If
+    
     xxReturnType = retrunType
     xxAddr = addr
     EarlyBindParamTypes paramTypes
