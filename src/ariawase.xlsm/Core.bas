@@ -7,7 +7,28 @@ Public Property Get Missing() As Variant
 End Property
 
 Private Function GetMissing(Optional ByVal mss As Variant) As Variant
+    'If Not IsMissing(mss) Then Err.Raise 5
     GetMissing = mss
+End Function
+
+''' @usage
+'''     Dim i as Integer: i = 42
+'''     IncrPre(i)  '43
+'''     i           '43
+''' @param n As Long
+''' @return As Long
+Public Function IncrPre(ByRef n As Variant, Optional ByVal stepVal As Variant = 1) As Variant
+    n = n + stepVal: IncrPre = n
+End Function
+
+''' @usage
+'''     Dim i as Integer: i = 42
+'''     IncrPst(i)  '42
+'''     i           '43
+''' @param n As Long
+''' @return As Long
+Public Function IncrPst(ByRef n As Variant, Optional ByVal stepVal As Variant = 1) As Variant
+    IncrPst = n: n = n + stepVal
 End Function
 
 Public Function ToStr(ByVal x As Variant) As String
@@ -227,55 +248,6 @@ Escape:
 End Function
 
 ''' @usage
-'''     ArrConcat(Array(1, 2, 3), Array(4, 5)) ' Array(1, 2, 3, 4, 5)
-''' @param arr1 As Variant(Of Array(Of T))
-''' @param arr2 As Variant(Of Array(Of T))
-''' @return As Variant(Of Array(Of T))
-Public Function ArrConcat(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
-    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
-    
-    Dim lb2 As Long: lb2 = LBound(arr2)
-    Dim ub2 As Long: ub2 = UBound(arr2)
-    Dim alen2 As Long: alen2 = ub2 - lb2 + 1
-    If alen2 < 1 Then GoTo Ending
-    
-    Dim isObj2 As Boolean: isObj2 = IsObject(arr2(lb2))
-    
-    Dim lb1 As Long: lb1 = LBound(arr1)
-    Dim ub1 As Long: ub1 = UBound(arr1)
-    Dim alen1 As Long: alen1 = ub1 - lb1 + 1
-    If alen1 > 0 Then If IsObject(arr1(lb1)) <> isObj2 Then Err.Raise 13
-    
-    ReDim Preserve arr1(lb1 To ub1 + alen2)
-    
-    Dim i As Integer
-    If isObj2 Then
-        For i = 0 To alen2 - 1: Set arr1(ub1 + 1 + i) = arr2(lb2 + i): Next
-    Else
-        For i = 0 To alen2 - 1: Let arr1(ub1 + 1 + i) = arr2(lb2 + i): Next
-    End If
-    
-Ending:
-    ArrConcat = arr1
-End Function
-
-''' @usage
-'''     ArrFlatten(Array(Array(1, 2), Array(3), Array(4, 5))) ' Array(1, 2, 3, 4, 5)
-''' @param jagArray As Variant(Of Array(Of Array(Of T)))
-''' @return As Variant(Of Array(Of T))
-Public Function ArrFlatten(ByVal jagArr As Variant) As Variant
-    If Not IsArray(jagArr) Then Err.Raise 13
-    Dim ret As Variant: ret = Array()
-    If ArrLen(jagArr) < 1 Then GoTo Ending
-    
-    Dim arr As Variant
-    For Each arr In jagArr: ret = ArrConcat(ret, arr): Next
-    
-Ending:
-    ArrFlatten = ret
-End Function
-
-''' @usage
 '''     Dim arr As Variant: arr = Array("S", "O", "R", "T")
 '''     ArrSort arr
 '''     arr 'Array("O", "R", "S", "T")
@@ -321,9 +293,9 @@ Private Sub ObjArrMSort(arr As Variant, lb As Long)
     Dim i2 As Long: i2 = lb
     While i1 <= ub1 Or i2 <= ub2
         If ArrMergeSw(a1, i1, ub1, a2, i2, ub2) Then
-            Set arr(i1 + i2 - lb) = a1(i1): i1 = i1 + 1
+            Set arr(i1 + i2 - lb) = a1(IncrPst(i1))
         Else
-            Set arr(i1 + i2 - lb) = a2(i2): i2 = i2 + 1
+            Set arr(i1 + i2 - lb) = a2(IncrPst(i2))
         End If
     Wend
     
@@ -357,9 +329,9 @@ Private Sub ValArrMSort(arr As Variant, lb As Long)
     Dim i2 As Long: i2 = lb
     While i1 <= ub1 Or i2 <= ub2
         If ArrMergeSw(a1, i1, ub1, a2, i2, ub2) Then
-            Let arr(i1 + i2 - lb) = a1(i1): i1 = i1 + 1
+            Let arr(i1 + i2 - lb) = a1(IncrPst(i1))
         Else
-            Let arr(i1 + i2 - lb) = a2(i2): i2 = i2 + 1
+            Let arr(i1 + i2 - lb) = a2(IncrPst(i2))
         End If
     Wend
     
@@ -414,15 +386,13 @@ Public Function ArrUniq(ByVal arr As Variant) As Variant
     If IsObject(arr(lbA)) Then
         For ixA = lbA To ubA
             If ArrIndexOf(ret, arr(ixA), lbA, ixR - lbA) < lbA Then
-                Set ret(ixR) = arr(ixA)
-                ixR = ixR + 1
+                Set ret(IncrPst(ixR)) = arr(ixA)
             End If
         Next
     Else
         For ixA = lbA To ubA
             If ArrIndexOf(ret, arr(ixA), lbA, ixR - lbA) < lbA Then
-                Let ret(ixR) = arr(ixA)
-                ixR = ixR + 1
+                Let ret(IncrPst(ixR)) = arr(ixA)
             End If
         Next
     End If
@@ -431,6 +401,232 @@ Public Function ArrUniq(ByVal arr As Variant) As Variant
     
 Ending:
     ArrUniq = ret
+End Function
+
+''' @usage
+'''     ArrConcat(Array(1, 2, 3), Array(4, 5)) ' Array(1, 2, 3, 4, 5)
+''' @param arr1 As Variant(Of Array(Of T))
+''' @param arr2 As Variant(Of Array(Of T))
+''' @return As Variant(Of Array(Of T))
+Public Function ArrConcat(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
+    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
+    
+    Dim lb2 As Long: lb2 = LBound(arr2)
+    Dim ub2 As Long: ub2 = UBound(arr2)
+    Dim alen2 As Long: alen2 = ub2 - lb2 + 1
+    If alen2 < 1 Then GoTo Ending
+    
+    Dim isObj2 As Boolean: isObj2 = IsObject(arr2(lb2))
+    
+    Dim lb1 As Long: lb1 = LBound(arr1)
+    Dim ub1 As Long: ub1 = UBound(arr1)
+    Dim alen1 As Long: alen1 = ub1 - lb1 + 1
+    If alen1 > 0 Then If IsObject(arr1(lb1)) <> isObj2 Then Err.Raise 13
+    
+    Dim ret As Variant: ReDim ret(alen1 + alen2 - 1)
+    
+    Dim i As Integer
+    If isObj2 Then
+        For i = 0 To alen1 - 1: Set ret(i) = arr1(lb1 + i): Next
+        For i = 0 To alen2 - 1: Set ret(alen1 + i) = arr2(lb2 + i): Next
+    Else
+        For i = 0 To alen1 - 1: Let ret(i) = arr1(lb1 + i): Next
+        For i = 0 To alen2 - 1: Let ret(alen1 + i) = arr2(lb2 + i): Next
+    End If
+    
+Ending:
+    ArrConcat = ret
+End Function
+
+''' @usage
+'''     ArrFlatten(Array(Array(1, 2), Array(3), Array(4, 5))) ' Array(1, 2, 3, 4, 5)
+''' @param jagArray As Variant(Of Array(Of Array(Of T)))
+''' @return As Variant(Of Array(Of T))
+Public Function ArrFlatten(ByVal jagArr As Variant) As Variant
+    If Not IsArray(jagArr) Then Err.Raise 13
+    Dim ret As Variant: ret = Array()
+    If ArrLen(jagArr) < 1 Then GoTo Ending
+    
+    Dim arr As Variant
+    For Each arr In jagArr: ret = ArrConcat(ret, arr): Next
+    
+Ending:
+    ArrFlatten = ret
+End Function
+
+''' @usage
+'''     ArrRange(1, 9) 'Array(1, 2, 3, 4, 5, 6, 7, 8, 9)
+''' @param fromVal As Variant(Of T)
+''' @param toVal As Variant(Of T)
+''' @param stepVal As Variant(Of T)
+''' @return As Variant(Of Array(Of T))
+Public Function ArrRange( _
+    ByVal fromVal As Variant, ByVal toVal As Variant, Optional ByVal stepVal As Variant = 1 _
+    ) As Variant
+    
+    'FIXME: parameters type check
+    
+    Dim i As Long: i = 0
+    Dim alen As Long: alen = 32
+    Dim arr As Variant: ReDim arr(alen - 1)
+    
+    Select Case stepVal
+    Case Is > 0
+        Do While fromVal <= toVal
+            arr(IncrPst(i)) = IncrPst(fromVal, stepVal)
+            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+        Loop
+    Case Is < 0
+        Do While fromVal >= toVal
+            arr(IncrPst(i)) = IncrPst(fromVal, stepVal)
+            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+        Loop
+    Case Else
+        Err.Raise 5
+    End Select
+    
+    If i > 0 Then
+        ReDim Preserve arr(i - 1)
+    Else
+        arr = Array()
+    End If
+    ArrRange = arr
+End Function
+
+''' @usage
+'''     ' Function Twice(ByVal n As Integer) As Integer
+'''     ArrMap(Init(New Func, AddressOf Twice, vbInteger), ArrRange(1, 9))
+'''     ' => Array(2, 4, 6, 8, 10, 12, 14, 16, 18)
+''' @param f As Func(Of T, U)
+''' @param arr As Variant(Of Array(Of T))
+''' @return As Variant(Of Array(Of U))
+Public Function ArrMap(ByVal f As Func, ByVal arr As Variant) As Variant
+    If Not IsArray(arr) Then Err.Raise 13
+    Dim lb As Long: lb = LBound(arr)
+    Dim ub As Long: ub = UBound(arr)
+    Dim ret As Variant
+    If ub - lb < 0 Then
+        ret = Array()
+        GoTo Ending
+    End If
+    
+    ReDim ret(lb To ub)
+    
+    Dim i As Long
+    For i = lb To ub: f.FastApply ret(i), arr(i): Next
+    
+Ending:
+    ArrMap = ret
+End Function
+
+''' @usage
+'''     ' Function IsOdd(ByVal n As Integer) As Boolean
+'''     ArrFilter(Init(New Func, vbBoolean, AddressOf IsOdd), ArrRange(1, 9))
+'''     ' => Array(1, 3, 5, 7, 9)
+''' @param f As Func(Of T, Boolean)
+''' @param arr As Variant(Of Array(Of T))
+''' @return As Variant(Of Array(Of T))
+Public Function ArrFilter(ByVal f As Func, ByVal arr As Variant) As Variant
+    If Not IsArray(arr) Then Err.Raise 13
+    Dim lb As Long: lb = LBound(arr)
+    Dim ub As Long: ub = UBound(arr)
+    Dim ret As Variant
+    If ub - lb < 0 Then
+        ret = Array()
+        GoTo Ending
+    End If
+    
+    ReDim ret(lb To ub)
+    
+    Dim flg As Boolean
+    Dim ixArr As Long
+    Dim ixRet As Long: ixRet = lb
+    If IsObject(arr(lb)) Then
+        For ixArr = lb To ub
+            f.FastApply flg, arr(ixArr)
+            If flg Then Set ret(IncrPst(ixRet)) = arr(ixArr)
+        Next
+    Else
+        For ixArr = lb To ub
+            f.FastApply flg, arr(ixArr)
+            If flg Then Let ret(IncrPst(ixRet)) = arr(ixArr)
+        Next
+    End If
+    
+    If ixRet > 0 Then
+        ReDim Preserve ret(lb To ixRet - 1)
+    Else
+        ret = Array()
+    End If
+    
+Ending:
+    ArrFilter = ret
+End Function
+
+''' @usage
+'''     ' Function Add(ByVal i As Integer, ByVal j As Integer) As Integer
+'''     ArrFold(Init(New Func, AddressOf Add, vbInteger), ArrRange(1, 100), 0) '5050
+''' @param f As Func(Of U, T, U)
+''' @param arr As Variant(Of Array(Of T))
+''' @param seedVal As Variant(Of U)
+''' @return As Variant(Of U)
+Public Function ArrFold(ByVal f As Func, ByVal arr As Variant, Optional ByVal seedVal As Variant _
+    ) As Variant
+    
+    If Not IsArray(arr) Then Err.Raise 13
+    
+    Dim stat As Variant
+    Dim i As Long: i = LBound(arr)
+    If IsMissing(seedVal) Then
+        stat = arr(IncrPst(i))
+    Else
+        stat = seedVal
+    End If
+    
+    For i = i To UBound(arr): f.FastApply stat, stat, arr(i): Next
+    
+    If IsObject(stat) Then
+        Set ArrFold = stat
+    Else
+        Let ArrFold = stat
+    End If
+End Function
+
+''' @usage
+'''     ' Function FibFun(ByVal pair As Variant) As Variant
+'''     ArrUnfold(Init(New Func, AddressOf FibFun, vbVariant, vbVariant), Array(1, 1))
+'''     ' => 1, 2, 3, 5, 8, 13, 21, 34, 55, 89
+''' @param f As Func
+''' @param seedVal As Variant(Of T)
+''' @return As Variant(Of Array(Of U))
+Public Function ArrUnfold(ByVal f As Func, ByVal seedVal As Variant) As Variant
+    Dim i As Long: i = 0
+    Dim alen As Long: alen = 32
+    Dim arr As Variant: ReDim arr(alen - 1)
+    
+    Dim stat As Variant
+    If IsObject(seedVal) Then
+        f.FastApply stat, seedVal
+        Do Until IsMissing(stat(1))
+            Set arr(IncrPst(i)) = stat(0)
+            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+            f.FastApply stat, stat(1)
+        Loop
+    Else
+        f.FastApply stat, seedVal
+        Do Until IsMissing(stat(1))
+            Let arr(IncrPst(i)) = stat(0)
+            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+            f.FastApply stat, stat(1)
+        Loop
+    End If
+    
+    If i > 0 Then
+        ReDim Preserve arr(i - 1)
+    Else
+        arr = Array()
+    End If
+    ArrUnfold = arr
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
@@ -485,9 +681,9 @@ Public Function ClctToArr(ByVal clct As Collection) As Variant
     Dim i As Long: i = 0
     Dim v As Variant
     If IsObject(clct.Item(1)) Then
-        For Each v In clct: Set arr(i) = v: i = i + 1: Next
+        For Each v In clct: Set arr(IncrPst(i)) = v: Next
     Else
-        For Each v In clct: Let arr(i) = v: i = i + 1: Next
+        For Each v In clct: Let arr(IncrPst(i)) = v: Next
     End If
     
 Ending:
@@ -624,9 +820,9 @@ End Function
 ''' @return As Long
 Public Function BitFlag(ParamArray flgs() As Variant) As Long
     BitFlag = 0
-    Dim ub As Integer: ub = UBound(flgs)
+    Dim ub As Long: ub = UBound(flgs)
     
-    Dim i As Integer
+    Dim i As Long
     For i = 0 To ub
         BitFlag = BitFlag + IIf(flgs(i), 1, 0) * 2 ^ (ub - i)
     Next
@@ -682,8 +878,7 @@ Public Function LeftA(ByVal str As String, ByVal byteLen As Long) As String
     Dim ixByte As Long: ixByte = 1
     Dim ixStr As Long:  ixStr = 1
     While (ixByte < 1 + byteLen) And (ixStr <= Len(str))
-        ixByte = ixByte + SjisByteNum(Mid(str, ixStr, 1))
-        ixStr = ixStr + 1
+        ixByte = ixByte + SjisByteNum(Mid(str, IncrPst(ixStr), 1))
     Wend
     LeftA = Left(str, ixStr - (ixByte - byteLen))
 End Function
@@ -694,8 +889,7 @@ Public Function RightA(ByVal str As String, ByVal byteLen As Long) As String
     Dim ixStr As Long:  ixStr = 1
     While ixStr <= Len(str)
         idxs.Add ixByte, ixStr
-        ixByte = ixByte + SjisByteNum(Mid(str, ixStr, 1))
-        ixStr = ixStr + 1
+        ixByte = ixByte + SjisByteNum(Mid(str, IncrPst(ixStr), 1))
     Wend
     idxs.Add ixByte, ixStr
     
@@ -712,8 +906,7 @@ Public Function SepA(ByVal str As String, ByVal byteLen As Long) As Tuple2
     Dim strLen As Long: strLen = Len(str)
     
     While (ixByte < 1 + byteLen) And (ixStr <= strLen)
-        ixByte = ixByte + SjisByteNum(Mid(str, ixStr, 1))
-        ixStr = ixStr + 1
+        ixByte = ixByte + SjisByteNum(Mid(str, IncrPst(ixStr), 1))
     Wend
     
     Dim n As Long: n = ixStr - (ixByte - byteLen)
