@@ -434,27 +434,6 @@ Ending:
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
-''' @param f As Func
-''' @return As Variant(Of Array(Of T))
-Public Function ArrMap(ByVal arr As Variant, ByVal f As Func) As Variant
-    If Not IsArray(arr) Then Err.Raise 13
-    Dim i As Long
-    For i = LBound(arr) To UBound(arr): f.Apply Array(arr(i)), arr(i): Next
-    ArrMap = arr
-End Function
-
-''' @param arr As Variant(Of Array(Of T))
-''' @param f As Func
-''' @param x As Variant(Of U)
-''' @return As Variant(Of U)
-Public Function ArrFold(ByVal arr As Variant, ByVal f As Func, ByVal x As Variant) As Variant
-    If Not IsArray(arr) Then Err.Raise 13
-    Dim i As Long
-    For i = LBound(arr) To UBound(arr): f.Apply Array(x, arr(i)), x: Next
-    If IsObject(x) Then Set ArrFold = x Else Let ArrFold = x
-End Function
-
-''' @param arr As Variant(Of Array(Of T))
 ''' @return As Collection(Of T)
 Public Function ArrToClct(ByVal arr As Variant) As Collection
     If Not IsArray(arr) Then Err.Raise 13
