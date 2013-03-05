@@ -446,7 +446,7 @@ Excel.prototype.createOpenFile = function(xlApp, path) {
     var vernum = parseInt(xlApp.Version);
     switch (fso.GetExtensionName(path)) {
     case 'xls':  case 'xla':  case 'xlt':
-        xlFileFormat = xlExcel9795;
+        xlFileFormat = (vernum < 12) ? xlExcel9795 : xlExcel8;
         break;
     case 'xlsm': case 'xlam': case 'xltm':
         xlFileFormat = xlOpenXMLWorkbookMacroEnabled;
