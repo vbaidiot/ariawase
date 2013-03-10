@@ -31,7 +31,7 @@ Function InternetOpen Lib "wininet.dll" Alias "InternetOpenA" ( _
     ByVal lpProxyName As String, _
     ByVal lpProxyBypass As String, _
     ByVal dwFlags As Long _
-    ) As Long
+    ) As LongPtr
 #Else
 Private Declare _
 Function InternetOpen Lib "wininet.dll" Alias "InternetOpenA" ( _
@@ -59,7 +59,7 @@ Function InternetOpenUrl Lib "wininet.dll" Alias "InternetOpenUrlA" ( _
     ByVal dwHeadersLength As Long, _
     ByVal dwFlags As Long, _
     ByVal dwContext As Long _
-    ) As Long
+    ) As LongPtr
 #Else
 Private Declare _
 Function InternetOpenUrl Lib "wininet.dll" Alias "InternetOpenUrlA" ( _
@@ -125,16 +125,57 @@ Private Function FileNameInUrl(ByVal strUrl As String) As String
     FileNameInUrl = strUrl
 End Function
 
-Public Function FileDownload(ByVal dlUrl As String, ByVal svPath As String) As String
-    Dim hOpen As Long
-    hOpen = InternetOpen(AGENT_NAME, INTERNET_OPEN_TYPE_PRECONFIG, vbNullString, vbNullString, 0)
-    FileDownload = FileDownloadImpl(hOpen, dlUrl, svPath)
-    InternetCloseHandle hOpen
-End Function
+#If VBA7 And Win64 Then
+Private Sub SaveDownloading(ByVal hCnn As LongPtr, ByVal svPath As String)
+#Else
+Private Sub SaveDownloading(ByVal hCnn As Long, ByVal svPath As String)
+#End If
+    Dim strm As Object: Set strm = CreateAdoDbStream(adTypeBinary)
+    strm.Open
+    
+    Dim sz As Long, dif As Long, buf(DL_BUFFER_SIZE - 1) As Byte
+    Do
+        InternetReadFile hCnn, buf(0), DL_BUFFER_SIZE, sz
+        If sz = 0 Then Exit Do
+        
+        strm.Write buf
+        dif = DL_BUFFER_SIZE - sz
+        If dif > 0 Then strm.Position = strm.Position - dif
+    Loop
+    strm.SetEOS
+    
+    strm.Position = 0
+    strm.SaveToFile svPath, adSaveCreateOverWrite
+    strm.Close
+End Sub
+
+#If VBA7 And Win64 Then
+Private Function FileDownloadImpl( _
+    ByVal hOpen As LongPtr, ByVal dlUrl As String, ByVal svPath As String _
+    ) As String
+    
+    Dim hCnn As LongPtr
+#Else
 Private Function FileDownloadImpl( _
     ByVal hOpen As Long, ByVal dlUrl As String, ByVal svPath As String _
     ) As String
     
+    Dim hCnn As Long
+#End If
+    
+    Dim succ As Boolean
+    hCnn = InternetOpenUrl(hOpen, dlUrl, vbNullString, 0, INTERNET_FLAG_RELOAD, 0)
+    succ = hCnn <> 0
+    If Not succ Then GoTo Ending
+    
+    SaveDownloading hCnn, svPath
+    
+Ending:
+    InternetCloseHandle hCnn
+    FileDownloadImpl = IIf(succ, svPath, vbNullString)
+End Function
+
+Public Function FileDownload(ByVal dlUrl As String, ByVal svPath As String) As String
     If Right(svPath, 1) = "\" Then
         Dim fname As String: fname = FileNameInUrl(dlUrl)
         If Len(fname) > 0 Then
@@ -144,30 +185,12 @@ Private Function FileDownloadImpl( _
         End If
     End If
     
-    Dim hConn As Long, succ As Boolean
-    hConn = InternetOpenUrl(hOpen, dlUrl, vbNullString, 0, INTERNET_FLAG_RELOAD, 0)
-    succ = hConn <> 0
-    If Not succ Then GoTo Ending
-    
-    Dim strm As Object: Set strm = CreateAdoDbStream(adTypeBinary)
-    strm.Open
-    
-    Dim sz As Long, diff As Long, buf(DL_BUFFER_SIZE - 1) As Byte
-    Do
-        InternetReadFile hConn, buf(0), DL_BUFFER_SIZE, sz
-        If sz = 0 Then Exit Do
-        
-        strm.Write buf
-        diff = DL_BUFFER_SIZE - sz
-        If diff > 0 Then strm.Position = strm.Position - diff
-    Loop
-    strm.SetEOS
-    
-    strm.Position = 0
-    strm.SaveToFile svPath, adSaveCreateOverWrite
-    strm.Close
-    
-Ending:
-    InternetCloseHandle hConn
-    FileDownloadImpl = IIf(succ, svPath, vbNullString)
+#If VBA7 And Win64 Then
+    Dim hOpen As LongPtr
+#Else
+    Dim hOpen As Long
+#End If
+    hOpen = InternetOpen(AGENT_NAME, INTERNET_OPEN_TYPE_PRECONFIG, vbNullString, vbNullString, 0)
+    FileDownload = FileDownloadImpl(hOpen, dlUrl, svPath)
+    InternetCloseHandle hOpen
 End Function
