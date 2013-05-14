@@ -150,7 +150,7 @@ Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Varian
         
         ret(i + 0) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
         If Len(brcs) Mod 2 = 0 Then
-            ret(i + 1) = vals(m.SubMatches(1))
+            ret(i + 1) = Format(vals(m.SubMatches(1)), m.SubMatches(3))
         Else
             ret(i + 1) = m.SubMatches(1)
         End If
