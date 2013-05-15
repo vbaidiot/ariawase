@@ -54,45 +54,45 @@ Public Sub IsNotNullVal(ByVal x As Variant, Optional ByVal msg As String = "")
 End Sub
 
 Public Sub AreEqVal( _
-    ByVal ext As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    TestDone Eq(ext, act), msg
+    TestDone Eq(exp, act), msg
 End Sub
 
 Public Sub AreNotEqVal( _
-    ByVal ext As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    TestDone Not Eq(ext, act), msg
+    TestDone Not Eq(exp, act), msg
 End Sub
 
 Public Sub AreEqualVal( _
-    ByVal ext As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    TestDone Equals(ext, act), msg
+    TestDone Equals(exp, act), msg
 End Sub
 
 Public Sub AreNotEqualVal( _
-    ByVal ext As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    TestDone Not Equals(ext, act), msg
+    TestDone Not Equals(exp, act), msg
 End Sub
 
 Public Sub AreEqualArr( _
-    ByVal ext As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    TestDone ArrEquals(ext, act), msg
+    TestDone ArrEquals(exp, act), msg
 End Sub
 
 Public Sub AreNotEqualArr( _
-    ByVal ext As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
+    ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    TestDone Not ArrEquals(ext, act), msg
+    TestDone Not ArrEquals(exp, act), msg
 End Sub
 
 Public Sub IsErrFunc( _
