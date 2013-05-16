@@ -833,7 +833,7 @@ Public Function ARound( _
     ) As Variant
     
     If Not IsNumeric(num) Then Err.Raise 13
-    If Not (1 <= rndup And rndup <= 9) Then Err.Raise 5
+    If Not (1 <= rndup And rndup <= 10) Then Err.Raise 5
     
     Dim n As Integer: n = CDec(10 ^ Abs(digits))
     Dim z As Double:  z = CDec(Sgn(num) * 0.1 * (10 - rndup))
