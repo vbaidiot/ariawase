@@ -14,6 +14,7 @@ Private xxFailMsgs As Collection
 
 Private Property Get VBProject() As Object
     Select Case Application.Name
+        Case "Microsoft Word":   Set VBProject = Application.MacroContainer.VBProject
         Case "Microsoft Excel":  Set VBProject = Application.ThisWorkbook.VBProject
         Case "Microsoft Access": Set VBProject = Application.VBE.ActiveVBProject
         Case Else: Err.Raise 17
