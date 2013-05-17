@@ -178,18 +178,13 @@ Public Sub IsErrMethod( _
     
     On Error GoTo Catch
     
-    Dim ret As Boolean
-    Select Case UBound(params)
-        Case 0:  CallByName obj, proc, VbMethod, params(0)
-        Case 1:  CallByName obj, proc, VbMethod, params(0), params(1)
-        Case 2:  CallByName obj, proc, VbMethod, params(0), params(1), params(2)
-        Case 3:  CallByName obj, proc, VbMethod, params(0), params(1), params(2), params(3)
-        Case 4:  CallByName obj, proc, VbMethod, params(0), params(1), params(2), params(3), params(4)
-        Case 5:  CallByName obj, proc, VbMethod, params(0), params(1), params(2), params(3), params(4), params(5)
-        Case 6:  CallByName obj, proc, VbMethod, params(0), params(1), params(2), params(3), params(4), params(5), params(6)
-        Case 7:  CallByName obj, proc, VbMethod, params(0), params(1), params(2), params(3), params(4), params(5), params(6), params(7)
-        Case Else: Err.Raise 5
-    End Select
+    Dim i As Long, ret As Boolean
+    Dim ubParam As Long: ubParam = UBound(params)
+    Dim ps() As Variant: ReDim ps(ubParam)
+    For i = 0 To ubParam: ps(i) = params(i): Next
+    
+    rtcCallByName obj, StrPtr(proc), VbMethod, ps
+    
     AssertDone ret, msg
     GoTo Escape
     

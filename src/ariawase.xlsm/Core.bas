@@ -2,6 +2,40 @@ Attribute VB_Name = "Core"
 Option Explicit
 Option Private Module
 
+''' @return VARIANT
+''' @param [in] IDispatch* Object
+''' @param [in] BSTR ProcName
+''' @param [in] VbCallType CallType
+''' @param [in] SAFEARRAY(VARIANT)* Args
+''' @param [in, lcid] long lcid
+#If VBA7 Then
+#If Win64 Then
+Public Declare PtrSafe _
+Function rtcCallByName Lib "VBE7.DLL" ( _
+    ByVal Object As Object, _
+    ByVal ProcName As LongPtr, _
+    ByVal CallType As VbCallType, _
+    ByRef Args() As Any _
+    ) As Variant
+#Else
+Public Declare _
+Function rtcCallByName Lib "VBE7.DLL" ( _
+    ByVal Object As Object, _
+    ByVal ProcName As Long, _
+    ByVal CallType As VbCallType, _
+    ByRef Args() As Any _
+    ) As Variant
+#End If
+#Else
+Public Declare _
+Function rtcCallByName Lib "VBE6.DLL" ( _
+    ByVal Object As Object, _
+    ByVal ProcName As Long, _
+    ByVal CallType As VbCallType, _
+    ByRef Args() As Any _
+    ) As Variant
+#End If
+
 Public Property Get Missing() As Variant
     Missing = GetMissing()
 End Property
@@ -46,19 +80,14 @@ End Function
 ''' @param obj As Object Is T
 ''' @param args As Variant()
 ''' @return As Object Is T
-Public Function Init(ByVal obj As Object, ParamArray args() As Variant) As Object
-    Select Case UBound(args)
-        Case -1: obj.Init
-        Case 0:  obj.Init args(0)
-        Case 1:  obj.Init args(0), args(1)
-        Case 2:  obj.Init args(0), args(1), args(2)
-        Case 3:  obj.Init args(0), args(1), args(2), args(3)
-        Case 4:  obj.Init args(0), args(1), args(2), args(3), args(4)
-        Case 5:  obj.Init args(0), args(1), args(2), args(3), args(4), args(5)
-        Case 6:  obj.Init args(0), args(1), args(2), args(3), args(4), args(5), args(6)
-        Case 7:  obj.Init args(0), args(1), args(2), args(3), args(4), args(5), args(6), args(7)
-        Case Else: Err.Raise 5
-    End Select
+Public Function Init(ByVal obj As Object, ParamArray params() As Variant) As Object
+    Dim i As Long
+    Dim ubParam As Long: ubParam = UBound(params)
+    Dim ps() As Variant: ReDim ps(ubParam)
+    For i = 0 To ubParam: ps(i) = params(i): Next
+    
+    rtcCallByName obj, StrPtr("Init"), VbMethod, ps
+    
     Set Init = obj
 End Function
 
