@@ -1,5 +1,6 @@
 Attribute VB_Name = "Assert"
 Option Explicit
+Option Private Module
 
 Private Const TestClassSuffix As String = "Test"
 Private Const TestProcSuffix As String = "_Test"
