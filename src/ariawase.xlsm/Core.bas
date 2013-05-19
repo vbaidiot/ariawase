@@ -658,15 +658,6 @@ Public Function ArrUnfold(ByVal f As Func, ByVal seedVal As Variant) As Variant
     ArrUnfold = arr
 End Function
 
-''' @param arr As Variant(Of Array(Of T))
-''' @return As Collection(Of T)
-Public Function ArrToClct(ByVal arr As Variant) As Collection
-    If Not IsArray(arr) Then Err.Raise 13
-    Set ArrToClct = New Collection
-    Dim v As Variant
-    For Each v In arr: ArrToClct.Add v: Next
-End Function
-
 ''' @param clct As Collection(Of T)
 ''' @param val As Variant(Of T)
 Public Sub Push(ByVal clct As Collection, ByVal val As Variant)
@@ -697,6 +688,15 @@ Public Function Unshift(ByVal clct As Collection) As Variant
     Dim i As Long: i = 1
     If IsObject(clct.Item(i)) Then Set Unshift = clct.Item(i) Else Let Unshift = clct.Item(i)
     clct.Remove i
+End Function
+
+''' @param arr As Variant(Of Array(Of T))
+''' @return As Collection(Of T)
+Public Function ArrToClct(ByVal arr As Variant) As Collection
+    If Not IsArray(arr) Then Err.Raise 13
+    Set ArrToClct = New Collection
+    Dim v As Variant
+    For Each v In arr: ArrToClct.Add v: Next
 End Function
 
 ''' @param clct As Collection(Of T)
