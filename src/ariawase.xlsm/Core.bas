@@ -719,6 +719,27 @@ Ending:
     ClctToArr = arr
 End Function
 
+''' @param eobj As Enumerator(Of Object)
+''' @return As Variant(Of Array(Of Object))
+Public Function EnumToArr(ByVal eobj As Object) As Variant
+    Dim i As Long: i = 0
+    Dim alen As Long: alen = 32
+    Dim arr As Variant: ReDim arr(alen - 1)
+    
+    Dim obj As Object
+    For Each obj In eobj
+        Set arr(IncrPst(i)) = obj
+        If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+    Next
+    
+    If i > 0 Then
+        ReDim Preserve arr(i - 1)
+    Else
+        arr = Array()
+    End If
+    EnumToArr = arr
+End Function
+
 ''' @param jagArr As Variant(Of Array(Of Array(Of T))
 ''' @return As Variant(Of Array(Of T, T))
 Public Function JagArrToArr2D(ByVal jagArr As Variant) As Variant
