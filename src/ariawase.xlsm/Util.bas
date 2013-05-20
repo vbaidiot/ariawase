@@ -167,7 +167,7 @@ End Function
 
 Private Function EvalScript(ByVal expr As String, ByVal lang As String) As Variant
     Dim doc As Object: Set doc = CreateObject("HtmlFile")
-    doc.parentWindow.execScript "document.write(" & expr & ");", lang
+    doc.parentWindow.execScript "document.write(" & expr & ")", lang
     EvalScript = doc.body.innerHTML
 End Function
 
