@@ -182,8 +182,13 @@ Public Sub IsErrMethod( _
     Dim i As Long, ret As Boolean
     Dim ubParam As Long: ubParam = UBound(params)
     Dim ps() As Variant: ReDim ps(ubParam)
-    For i = 0 To ubParam: ps(i) = params(i): Next
-    
+    For i = 0 To ubParam
+        If IsObject(params(i)) Then
+            Set ps(i) = params(i)
+        Else
+            Let ps(i) = params(i)
+        End If
+    Next
     rtcCallByName obj, StrPtr(proc), VbMethod, ps
     
     AssertDone ret, msg
