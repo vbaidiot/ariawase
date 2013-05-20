@@ -57,7 +57,7 @@ End Function
 ''' @param ptrnFind As String
 ''' @param iCase As Boolean
 ''' @return As Variant(Of Array(Of String))
-Public Function RegExpMatch( _
+Public Function RegExpMatches( _
     ByVal expr As String, ByVal ptrnFind As String, _
     Optional ByVal iCase As Boolean = False _
     ) As Variant
@@ -76,14 +76,14 @@ Public Function RegExpMatch( _
     For i = 1 To UBound(ret): ret(i) = sms.Item(i - 1): Next
     
 Ending:
-    RegExpMatch = ret
+    RegExpMatches = ret
 End Function
 
 ''' @param expr As String
 ''' @param ptrnFind As String
 ''' @param iCase As Boolean
 ''' @return As Variant(Of Array(Of Array(Of String)))
-Public Function RegExpGMatchs( _
+Public Function RegExpGMatches( _
     ByVal expr As String, ByVal ptrnFind As String, _
     Optional ByVal iCase As Boolean = False _
     ) As Variant
@@ -107,7 +107,7 @@ Public Function RegExpGMatchs( _
     Next
     
 Ending:
-    RegExpGMatchs = ret
+    RegExpGMatches = ret
 End Function
 
 ''' @param expr As String
@@ -145,7 +145,7 @@ Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Varian
     For Each m In ms
         ix1 = m.FirstIndex + IIf(Left(m.Value, 1) <> "{", 1, 0)
         s = Mid(strTemplate, ix0, ix1 - ix0 + 1)
-        Dim mbrc As Variant: mbrc = RegExpMatch(s, "{+$")
+        Dim mbrc As Variant: mbrc = RegExpMatches(s, "{+$")
         Dim brcs As String:  If ArrLen(mbrc) > 0 Then brcs = mbrc(0) Else brcs = ""
         
         ret(i + 0) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
