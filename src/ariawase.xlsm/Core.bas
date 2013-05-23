@@ -109,19 +109,21 @@ End Function
 Public Function Eq(ByVal x As Variant, ByVal y As Variant) As Variant
     Dim xIsObj As Boolean: xIsObj = IsObject(x)
     Dim yIsObj As Boolean: yIsObj = IsObject(y)
-    If xIsObj Xor yIsObj Then Err.Raise 13
-    
-    If xIsObj And yIsObj Then
-        Eq = x Is y
+    If xIsObj = yIsObj Then
+        If xIsObj Then
+            Eq = x Is y
+        Else
+            Eq = x = y 'Nullable
+        End If
     Else
-        Eq = x = y 'Nullable
+        Eq = Empty
     End If
 End Function
 
 ''' @usage
 '''     Equals(Empty, Empty)    'True
-'''     Equals(Empty, 0)        'Err.Raise 13
-'''     Equals(0, 0.0)          'Err.Raise 13
+'''     Equals(Empty, 0)        'Empty
+'''     Equals(0, 0.0)          'Empty
 '''     Equals("", vbNullString)    'True
 '''     Equals(Init(New Tuple2, "A", 4), Init(New Tuple2, "A", 4)) 'True
 ''' @param x As Variant(Of T)
@@ -130,18 +132,19 @@ End Function
 Public Function Equals(ByVal x As Variant, ByVal y As Variant) As Variant
     Dim xIsObj As Boolean: xIsObj = IsObject(x)
     Dim yIsObj As Boolean: yIsObj = IsObject(y)
-    If xIsObj Xor yIsObj Then Err.Raise 13
-    
-    If xIsObj And yIsObj Then
-        Equals = x.Equals(y)
-    Else
-        If TypeName(x) = TypeName(y) Then
-            Equals = x = y 'Nullable
+    If xIsObj = yIsObj Then
+        If xIsObj Then
+            Equals = x.Equals(y)
         Else
-            Err.Raise 13
+            If TypeName(x) = TypeName(y) Then
+                Equals = x = y 'Nullable
+            Else
+                Equals = Empty
+            End If
         End If
+    Else
+        Equals = Empty
     End If
-    Exit Function
 End Function
 
 ''' @usage
