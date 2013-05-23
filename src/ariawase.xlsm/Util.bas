@@ -124,8 +124,6 @@ Public Function RegExpReplace( _
     RegExpReplace = regex.Replace(expr, ptrnReplace)
 End Function
 
-''' @usage
-'''     Formats("{0:000} {{{1:yyyy/mm/dd}}} {2}", 1, Now, "Simple is best.") '001 {2012/04/08} Simple is best.
 ''' @param strTemplate As String
 ''' @param vals() As Variant
 ''' @return As String

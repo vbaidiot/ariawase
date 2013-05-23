@@ -45,20 +45,12 @@ Private Function GetMissing(Optional ByVal mss As Variant) As Variant
     GetMissing = mss
 End Function
 
-''' @usage
-'''     Dim i as Integer: i = 42
-'''     IncrPre(i)  '43
-'''     i           '43
 ''' @param n As Long
 ''' @return As Long
 Public Function IncrPre(ByRef n As Variant, Optional ByVal stepVal As Variant = 1) As Variant
     n = n + stepVal: IncrPre = n
 End Function
 
-''' @usage
-'''     Dim i as Integer: i = 42
-'''     IncrPst(i)  '42
-'''     i           '43
 ''' @param n As Long
 ''' @return As Long
 Public Function IncrPst(ByRef n As Variant, Optional ByVal stepVal As Variant = 1) As Variant
@@ -75,8 +67,6 @@ Public Function ToStr(ByVal x As Variant) As String
     End If
 End Function
 
-''' @usage
-'''     Init(New Tuple2, "A", 4) 'Tuple2 { Item1 = "A", Item2 = 4 }
 ''' @param obj As Object Is T
 ''' @param args As Variant()
 ''' @return As Object Is T
@@ -96,13 +86,6 @@ Public Function Init(ByVal obj As Object, ParamArray params() As Variant) As Obj
     Set Init = obj
 End Function
 
-''' @usage
-'''     Eq(42, 42)              'True
-'''     42 = "42"               'True
-'''     CVar(42) = CVar("42")   'False
-'''     Eq(42, "42")            'False
-'''     CVar(Empty) = CVar(0) And Eq(Empty, 0)  'True
-'''     Eq(Init(New Tuple2, "A", 4), Init(New Tuple2, "A", 4)) 'False
 ''' @param x As Variant(Of T)
 ''' @param y As Variant(Of T)
 ''' @return As Variant(Of Nullable(Of Boolean))
@@ -120,12 +103,6 @@ Public Function Eq(ByVal x As Variant, ByVal y As Variant) As Variant
     End If
 End Function
 
-''' @usage
-'''     Equals(Empty, Empty)    'True
-'''     Equals(Empty, 0)        'Empty
-'''     Equals(0, 0.0)          'Empty
-'''     Equals("", vbNullString)    'True
-'''     Equals(Init(New Tuple2, "A", 4), Init(New Tuple2, "A", 4)) 'True
 ''' @param x As Variant(Of T)
 ''' @param y As Variant(Of T)
 ''' @return As Variant(Of Nullable(Of Boolean))
@@ -147,12 +124,6 @@ Public Function Equals(ByVal x As Variant, ByVal y As Variant) As Variant
     End If
 End Function
 
-''' @usage
-'''     Compare(3, 9) '-1
-'''     Compare(5, 5) ' 0
-'''     Compare(9, 3) ' 1
-'''     Compare(Init(New Tuple2, 2, ".txt"), Init(New Tuple2, 10, ".txt"))      '-1
-'''     Compare(Init(New Tuple2, "2", ".txt"), Init(New Tuple2, "10", ".txt"))  ' 1
 ''' @param x As Variant(Of T)
 ''' @param y As Variant(Of T)
 ''' @return As Variant(Of Nullable(Of Integer))
@@ -194,24 +165,18 @@ Private Sub MinOrMax(ByVal arr As Variant, ByVal comp As Integer, ByRef ret As V
 Escape:
 End Sub
 
-''' @usage
-'''     Min(3, 6, 5) '3
 ''' @param arr() As Variant(Of T)
 ''' @return As Variant(Of T)
 Public Function Min(ParamArray arr() As Variant) As Variant
     MinOrMax arr, -1, Min
 End Function
 
-''' @usage
-'''     Max(3, 6, 5) '6
 ''' @param arr() As Variant(Of T)
 ''' @return As Variant(Of T)
 Public Function Max(ParamArray arr() As Variant) As Variant
     MinOrMax arr, 1, Max
 End Function
 
-''' @usage
-'''     ArrLen(Array("V", "B", "A")) '3
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Long
 Public Function ArrLen(ByVal arr As Variant, Optional ByVal dimen As Integer = 1) As Long
@@ -219,9 +184,6 @@ Public Function ArrLen(ByVal arr As Variant, Optional ByVal dimen As Integer = 1
     ArrLen = UBound(arr, dimen) - LBound(arr, dimen) + 1
 End Function
 
-''' @usage
-'''     ArrEquals(Array(0, 1, 2), Array(0, 1, 2)) 'True
-'''     ArrEquals(Array(0, 1, 2), Array(2, 1, 0)) 'False
 ''' @param arr1 As Variant(Of Array(Of T))
 ''' @param arr2 As Variant(Of Array(Of T))
 ''' @return As Boolean
@@ -244,12 +206,6 @@ Public Function ArrEquals(ByVal arr1 As Variant, ByVal arr2 As Variant) As Boole
 Escape:
 End Function
 
-''' @usage
-'''     ArrIndexOf(Array("V", "B", "A"), "A")       ' 2
-'''     ArrIndexOf(Array("V", "B", "A"), "Z")       '-1
-'''     ArrIndexOf(Array("I", "I", "f"), "I", 1)    ' 1
-'''     ArrIndexOf(Array("I", "I", "f"), "f", 0, 2) '-1
-'''     ArrIndexOf(Array("I", "I", "f"), "f", 1, 9) ' 2
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param val As Variant(Of T)
 ''' @param ixStart As Variant(Of Long)
@@ -284,10 +240,6 @@ Public Function ArrIndexOf( _
 Escape:
 End Function
 
-''' @usage
-'''     Dim arr As Variant: arr = Array("S", "O", "R", "T")
-'''     ArrSort arr
-'''     arr 'Array("O", "R", "S", "T")
 ''' @param arr As Variant(Of Array(Of T))
 Public Sub ArrSort(ByRef arr As Variant)
     If Not IsArray(arr) Then Err.Raise 13
@@ -406,8 +358,6 @@ Private Function ArrMergeSw( _
     ArrMergeSw = Compare(arr1(i1), arr2(i2)) < 1
 End Function
 
-''' @usage
-'''     ArrUniq(Array(6, 5, 5, 3, 6)) ' Array(6, 5, 3)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of T))
 Public Function ArrUniq(ByVal arr As Variant) As Variant
@@ -440,8 +390,6 @@ Ending:
     ArrUniq = ret
 End Function
 
-''' @usage
-'''     ArrConcat(Array(1, 2, 3), Array(4, 5)) ' Array(1, 2, 3, 4, 5)
 ''' @param arr1 As Variant(Of Array(Of T))
 ''' @param arr2 As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of T))
@@ -475,8 +423,6 @@ Ending:
     ArrConcat = ret
 End Function
 
-''' @usage
-'''     ArrFlatten(Array(Array(1, 2), Array(3), Array(4, 5))) ' Array(1, 2, 3, 4, 5)
 ''' @param jagArray As Variant(Of Array(Of Array(Of T)))
 ''' @return As Variant(Of Array(Of T))
 Public Function ArrFlatten(ByVal jagArr As Variant) As Variant
@@ -491,8 +437,6 @@ Ending:
     ArrFlatten = ret
 End Function
 
-''' @usage
-'''     ArrRange(1, 9) 'Array(1, 2, 3, 4, 5, 6, 7, 8, 9)
 ''' @param fromVal As Variant(Of T)
 ''' @param toVal As Variant(Of T)
 ''' @param stepVal As Variant(Of T)
@@ -530,10 +474,6 @@ Public Function ArrRange( _
     ArrRange = arr
 End Function
 
-''' @usage
-'''     ' Function Twice(ByVal n As Integer) As Integer
-'''     ArrMap(Init(New Func, AddressOf Twice, vbInteger), ArrRange(1, 9))
-'''     ' => Array(2, 4, 6, 8, 10, 12, 14, 16, 18)
 ''' @param f As Func(Of T, U)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of U))
@@ -556,10 +496,6 @@ Ending:
     ArrMap = ret
 End Function
 
-''' @usage
-'''     ' Function IsOdd(ByVal n As Integer) As Boolean
-'''     ArrFilter(Init(New Func, vbBoolean, AddressOf IsOdd), ArrRange(1, 9))
-'''     ' => Array(1, 3, 5, 7, 9)
 ''' @param f As Func(Of T, Boolean)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of T))
@@ -600,9 +536,6 @@ Ending:
     ArrFilter = ret
 End Function
 
-''' @usage
-'''     ' Function Add(ByVal i As Integer, ByVal j As Integer) As Integer
-'''     ArrFold(Init(New Func, AddressOf Add, vbInteger), ArrRange(1, 100), 0) '5050
 ''' @param f As Func(Of U, T, U)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param seedVal As Variant(Of U)
@@ -629,10 +562,6 @@ Public Function ArrFold(ByVal f As Func, ByVal arr As Variant, Optional ByVal se
     End If
 End Function
 
-''' @usage
-'''     ' Function FibFun(ByVal pair As Variant) As Variant
-'''     ArrUnfold(Init(New Func, AddressOf FibFun, vbVariant, vbVariant), Array(1, 1))
-'''     ' => 1, 2, 3, 5, 8, 13, 21, 34, 55, 89
 ''' @param f As Func
 ''' @param seedVal As Variant(Of T)
 ''' @return As Variant(Of Array(Of U))
@@ -870,10 +799,6 @@ Ending:
     DictToAssocArr = arr
 End Function
 
-''' @usage
-'''     BitFlag(False, True)                '1
-'''     BitFlag(True, False, False, False)  '8
-'''     BitFlag(1, 0, 0, 0)                 '8
 ''' @param flgs() As Variant(Of Boolean)
 ''' @return As Long
 Public Function BitFlag(ParamArray flgs() As Variant) As Long
