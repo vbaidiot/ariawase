@@ -22,6 +22,10 @@ Private Property Get VBProject() As Object
     End Select
 End Property
 
+Private Sub WriteResult(ByVal res As String)
+    Debug.Print res
+End Sub
+
 Private Sub TestStart()
     xxSuccSubCount = 0
     xxFailSubCount = 0
@@ -31,8 +35,8 @@ End Sub
 Private Sub TestEnd()
     xxEndTime = Timer
     
-    Debug.Print "===="
-    Debug.Print Formats( _
+    WriteResult "===="
+    WriteResult Formats( _
         "{0} succeeded, {1} failed, took {2:0.00} seconds.", _
         xxSuccSubCount, xxFailSubCount, xxEndTime - xxStartTime)
 End Sub
@@ -44,11 +48,11 @@ Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)
     CallByName obj, proc, VbMethod
     
     If xxFailMsgs.Count < 1 Then
-        Debug.Print "+ " & proc
+        WriteResult "+ " & proc
         IncrPre xxSuccSubCount
     Else
-        Debug.Print "- " & proc
-        Debug.Print "  " & Join(ClctToArr(xxFailMsgs), vbCrLf & "  ")
+        WriteResult "- " & proc
+        WriteResult "  " & Join(ClctToArr(xxFailMsgs), vbCrLf & "  ")
         IncrPre xxFailSubCount
     End If
 End Sub
