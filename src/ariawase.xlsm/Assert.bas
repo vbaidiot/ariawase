@@ -59,9 +59,10 @@ End Sub
 
 Public Sub RunTestClass(ByVal clsObj As Object)
     Dim clsName As String: clsName = TypeName(clsObj)
-    Dim vbcompo As Object: Set vbcompo = VBProject.VBComponents(clsName)
-    If vbcompo.Type <> 2 Then Err.Raise 5
     If Right(clsName, Len(TestClassSuffix)) <> TestClassSuffix Then Err.Raise 5
+    
+    Dim vbcompo As Object: Set vbcompo = VBProject.VBComponents(clsName)
+    'If vbcompo.Type <> 2 Then Err.Raise 5
     
     Dim cdmdl As Object:     Set cdmdl = vbcompo.CodeModule
     Dim procs As Collection: Set procs = New Collection
