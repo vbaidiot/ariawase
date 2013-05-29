@@ -57,7 +57,8 @@ Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)
     End If
 End Sub
 
-Public Sub RunTestClass(ByVal clsObj As Object, ByVal clsName As String)
+Public Sub RunTestClass(ByVal clsObj As Object)
+    Dim clsName As String: clsName = TypeName(clsObj)
     Dim vbcompo As Object: Set vbcompo = VBProject.VBComponents(clsName)
     If vbcompo.Type <> 2 Then Err.Raise 5
     If Right(clsName, Len(TestClassSuffix)) <> TestClassSuffix Then Err.Raise 5

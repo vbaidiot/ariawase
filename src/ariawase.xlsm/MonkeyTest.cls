@@ -9,7 +9,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-' Assert.RunTestClass New MonkeyTest, "MonkeyTest"
+' Assert.RunTestClass New MonkeyTest
 
 Sub Core_Test()
     Dim i As Integer, n As Long, v As Variant
