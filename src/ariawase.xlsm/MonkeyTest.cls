@@ -11,7 +11,7 @@ Option Explicit
 
 ' Assert.RunTestClass New MonkeyTest
 
-Sub Core_Test()
+Public Sub Core_Test()
     Dim i As Integer, n As Long, v As Variant
     
     i = 42
