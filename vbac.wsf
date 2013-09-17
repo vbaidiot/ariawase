@@ -69,7 +69,7 @@ var forAppending = 8;
 
 var scriptPath = WScript.ScriptFullName;
 
-var args = (function () {
+var args = (function() {
     var a = new Array(WScript.Arguments.length);
     for (var i = 0; i < a.length; i++) a[i] = WScript.Arguments.item(i);
     return a;
@@ -98,6 +98,55 @@ var dateTimeString = function(dt) {
     var f = function(n) { return (n < 10) ? "0" + n : n.toString(); };
     return g(dt.getYear())  + f(dt.getMonth() + 1) + f(dt.getDate())
          + f(dt.getHours()) + f(dt.getMinutes())   + f(dt.getSeconds());
+};
+
+var typename = function(obj) {
+    return Object.prototype.toString.call(obj).slice(8, -1);
+};
+
+var CmdParam = function(paramObj) {
+    this.defaultParameterName = paramObj.defaultParameterName;
+    delete paramObj.defaultParameterName;
+    this.parameters = paramObj;
+    
+    this.paramNames = {};
+    for (var pname in this.parameters)
+        this.paramNames[pname.toLowerCase()] = pname;
+};
+CmdParam.prototype.exists = function(paramName) {
+    return paramName.toLowerCase() in this.paramNames;
+};
+CmdParam.prototype.get = function(paramName) {
+    var pname = this.paramNames[paramName.toLowerCase()];
+    return this[pname];
+};
+CmdParam.prototype.set = function(paramName, value) {
+    var pname = this.paramNames[paramName.toLowerCase()];
+    this[pname] = value;
+};
+CmdParam.prototype.parse = function(args) {
+    var param = this.parameters;
+    var pname = this.defaultParameterName;
+    for (var i = 0; i < args.length; i++) {
+        switch (args[i].charAt(0)) {
+            case '-': case '/':
+                pname = args[i].substring(1);
+                switch (typename(param[pname])) {
+                    case 'Boolean': param[pname] = true; break;
+                }
+                break;
+            default:
+                switch (typename(param[pname])) {
+                    case 'Array':   param[pname].push(args[i]); break;
+                    case 'Boolean': param[pname] = Boolean(args[i]); break;
+                    case 'Number':  param[pname] = Number(args[i]); break;
+                  //case 'Date':    param[pname] = Date.parse(args[i]); break;
+                    default:        param[pname] = args[i]; break;
+                }
+                break;
+        }
+    }
+    return param;
 };
 
 var Config = function() {
@@ -313,26 +362,26 @@ Office.prototype.exportProject = function(vbproj, expdir) {
     proj.write();
     println("- Export: " + proj.fileName);
 };
-Office.prototype.combine = function(tsrc, tbin) {
+Office.prototype.combine = function(tsrc, tbin, hasProj) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
     this.loanOfOfficeDocument(tbin, true, function(ofDoc) {
         self.cleanupBinary(ofDoc);
-        self.importProject(tsrc, ofDoc.VBProject);
+        if (hasProj) self.importProject(tsrc, ofDoc.VBProject);
         self.importSource(tsrc, ofDoc);
         ofDoc.Save();
     });
     
     println();
 };
-Office.prototype.decombine = function(tbin, tsrc) {
+Office.prototype.decombine = function(tbin, tsrc, hasProj) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
     this.loanOfOfficeDocument(tbin, false, function(ofDoc) {
         self.cleanupSource(tsrc);
-        self.exportProject(ofDoc.VBProject, tsrc);
+        if (hasProj) self.exportProject(ofDoc.VBProject, tsrc);
         self.exportSource(ofDoc, tsrc);
     });
     
@@ -655,25 +704,25 @@ Access.prototype.exportSource = function(acProj, expdir) {
         println("- Export: " + fname);
     });
 };
-Access.prototype.combine = function(tsrc, tbin) {
+Access.prototype.combine = function(tsrc, tbin, hasProj) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupBinary(acProj);
-        self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject);
+        if (hasProj) self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject);
         self.importSource(tsrc, acProj);
     });
     
     println();
 };
-Access.prototype.decombine = function(tbin, tsrc) {
+Access.prototype.decombine = function(tbin, tsrc, hasProj) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupSource(tsrc);
-        self.exportProject(acProj.Application.VBE.ActiveVBProject, tsrc);
+        if (hasProj) self.exportProject(acProj.Application.VBE.ActiveVBProject, tsrc);
         self.exportSource(acProj, tsrc);
     });
     
@@ -712,8 +761,8 @@ Command.prototype.clear = function clear() {
         function(path) { hlp.createOffice(path)[hlp.commandName](path); });
 };
 
-var CommandHelper = function(args) {
-    this.commandName = (args.length > 0) ? args.shift() : 'help';
+var CommandHelper = function(param) {
+    this.parameter = param;
     this.command = new Command(this);
 };
 CommandHelper.prototype.createOffice = function(fname) {
@@ -748,36 +797,43 @@ CommandHelper.prototype.combineImpl = function(fromDir, toDir, getPaths) {
     
     var self = this;
     this.iterTarget(getPaths, function(path) {
-        self.createOffice(path)[self.commandName](
+        self.createOffice(path)[self.parameter.commandType](
             path, fso.BuildPath(toDir, fso.GetFileName(path)));
     });
 };
-CommandHelper.prototype.isDefined = function() {
-    return this.commandName in this.command
-        && this.command[this.commandName] != this;
+CommandHelper.prototype.isDefined = function(cmdType) {
+    return cmdType in this.command
+        && this.command[cmdType] != this;
 };
 CommandHelper.prototype.runCommand = function() {
     var cmd = this.command;
-    var cmdName = this.commandName;
+    var cmdType = this.parameter.commandType;
     
-    if (!this.isDefined()) {
-        println("command '" + cmdName + "' is undefined.");
+    if (!this.isDefined(cmdType)) {
+        println("command '" + cmdType + "' is undefined.");
         return;
     }
     
-    var runner = function() { cmd[cmdName].apply(cmd, arguments); };
-    if (cmdName == 'help') {
+    var runner = function() { cmd[cmdType].apply(cmd, arguments); };
+    if (cmdType == 'help') {
         runner();
     }
     else {
-        println("begin " + cmdName + "\n");
+        println("begin " + cmdType + "\n");
         runner();
         println("end");
     }
 };
 
 function main(args) {
-    var hlp = new CommandHelper(args);
+    var param =
+        new CmdParam({
+            defaultParameterName: "commandType",
+            commandType: "help",
+            vbaproj:     false
+        })
+        .parse(args);
+    var hlp = new CommandHelper(param);
     hlp.runCommand();
 }
 
