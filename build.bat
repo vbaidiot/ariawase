@@ -1,2 +1,2 @@
 cd %~dp0
-cscript vbac.wsf combine
+cscript //nologo vbac.wsf combine
