@@ -441,7 +441,7 @@ Public Function ArrSlice( _
     
     Dim ret As Variant: ret = Array()
     Dim ub As Long: ub = ixEnd - ixStart
-    If ub > 0 Then GoTo Ending
+    If ub < 1 Then GoTo Ending
     
     ReDim ret(ub)
     Dim isObj As Boolean: isObj = IsObject(arr(ixStart))
