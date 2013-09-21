@@ -195,6 +195,7 @@ VBAProjFile.prototype.read = function() {
                 if (isSection(line)) break;
                 
                 var p = getParam(line);
+                // FIXME: BUG in Win8 64-bit
                 this.vbproj[p.key] = p.val;
             }
             break;
@@ -740,25 +741,25 @@ Access.prototype.clear = function(tbin) {
 };
 
 var Command = function(helper) {
-    this.helper = helper;
+    this.__helper = helper;
 };
-Command.prototype.helper = null;
+Command.prototype.__helper = null;
 Command.prototype.help = function() {
     println(getResource('HelpMessage'));
 };
 Command.prototype.combine = function() {
-    this.helper.combineImpl(
-        conf.src, conf.bin, function() { return conf.getSrcs(); });
+    var h = this.__helper;
+    h.combineImpl(conf.src, conf.bin, function() { return conf.getSrcs(); });
 };
 Command.prototype.decombine = function() {
-    this.helper.combineImpl(
-        conf.bin, conf.src, function() { return conf.getBins(); });
+    var h = this.__helper;
+    h.combineImpl(conf.bin, conf.src, function() { return conf.getBins(); });
 };
 Command.prototype.clear = function clear() {
-    var hlp = this.helper;
-    hlp.iterTarget(
+    var h = this.__helper;
+    h.iterTarget(
         function() { return conf.getBins(); },
-        function(path) { hlp.createOffice(path)[hlp.commandName](path); });
+        function(path) { h.createOffice(path)[h.commandName](path); });
 };
 
 var CommandHelper = function(param) {
@@ -803,7 +804,7 @@ CommandHelper.prototype.combineImpl = function(fromDir, toDir, getPaths) {
         office[param.commandType](fromPath, toPath, param.vbaproj);
     });
 };
-CommandHelper.prototype.isDefined = function(cmdType) {
+CommandHelper.prototype.hasCommand = function(cmdType) {
     return cmdType in this.command
         && this.command[cmdType] != this;
 };
@@ -811,7 +812,7 @@ CommandHelper.prototype.runCommand = function() {
     var cmd = this.command;
     var cmdType = this.parameter.commandType;
     
-    if (!this.isDefined(cmdType)) {
+    if (!this.hasCommand(cmdType)) {
         println("command '" + cmdType + "' is undefined.");
         return;
     }
@@ -835,8 +836,8 @@ function main(args) {
             vbaproj:     false
         })
         .parse(args);
-    var hlp = new CommandHelper(param);
-    hlp.runCommand();
+    var h = new CommandHelper(param);
+    h.runCommand();
 }
 
 main(args);
