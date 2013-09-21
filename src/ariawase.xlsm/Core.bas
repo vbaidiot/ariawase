@@ -423,6 +423,38 @@ Ending:
     ArrConcat = ret
 End Function
 
+''' @param arr As Variant(Of Array(Of T))
+''' @param ixStart As Variant(Of Long)
+''' @param ixEnd As Variant(Of Long)
+''' @return As Variant(Of Array(Of T))
+Public Function ArrSlice( _
+    ByVal arr As Variant, _
+    Optional ByVal ixStart As Variant, Optional ByVal ixEnd As Variant _
+    ) As Variant
+    
+    If IsMissing(ixStart) Then ixStart = LBound(arr)
+    If IsNumeric(ixStart) Then ixStart = CLng(ixStart) Else Err.Raise 13
+    If IsMissing(ixEnd) Then ixEnd = UBound(arr)
+    If IsNumeric(ixEnd) Then ixEnd = CLng(ixEnd) Else Err.Raise 13
+    
+    Dim ret As Variant: ret = Array()
+    Dim ub As Long: ub = ixEnd - ixStart
+    If ub > 0 Then GoTo Ending
+    
+    ReDim ret(ub)
+    Dim isObj As Boolean: isObj = IsObject(arr(ixStart))
+    
+    Dim i As Long
+    If isObj Then
+        For i = 0 To ub: Set ret(i) = arr(ixStart + i): Next
+    Else
+        For i = 0 To ub: Let ret(i) = arr(ixStart + i): Next
+    End If
+    
+Ending:
+    ArrSlice = ret
+End Function
+
 ''' @param jagArray As Variant(Of Array(Of Array(Of T)))
 ''' @return As Variant(Of Array(Of T))
 Public Function ArrFlatten(ByVal jagArr As Variant) As Variant
