@@ -10,14 +10,13 @@
 <resource id="HelpMessage">
 vbac (version 0.3)
 
-Usage:
-  cscript vbac.wsf [combine|decombine|clear|help]
+Usage: cscript vbac.wsf &lt;command&gt; [&lt;args&gt;]
 
-Command:
-  combine     Import all VBComponents.
-  decombine   Export all VBComponents.
-  clear       Remove all VBComponents.
-  help        Display this help message.
+Commands:
+  combine     Import all VBComponents
+  decombine   Export all VBComponents
+  clear       Remove all VBComponents
+  help        Display this help message
 </resource>
 <script language="JScript">
 <![CDATA[
@@ -797,9 +796,11 @@ CommandHelper.prototype.combineImpl = function(fromDir, toDir, getPaths) {
     if (!fso.FolderExists(toDir)) fso.CreateFolder(toDir);
     
     var self = this;
-    this.iterTarget(getPaths, function(path) {
-        self.createOffice(path)[self.parameter.commandType](
-            path, fso.BuildPath(toDir, fso.GetFileName(path)));
+    this.iterTarget(getPaths, function(fromPath) {
+        var toPath  = fso.BuildPath(toDir, fso.GetFileName(fromPath));
+        var office  = self.createOffice(fromPath);
+        var param   = self.parameter;
+        office[param.commandType](fromPath, toPath, param.vbaproj);
     });
 };
 CommandHelper.prototype.isDefined = function(cmdType) {
