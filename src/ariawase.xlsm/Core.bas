@@ -432,6 +432,8 @@ Public Function ArrSlice( _
     Optional ByVal ixStart As Variant, Optional ByVal ixEnd As Variant _
     ) As Variant
     
+    If Not IsArray(arr) Then Err.Raise 13
+    
     If IsMissing(ixStart) Then ixStart = LBound(arr)
     If IsNumeric(ixStart) Then ixStart = CLng(ixStart) Else Err.Raise 13
     If IsMissing(ixEnd) Then ixEnd = UBound(arr)
