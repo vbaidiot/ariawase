@@ -241,26 +241,27 @@ Escape:
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
-Public Sub ArrSort(ByRef arr As Variant)
+''' @param orderAsc As Boolean
+Public Sub ArrSort(ByRef arr As Variant, Optional ByVal orderAsc As Boolean = True)
     If Not IsArray(arr) Then Err.Raise 13
     If ArrLen(arr) <= 1 Then GoTo Escape
     
     Dim ix0 As Long: ix0 = LBound(arr)
     If IsObject(arr(ix0)) Then
-        ObjArrMSort arr, ix0
+        ObjArrMSort arr, ix0, orderAsc
     Else
-        ValArrMSort arr, ix0
+        ValArrMSort arr, ix0, orderAsc
     End If
     
 Escape:
 End Sub
-Private Sub ObjArrMSort(arr As Variant, lb As Long)
+Private Sub ObjArrMSort(arr As Variant, lb As Long, orderAsc As Boolean)
     Dim alen As Long: alen = ArrLen(arr)
     If alen <= 1 Then GoTo Escape
     
     '' optimization
     If alen <= 8 Then
-        ObjArrISort arr, lb
+        ObjArrISort arr, lb, orderAsc
         GoTo Escape
     End If
     
@@ -271,17 +272,17 @@ Private Sub ObjArrMSort(arr As Variant, lb As Long)
     Dim ub1 As Long:   ub1 = lb + l1 - 1
     Dim a1 As Variant: ReDim a1(lb To ub1)
     For i = lb To ub1: Set a1(i) = arr(i): Next
-    ObjArrMSort a1, lb
+    ObjArrMSort a1, lb, orderAsc
     
     Dim ub2 As Long:   ub2 = lb + l2 - 1
     Dim a2 As Variant: ReDim a2(lb To ub2)
     For i = lb To ub2: Set a2(i) = arr(l1 + i): Next
-    ObjArrMSort a2, lb
+    ObjArrMSort a2, lb, orderAsc
     
     Dim i1 As Long: i1 = lb
     Dim i2 As Long: i2 = lb
     While i1 <= ub1 Or i2 <= ub2
-        If ArrMergeSw(a1, i1, ub1, a2, i2, ub2) Then
+        If ArrMergeSw(a1, i1, ub1, a2, i2, ub2, orderAsc) Then
             Set arr(i1 + i2 - lb) = a1(IncrPst(i1))
         Else
             Set arr(i1 + i2 - lb) = a2(IncrPst(i2))
@@ -290,13 +291,13 @@ Private Sub ObjArrMSort(arr As Variant, lb As Long)
     
 Escape:
 End Sub
-Private Sub ValArrMSort(arr As Variant, lb As Long)
+Private Sub ValArrMSort(arr As Variant, lb As Long, orderAsc As Boolean)
     Dim alen As Long: alen = ArrLen(arr)
     If alen <= 1 Then GoTo Escape
     
     '' optimization
     If alen <= 8 Then
-        ValArrISort arr, lb
+        ValArrISort arr, lb, orderAsc
         GoTo Escape
     End If
     
@@ -307,17 +308,17 @@ Private Sub ValArrMSort(arr As Variant, lb As Long)
     Dim ub1 As Long:   ub1 = lb + l1 - 1
     Dim a1 As Variant: ReDim a1(lb To ub1)
     For i = lb To ub1: Let a1(i) = arr(i): Next
-    ValArrMSort a1, lb
+    ValArrMSort a1, lb, orderAsc
     
     Dim ub2 As Long:   ub2 = lb + l2 - 1
     Dim a2 As Variant: ReDim a2(lb To ub2)
     For i = lb To ub2: Let a2(i) = arr(l1 + i): Next
-    ValArrMSort a2, lb
+    ValArrMSort a2, lb, orderAsc
     
     Dim i1 As Long: i1 = lb
     Dim i2 As Long: i2 = lb
     While i1 <= ub1 Or i2 <= ub2
-        If ArrMergeSw(a1, i1, ub1, a2, i2, ub2) Then
+        If ArrMergeSw(a1, i1, ub1, a2, i2, ub2, orderAsc) Then
             Let arr(i1 + i2 - lb) = a1(IncrPst(i1))
         Else
             Let arr(i1 + i2 - lb) = a2(IncrPst(i2))
@@ -326,23 +327,23 @@ Private Sub ValArrMSort(arr As Variant, lb As Long)
     
 Escape:
 End Sub
-Private Sub ObjArrISort(arr As Variant, lb As Long)
+Private Sub ObjArrISort(arr As Variant, lb As Long, orderAsc As Boolean)
     Dim i As Long, j As Long, x As Variant
     For i = lb + 1 To UBound(arr)
         j = i
         Do While j > lb
-            If Compare(arr(j - 1), arr(j)) <= 0 Then Exit Do
+            If Compare(arr(j - 1), arr(j)) * IIf(orderAsc, 1, -1) <= 0 Then Exit Do
             Set x = arr(j): Set arr(j) = arr(j - 1): Set arr(j - 1) = x
             j = j - 1
         Loop
     Next
 End Sub
-Private Sub ValArrISort(arr As Variant, lb As Long)
+Private Sub ValArrISort(arr As Variant, lb As Long, orderAsc As Boolean)
     Dim i As Long, j As Long, x As Variant
     For i = lb + 1 To UBound(arr)
         j = i
         Do While j > lb
-            If Compare(arr(j - 1), arr(j)) <= 0 Then Exit Do
+            If Compare(arr(j - 1), arr(j)) * IIf(orderAsc, 1, -1) <= 0 Then Exit Do
             Let x = arr(j): Let arr(j) = arr(j - 1): Let arr(j - 1) = x
             j = j - 1
         Loop
@@ -350,12 +351,13 @@ Private Sub ValArrISort(arr As Variant, lb As Long)
 End Sub
 Private Function ArrMergeSw( _
     arr1 As Variant, i1 As Long, ub1 As Long, _
-    arr2 As Variant, i2 As Long, ub2 As Long _
+    arr2 As Variant, i2 As Long, ub2 As Long, _
+    orderAsc As Boolean _
     ) As Boolean
     
     If i1 > ub1 Then ArrMergeSw = False Else _
     If i2 > ub2 Then ArrMergeSw = True Else _
-    ArrMergeSw = Compare(arr1(i1), arr2(i2)) < 1
+    ArrMergeSw = Compare(arr1(i1), arr2(i2)) * IIf(orderAsc, 1, -1) < 1
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
