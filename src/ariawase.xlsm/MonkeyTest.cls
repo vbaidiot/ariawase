@@ -89,10 +89,18 @@ Public Sub Core_Test()
     arr = Array("S", "O", "R", "T")
     ArrSort arr
     Assert.AreEqualArr Array("O", "R", "S", "T"), arr
+    arr = Array(2, 4, 3, 5, 6, 7, 0, 1, 9, 8)
+    ArrSort arr, True
+    Assert.AreEqualArr ArrRange(0, 9), arr
+    arr = Array(2, 4, 3, 5, 6, 7, 0, 1, 9, 8)
+    ArrSort arr, False
+    Assert.AreEqualArr ArrRange(9, 0, -1), arr
     
     Assert.AreEqualArr Array(6, 5, 3), ArrUniq(Array(6, 5, 5, 3, 6))
     
     Assert.AreEqualArr Array(1, 2, 3, 4, 5), ArrConcat(Array(1, 2, 3), Array(4, 5))
+    
+    Assert.AreEqualArr Array(2, 3, 4), ArrSlice(Array(1, 2, 3, 4, 5), 1, 3)
     
     Assert.AreEqualArr Array(1, 2, 3, 4, 5), ArrFlatten(Array(Array(1, 2), Array(3), Array(4, 5)))
     
