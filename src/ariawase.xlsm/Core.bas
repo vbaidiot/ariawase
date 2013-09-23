@@ -436,23 +436,27 @@ Public Function ArrSlice( _
     
     If Not IsArray(arr) Then Err.Raise 13
     
-    If IsMissing(ixStart) Then ixStart = LBound(arr)
+    Dim lbA As Long: lbA = LBound(arr)
+    Dim ubA As Long: ubA = UBound(arr)
+    If IsMissing(ixStart) Then ixStart = lbA
     If IsNumeric(ixStart) Then ixStart = CLng(ixStart) Else Err.Raise 13
-    If IsMissing(ixEnd) Then ixEnd = UBound(arr)
+    If IsMissing(ixEnd) Then ixEnd = ubA
     If IsNumeric(ixEnd) Then ixEnd = CLng(ixEnd) Else Err.Raise 13
     
-    Dim ret As Variant: ret = Array()
-    Dim ub As Long: ub = ixEnd - ixStart
-    If ub < 1 Then GoTo Ending
+    If Not (lbA <= ixStart And ixEnd <= ubA) Then Err.Raise 5
     
-    ReDim ret(ub)
+    Dim ret As Variant: ret = Array()
+    Dim ubR As Long: ubR = ixEnd - ixStart
+    If ubR < 1 Then GoTo Ending
+    
+    ReDim ret(ubR)
     Dim isObj As Boolean: isObj = IsObject(arr(ixStart))
     
     Dim i As Long
     If isObj Then
-        For i = 0 To ub: Set ret(i) = arr(ixStart + i): Next
+        For i = 0 To ubR: Set ret(i) = arr(ixStart + i): Next
     Else
-        For i = 0 To ub: Let ret(i) = arr(ixStart + i): Next
+        For i = 0 To ubR: Let ret(i) = arr(ixStart + i): Next
     End If
     
 Ending:
