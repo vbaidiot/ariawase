@@ -921,7 +921,7 @@ Public Function RightA(ByVal str As String, ByVal byteLen As Long) As String
     RightA = Right(str, ixStr - idxs.Item(ixByte - byteLen))
 End Function
 
-Public Function SepA(ByVal str As String, ByVal byteLen As Long) As Tuple2
+Public Function SepA(ByVal str As String, ByVal byteLen As Long) As Variant
     Dim ixByte As Long: ixByte = 1
     Dim ixStr  As Long: ixStr = 1
     Dim strLen As Long: strLen = Len(str)
@@ -931,5 +931,5 @@ Public Function SepA(ByVal str As String, ByVal byteLen As Long) As Tuple2
     Wend
     
     Dim n As Long: n = ixStr - (ixByte - byteLen)
-    SepA = Init(New Tuple2, Left(str, n), Mid(str, n + 1, strLen))
+    SepA = Array(Left(str, n), Mid(str, n + 1, strLen))
 End Function
