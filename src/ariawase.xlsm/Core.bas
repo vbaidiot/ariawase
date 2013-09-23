@@ -485,7 +485,7 @@ Public Function ArrRange( _
     ByVal fromVal As Variant, ByVal toVal As Variant, Optional ByVal stepVal As Variant = 1 _
     ) As Variant
     
-    'FIXME: parameters type check
+    If Not (IsNumeric(fromVal) And IsNumeric(toVal) And IsNumeric(stepVal)) Then Err.Raise 13
     
     Dim i As Long: i = 0
     Dim alen As Long: alen = 32
