@@ -902,35 +902,35 @@ End Function
 '''
 ''' NOTE: This function for Japanese. Please be customized to your language.
 '''
-''' @param str As String Is Char
+''' @param s As String Is Char
 ''' @return As Integer
-Private Function CharWidth(ByVal str As String) As Integer
-   Dim x As Integer: x = Asc(str) / &H100 And &HFF
+Private Function CharWidth(ByVal s As String) As Integer
+   Dim x As Integer: x = Asc(s) / &H100 And &HFF
    CharWidth = IIf((&H81 <= x And x <= &H9F) Or (&HE0 <= x And x <= &HFC), 2, 1)
 End Function
 
-''' @param str As String
+''' @param s As String
 ''' @param byteLen As Long
 ''' @return As String
-Public Function LeftA(ByVal str As String, ByVal byteLen As Long) As String
+Public Function LeftA(ByVal s As String, ByVal byteLen As Long) As String
     Dim ixByte As Long: ixByte = 1
     Dim ixStr As Long:  ixStr = 1
-    While (ixByte < 1 + byteLen) And (ixStr <= Len(str))
-        ixByte = ixByte + CharWidth(Mid(str, IncrPst(ixStr), 1))
+    While (ixByte < 1 + byteLen) And (ixStr <= Len(s))
+        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
     Wend
-    LeftA = Left(str, ixStr - (ixByte - byteLen))
+    LeftA = Left(s, ixStr - (ixByte - byteLen))
 End Function
 
-''' @param str As String
+''' @param s As String
 ''' @param byteLen As Long
 ''' @return As String
-Public Function RightA(ByVal str As String, ByVal byteLen As Long) As String
+Public Function RightA(ByVal s As String, ByVal byteLen As Long) As String
     Dim idxs As Object: Set idxs = CreateObject("Scripting.Dictionary")
     Dim ixByte As Long: ixByte = 1
     Dim ixStr As Long:  ixStr = 1
-    While ixStr <= Len(str)
+    While ixStr <= Len(s)
         idxs.Add ixByte, ixStr
-        ixByte = ixByte + CharWidth(Mid(str, IncrPst(ixStr), 1))
+        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
     Wend
     idxs.Add ixByte, ixStr
     
@@ -938,21 +938,21 @@ Public Function RightA(ByVal str As String, ByVal byteLen As Long) As String
         If idxs.Exists(ixByte - byteLen) Then Exit For
     Next
     
-    RightA = Right(str, ixStr - idxs.Item(ixByte - byteLen))
+    RightA = Right(s, ixStr - idxs.Item(ixByte - byteLen))
 End Function
 
-''' @param str As String
+''' @param s As String
 ''' @param byteLen As Long
 ''' @return As Variant(Of Array(Of String))
-Public Function SepA(ByVal str As String, ByVal byteLen As Long) As Variant
+Public Function SepA(ByVal s As String, ByVal byteLen As Long) As Variant
     Dim ixByte As Long: ixByte = 1
     Dim ixStr  As Long: ixStr = 1
-    Dim strLen As Long: strLen = Len(str)
+    Dim strLen As Long: strLen = Len(s)
     
     While (ixByte < 1 + byteLen) And (ixStr <= strLen)
-        ixByte = ixByte + CharWidth(Mid(str, IncrPst(ixStr), 1))
+        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
     Wend
     
     Dim n As Long: n = ixStr - (ixByte - byteLen)
-    SepA = Array(Left(str, n), Mid(str, n + 1, strLen))
+    SepA = Array(Left(s, n), Mid(s, n + 1, strLen))
 End Function
