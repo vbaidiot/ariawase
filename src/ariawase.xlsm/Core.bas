@@ -873,18 +873,28 @@ Public Function ARound( _
 Escape:
 End Function
 
+''' @param dt As Date
+''' @return As Date
 Public Function BeginOfMonth(ByVal dt As Date) As Date
     BeginOfMonth = DateAdd("d", -Day(dt) + 1, dt)
 End Function
 
+''' @param dt As Date
+''' @return As Date
 Public Function EndOfMonth(ByVal dt As Date) As Date
     EndOfMonth = DateAdd("d", -1, BeginOfMonth(DateAdd("m", 1, dt)))
 End Function
 
+''' @param dt As Date
+''' @param fstDayOfWeek As VbDayOfWeek
+''' @return As Date
 Public Function BeginOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
     BeginOfWeek = DateAdd("d", 1 - Weekday(dt, fstDayOfWeek), dt)
 End Function
 
+''' @param dt As Date
+''' @param fstDayOfWeek As VbDayOfWeek
+''' @return As Date
 Public Function EndOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
     EndOfWeek = DateAdd("d", 7 - Weekday(dt, fstDayOfWeek), dt)
 End Function
@@ -899,6 +909,9 @@ Private Function CharWidth(ByVal str As String) As Integer
    CharWidth = IIf((&H81 <= x And x <= &H9F) Or (&HE0 <= x And x <= &HFC), 2, 1)
 End Function
 
+''' @param str As String
+''' @param byteLen As Long
+''' @return As String
 Public Function LeftA(ByVal str As String, ByVal byteLen As Long) As String
     Dim ixByte As Long: ixByte = 1
     Dim ixStr As Long:  ixStr = 1
@@ -908,6 +921,9 @@ Public Function LeftA(ByVal str As String, ByVal byteLen As Long) As String
     LeftA = Left(str, ixStr - (ixByte - byteLen))
 End Function
 
+''' @param str As String
+''' @param byteLen As Long
+''' @return As String
 Public Function RightA(ByVal str As String, ByVal byteLen As Long) As String
     Dim idxs As Object: Set idxs = CreateObject("Scripting.Dictionary")
     Dim ixByte As Long: ixByte = 1
@@ -925,6 +941,9 @@ Public Function RightA(ByVal str As String, ByVal byteLen As Long) As String
     RightA = Right(str, ixStr - idxs.Item(ixByte - byteLen))
 End Function
 
+''' @param str As String
+''' @param byteLen As Long
+''' @return As Variant(Of Array(Of String))
 Public Function SepA(ByVal str As String, ByVal byteLen As Long) As Variant
     Dim ixByte As Long: ixByte = 1
     Dim ixStr  As Long: ixStr = 1
