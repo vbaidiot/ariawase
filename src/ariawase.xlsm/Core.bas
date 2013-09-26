@@ -909,6 +909,18 @@ Private Function CharWidth(ByVal s As String) As Integer
    CharWidth = IIf((&H81 <= x And x <= &H9F) Or (&HE0 <= x And x <= &HFC), 2, 1)
 End Function
 
+''' @param s As String Is Char
+''' @return As Long
+Public Function StringWidth(ByVal s As String) As Long
+    Dim w As Long: w = 0
+    
+    Dim i As Long
+    For i = 1 To Len(s)
+        w = w + CharWidth(Mid(s, i, 1))
+    Next
+    StringWidth = w
+End Function
+
 ''' @param s As String
 ''' @param byteLen As Long
 ''' @return As String
