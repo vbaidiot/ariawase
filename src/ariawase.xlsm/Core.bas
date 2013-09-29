@@ -241,6 +241,27 @@ Escape:
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
+Public Sub ArrRev(ByRef arr As Variant)
+    Dim ixL As Long: ixL = LBound(arr)
+    Dim ixU As Long: ixU = UBound(arr)
+    
+    Dim x As Variant
+    If IsObject(arr(ixL)) Then
+        While ixL < ixU
+            Set x = arr(ixL): Set arr(ixL) = arr(ixU): Set arr(ixU) = x
+            ixL = ixL + 1: ixU = ixU - 1
+        Wend
+    Else
+        While ixL < ixU
+            Let x = arr(ixL): Let arr(ixL) = arr(ixU): Let arr(ixU) = x
+            ixL = ixL + 1: ixU = ixU - 1
+        Wend
+    End If
+    
+Escape:
+End Sub
+
+''' @param arr As Variant(Of Array(Of T))
 ''' @param orderAsc As Boolean
 Public Sub ArrSort(ByRef arr As Variant, Optional ByVal orderAsc As Boolean = True)
     If Not IsArray(arr) Then Err.Raise 13

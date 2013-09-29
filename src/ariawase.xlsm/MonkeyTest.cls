@@ -88,6 +88,10 @@ Public Sub Core_Test()
     
     Assert.AreEqualArr Array(1, 2, 3, 4, 5, 6, 7, 8, 9), ArrRange(1, 9)
     
+    arr = ArrRange(1, 9)
+    ArrRev arr
+    Assert.AreEqualArr ArrRange(9, 1, -1), arr
+    
     arr = Array("S", "O", "R", "T")
     ArrSort arr
     Assert.AreEqualArr Array("O", "R", "S", "T"), arr
