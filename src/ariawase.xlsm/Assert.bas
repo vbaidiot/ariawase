@@ -5,6 +5,12 @@ Option Private Module
 Private Const TestClassSuffix As String = "Test"
 Private Const TestProcSuffix As String = "_Test"
 
+Private Const AssertModule As String = "Assert"
+Private Const GeneratedProc As String = "TestRunner"
+Private Const CommentLineInGeneratedProc As Long = 1
+
+Private Const ResultLineLen As Long = 76
+
 Private xxStartTime As Single
 Private xxEndTime As Single
 Private xxSuccSubCount As Long
@@ -22,11 +28,31 @@ Private Property Get VBProject() As Object
     End Select
 End Property
 
+Private Function ProcNames(ByVal vbcompo As Object) As Collection
+    Dim cdmdl As Object:     Set cdmdl = vbcompo.CodeModule
+    Dim procs As Collection: Set procs = New Collection
+    Dim proc As Variant:     proc = ""
+    
+    Dim i As Long
+    For i = 1 + cdmdl.CountOfDeclarationLines To cdmdl.CountOfLines
+        If proc <> cdmdl.ProcOfLine(i, 0) Then
+            proc = cdmdl.ProcOfLine(i, 0)
+            procs.Add proc
+        End If
+    Next
+    
+    Set ProcNames = procs
+End Function
+
 Private Sub WriteResult(ByVal res As String)
     Debug.Print res
 End Sub
 
-Private Sub TestStart()
+Private Sub TestStart(ByVal clsName As String)
+    WriteResult String(ResultLineLen, "-")
+    WriteResult clsName
+    WriteResult String(ResultLineLen, "-")
+    
     xxSuccSubCount = 0
     xxFailSubCount = 0
     xxStartTime = Timer
@@ -35,11 +61,19 @@ End Sub
 Private Sub TestEnd()
     xxEndTime = Timer
     
-    WriteResult "===="
+    WriteResult String(ResultLineLen, "=")
     WriteResult _
           xxSuccSubCount & " succeeded, " & xxFailSubCount & " failed," _
         & " took " & Format(xxEndTime - xxStartTime, "0.00") & " seconds."
 End Sub
+
+Private Function CheckTestProcName(ByVal proc As String) As Boolean
+    CheckTestProcName = Right(proc, Len(TestProcSuffix)) = TestProcSuffix
+End Function
+
+Private Function CheckTestClassName(ByVal clsName As String) As Boolean
+    CheckTestClassName = Right(clsName, Len(TestClassSuffix)) = TestClassSuffix
+End Function
 
 Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)
     xxAssertIx = 1
@@ -57,28 +91,50 @@ Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)
     End If
 End Sub
 
-Public Sub RunTestClass(ByVal clsObj As Object)
+Public Sub RunTestOf(ByVal clsObj As Object)
     Dim clsName As String: clsName = TypeName(clsObj)
-    If Right(clsName, Len(TestClassSuffix)) <> TestClassSuffix Then Err.Raise 5
+    If Not CheckTestClassName(clsName) Then Err.Raise 5
     
-    Dim vbcompo As Object: Set vbcompo = VBProject.VBComponents(clsName)
-    'If vbcompo.Type <> 2 Then Err.Raise 5
+    Dim proc As Variant, procs As Collection
+    Set procs = ProcNames(VBProject.VBComponents(clsName))
     
-    Dim cdmdl As Object:     Set cdmdl = vbcompo.CodeModule
-    Dim procs As Collection: Set procs = New Collection
-    Dim proc As Variant:     proc = ""
-    
-    Dim i As Long
-    For i = cdmdl.CountOfDeclarationLines To cdmdl.CountOfLines
-        If proc <> cdmdl.ProcOfLine(i, 0) Then
-            proc = cdmdl.ProcOfLine(i, 0)
-            If Right(proc, Len(TestProcSuffix)) = TestProcSuffix Then procs.Add proc
-        End If
-    Next
-    
-    TestStart
+    TestStart clsName
     For Each proc In procs: RunTestSub clsObj, proc: Next
     TestEnd
+End Sub
+
+Public Sub RunTest()
+    Call TestRunner
+End Sub
+
+Private Sub TestRunner()
+    ''' NOTE: This is auto-generated code - don't modify contents of this procedure with the code editor.
+End Sub
+
+Public Sub TestRunnerClear()
+    Dim asrt As Object: Set asrt = VBProject.VBComponents(AssertModule).CodeModule
+    Dim st0 As Long: st0 = asrt.ProcStartLine(GeneratedProc, 0)
+    Dim st1 As Long: st1 = asrt.ProcBodyLine(GeneratedProc, 0)
+    Dim cnt As Long: cnt = asrt.ProcCountLines(GeneratedProc, 0)
+    
+    asrt.DeleteLines _
+        st1 + (1 + CommentLineInGeneratedProc), _
+        cnt - ((st1 - st0) + 2 + CommentLineInGeneratedProc)
+End Sub
+
+Public Sub TestRunnerGenerate()
+    Dim asrt As Object: Set asrt = VBProject.VBComponents(AssertModule).CodeModule
+    Dim st1 As Long: st1 = asrt.ProcBodyLine(GeneratedProc, 0)
+    Dim pos As Long: pos = st1 + (1 + CommentLineInGeneratedProc)
+    
+    Dim vbcompo As Object, ln As String
+    For Each vbcompo In VBProject.VBComponents
+        If vbcompo.Type = 2 And CheckTestClassName(vbcompo.Name) Then
+            ln = "Assert.RunTestOf New " & vbcompo.Name
+            asrt.InsertLines pos, vbTab & ln
+            IncrPre pos
+        End If
+    Next
 End Sub
 
 Private Sub AssertDone(ByVal flg As Boolean, ByVal msg As String)
