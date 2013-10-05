@@ -269,13 +269,15 @@ Office.prototype.checkMacroSecurity = function(ofDoc) {
         throw ex;
     }
 };
-Office.prototype.extensionTypeTable = {
-    'bas': vbext_ct_StdModule,
-    'cls': vbext_ct_ClassModule,
-    'frm': vbext_ct_MSForm,
-    'frx': vbext_ct_MSForm,
-    'dcm': vbext_ct_Document
-};
+Office.prototype.extensionTypeTable = (function() {
+    var tbl = {};
+    tbl['bas'] = vbext_ct_StdModule;
+    tbl['cls'] = vbext_ct_ClassModule;
+    tbl['frm'] = vbext_ct_MSForm;
+    tbl['frx'] = vbext_ct_MSForm;
+    tbl['dcm'] = vbext_ct_Document;
+    return tbl;
+})();
 Office.prototype.typeExtensionTable = (function () {
     var tbl = {};
     tbl[vbext_ct_StdModule]   = 'bas';
@@ -621,25 +623,29 @@ Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
     
     return ret;
 };
-Access.prototype.extensionTypeTable = {
-    'mdl': acModule,
-    'bas': acModule,
-    'cls': acModule,
-    'frm': acForm,
-    'rpt': acReport,
-    'mcr': acMacro
-};
+Access.prototype.extensionTypeTable = (function() {
+    var tbl = {};
+    tbl['mdl'] = acModule;
+    tbl['bas'] = acModule;
+    tbl['cls'] = acModule;
+    tbl['frm'] = acForm;
+    tbl['rpt'] = acReport;
+    tbl['mcr'] = acMacro;
+    return tbl;
+})();
 Access.prototype.typeExtensionTable = (function() {
     var tbl = {};
-    tbl[acModule] = 'mdl';
+    tbl[acModule] = 'mdl'; // rename 'bas' or 'cls'
     tbl[acForm]   = 'frm';
     tbl[acReport] = 'rpt';
     tbl[acMacro]  = 'mcr';
     return tbl;
 })();
-Access.prototype.iterAllObjects = function(acProj, action) {
+Access.prototype.iterAllObjects = function(acApp, action) {
     var i;
     var objs = new Array();
+    
+    var acProj = acApp.CurrentProject;
     for (i = 0; i < acProj.AllModules.Count; i++) objs.push(acProj.AllModules.item(i));
     for (i = 0; i < acProj.AllForms.Count;   i++) objs.push(acProj.AllForms.item(i));
     for (i = 0; i < acProj.AllReports.Count; i++) objs.push(acProj.AllReports.item(i));
@@ -649,7 +655,7 @@ Access.prototype.iterAllObjects = function(acProj, action) {
 };
 Access.prototype.cleanupBinary = function(acProj, verbose) {
     var acApp = acProj.Application;
-    this.iterAllObjects(acProj, function(obj) {
+    this.iterAllObjects(acApp, function(obj) {
         var name = obj.Name;
         acApp.DoCmd.DeleteObject(obj.Type, name);
         if (!!verbose)
@@ -699,7 +705,7 @@ Access.prototype.exportSource = function(acProj, expdir) {
     var acApp  = acProj.Application;
     var compos = acApp.VBE.ActiveVBProject.VBComponents;
     var self   = this;
-    this.iterAllObjects(acProj, function(obj) {
+    this.iterAllObjects(acApp, function(obj) {
         var bname = obj.Name;
         if (!self.isValidFileName(bname)) {
             println("! Warning: skip export. object '" + bname + "' is invalid file name");
