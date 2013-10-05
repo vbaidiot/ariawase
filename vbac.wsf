@@ -691,7 +691,8 @@ Access.prototype.importSource = function(impdir, acProj) {
         if (xname in self.extensionTypeTable) {
             var typ = self.extensionTypeTable[xname];
             if (typ == acModule) {
-                compos.Import(path);
+                var c = compos.Import(path);
+                c.Name = bname;
                 acApp.DoCmd.Save(typ, bname);
             }
             else {
