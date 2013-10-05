@@ -327,8 +327,8 @@ Office.prototype.importSource = function(impdir, ofDoc) {
     foreachEnum(fso.GetFolder(impdir).Files, function(fl) {
         var xname = fso.GetExtensionName(fl.Path);
         var bname = fso.GetBaseName(fl.Path);
-        if (xname == 'frx')  return false;
         if (!(xname in self.extensionTypeTable)) return false;
+        if (xname == 'frx') return false;
         
         if (xname != 'dcm')
             self.importComponent(fl.Path, ofDoc);
@@ -673,8 +673,9 @@ Access.prototype.cleanupSource = function(dir, verbose) {
     });
 };
 Access.prototype.importSource = function(impdir, acProj) {
-    var acApp = acProj.Application;
-    var self  = this;
+    var acApp  = acProj.Application;
+    var compos = acApp.VBE.ActiveVBProject.VBComponents;
+    var self   = this;
     foreachEnum(fso.GetFolder(impdir).Files, function(fl) {
         var path  = fl.Path;
         var fname = fso.GetFileName(path);
@@ -682,7 +683,14 @@ Access.prototype.importSource = function(impdir, acProj) {
         var bname = fso.GetBaseName(path);
         
         if (xname in self.extensionTypeTable) {
-            acApp.LoadFromText(self.extensionTypeTable[xname], bname, path);
+            var typ = self.extensionTypeTable[xname];
+            if (typ == acModule) {
+                compos.Import(path);
+                acApp.DoCmd.Save(typ, bname);
+            }
+            else {
+                acApp.LoadFromText(typ, bname, path);
+            }
             println("- Import: " + fname);
         }
     });
