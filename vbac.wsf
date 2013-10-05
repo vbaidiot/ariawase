@@ -594,11 +594,11 @@ Access.prototype.createOpenFile = function(acApp, path) {
     
     return path;
 };
-Access.prototype.getProperties = function(db, propName) {
-    var val = undefined;
-    try { val = db.Properties(propName).Value; }
+Access.prototype.getDbProperty = function(db, propName) {
+    var prop = undefined;
+    try { prop = db.Properties(propName); }
     catch (e) {}
-    return val;
+    return prop;
 };
 Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
     var acApp, acProj, ret;
@@ -612,8 +612,8 @@ Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
         else
             acApp.OpenCurrentDatabase(path);
         
-        var startUp = this.getProperties(acApp.CurrentDb(), "StartUpForm");
-        if (startUp !== undefined) acApp.DoCmd.Close(acForm, startUp);
+        var startUp = this.getDbProperty(acApp.CurrentDb(), "StartUpForm");
+        if (startUp !== undefined) acApp.DoCmd.Close(acForm, startUp.Value);
         
         ret = callback(acApp.CurrentProject);
     } finally { if (acApp.CurrentDB() != null) acApp.CurrentDB().Close(); }
