@@ -631,8 +631,6 @@ Access.prototype.extensionTypeTable = (function() {
     tbl['frm'] = acForm;
     tbl['rpt'] = acReport;
     tbl['mcr'] = acMacro;
-    // NOTE: If you need to support queries, please comment in the following code.
-    //tbl['qry'] = acQuery;
     return tbl;
 })();
 Access.prototype.typeExtensionTable = (function() {
@@ -641,8 +639,6 @@ Access.prototype.typeExtensionTable = (function() {
     tbl[acForm]   = 'frm';
     tbl[acReport] = 'rpt';
     tbl[acMacro]  = 'mcr';
-    // NOTE: If you need to support queries, please comment in the following code.
-    //tbl[acQuery]  = 'qry';
     return tbl;
 })();
 Access.prototype.iterAllObjects = function(acApp, action) {
@@ -654,10 +650,6 @@ Access.prototype.iterAllObjects = function(acApp, action) {
     for (i = 0; i < acProj.AllForms.Count;   i++) objs.push(acProj.AllForms.item(i));
     for (i = 0; i < acProj.AllReports.Count; i++) objs.push(acProj.AllReports.item(i));
     for (i = 0; i < acProj.AllMacros.Count;  i++) objs.push(acProj.AllMacros.item(i));
-    
-    // NOTE: If you need to support queries, please comment in the following code.
-    //var acData = acApp.CurrentData;
-    //for (i = 0; i < acData.AllQueries.Count;  i++) objs.push(acData.AllQueries.item(i));
     
     for (i = 0; i < objs.length; i++) action(objs[i], i);
 };
