@@ -36,9 +36,9 @@ Private Sub TestEnd()
     xxEndTime = Timer
     
     WriteResult "===="
-    WriteResult Formats( _
-        "{0} succeeded, {1} failed, took {2:0.00} seconds.", _
-        xxSuccSubCount, xxFailSubCount, xxEndTime - xxStartTime)
+    WriteResult _
+          xxSuccSubCount & " succeeded, " & xxFailSubCount & " failed," _
+        & " took " & Format(xxEndTime - xxStartTime, "0.00") & " seconds."
 End Sub
 
 Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)
@@ -82,7 +82,7 @@ Public Sub RunTestClass(ByVal clsObj As Object)
 End Sub
 
 Private Sub AssertDone(ByVal flg As Boolean, ByVal msg As String)
-    If Not flg Then Push xxFailMsgs, Formats("[{0}] {1}", xxAssertIx, msg)
+    If Not flg Then Push xxFailMsgs, "[" & xxAssertIx & "] " & msg
     IncrPre xxAssertIx
 End Sub
 
