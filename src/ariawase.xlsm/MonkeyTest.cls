@@ -168,7 +168,7 @@ Public Sub Core_Test()
 End Sub
 
 Public Sub Util_Test()
-    Assert.AreEqualVal "C:\Windows", Wsh.ExpandEnvironmentStrings("%windir%")
+    Assert.AreEqualVal "C:\WINDOWS", UCase(Wsh.ExpandEnvironmentStrings("%windir%"))
     
     Assert.IsInstanceOfTypeName _
         "Decimal", _
