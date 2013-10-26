@@ -70,6 +70,36 @@ Public Function ToStr(ByVal x As Variant) As String
     End If
 End Function
 
+Public Function ToLiteral(ByVal x As Variant) As String
+    Dim ty As String: ty = TypeName(x)
+    Select Case ty
+        Case "Byte":        ToLiteral = "CByte(" & x & ")"
+        Case "Integer":     ToLiteral = x & "%"
+        Case "Long":        ToLiteral = x & "&"
+        Case "Single":      ToLiteral = x & "!"
+        Case "Double":      ToLiteral = x & "#"
+        Case "Currency":    ToLiteral = x & "@"
+        Case "Decimal":     ToLiteral = "CDec(" & x & ")"
+        Case "Date":        ToLiteral = "#" & x & "#"
+        Case "Boolean":     ToLiteral = x
+        Case "Error":       ToLiteral = "Error " & x.Number
+        Case "Empty":       ToLiteral = "(Empty)"
+        Case "Null":        ToLiteral = "(Null)"
+        Case "Unknown":     ToLiteral = "(Unknown)"
+        Case "Nothing":     ToLiteral = "(Nothing)"
+        Case "String"
+            If StrPtr(x) = 0 Then
+                ToLiteral = "(vbNullString)"
+            Else
+                ToLiteral = """" & x & """"
+            End If
+        Case Else
+            On Error Resume Next
+            ToLiteral = ty
+            ToLiteral = ToStr(x)
+    End Select
+End Function
+
 ''' @param obj As Object Is T
 ''' @param args As Variant()
 ''' @return As Object Is T
