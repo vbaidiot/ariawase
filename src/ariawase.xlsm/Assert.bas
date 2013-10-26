@@ -267,7 +267,7 @@ Public Sub IsErrMethod( _
     Next
     rtcCallByName obj, StrPtr(proc), VbMethod, ps
     
-    AssertDone False, ret, msg, errnum, act
+    AssertDone True, ret, msg, errnum, act
     GoTo Escape
     
 Catch:
