@@ -137,73 +137,82 @@ Public Sub TestRunnerGenerate()
     Next
 End Sub
 
-Private Sub AssertDone(ByVal flg As Boolean, ByVal msg As String)
-    If Not flg Then Push xxFailMsgs, "[" & xxAssertIx & "] " & msg
+Private Sub AssertDone( _
+    ByVal isa As Boolean, ByVal cond As Boolean, ByVal msg As String, ByVal exp As Variant, ByVal act As Variant _
+    )
+    
+    If isa <> cond Then
+        Push xxFailMsgs, "[" & xxAssertIx & "] " & msg & ":"
+        Push xxFailMsgs, "  Expected: " & IIf(isa, "", "Not") & "<" & ToStr(exp) & ">"
+        Push xxFailMsgs, "  But was:  <" & ToStr(act) & ">"
+    End If
     IncrPre xxAssertIx
 End Sub
 
 Public Sub IsNullVal(ByVal x As Variant, Optional ByVal msg As String = "")
-    AssertDone IsNull(x), msg
+    AssertDone True, IsNull(x), msg, Null, x
 End Sub
 
 Public Sub IsNotNullVal(ByVal x As Variant, Optional ByVal msg As String = "")
-    AssertDone Not IsNull(x), msg
+    AssertDone False, IsNull(x), msg, Null, x
 End Sub
 
 Public Sub IsInstanceOfTypeName( _
     ByVal expType As String, ByVal x As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone TypeName(x) = expType, msg
+    Dim t As String: t = TypeName(x)
+    AssertDone True, expType = t, msg, expType, t
 End Sub
 
 Public Sub IsNotInstanceOfTypeName( _
     ByVal expType As String, ByVal x As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone Not TypeName(x) = expType, msg
+    Dim t As String: t = TypeName(x)
+    AssertDone False, expType = t, msg, expType, t
 End Sub
 
 Public Sub AreEqVal( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone Eq(exp, act), msg
+    AssertDone True, Eq(exp, act), msg, exp, act
 End Sub
 
 Public Sub AreNotEqVal( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone Not Eq(exp, act), msg
+    AssertDone False, Eq(exp, act), msg, exp, act
 End Sub
 
 Public Sub AreEqualVal( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone Equals(exp, act), msg
+    AssertDone True, Equals(exp, act), msg, exp, act
 End Sub
 
 Public Sub AreNotEqualVal( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone Not Equals(exp, act), msg
+    AssertDone False, Equals(exp, act), msg, exp, act
 End Sub
 
 Public Sub AreEqualArr( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone ArrEquals(exp, act), msg
+    AssertDone True, ArrEquals(exp, act), msg, exp, act
 End Sub
 
 Public Sub AreNotEqualArr( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone Not ArrEquals(exp, act), msg
+    AssertDone False, ArrEquals(exp, act), msg, exp, act
 End Sub
 
 Public Sub IsErrFunc( _
@@ -217,13 +226,16 @@ Public Sub IsErrFunc( _
     
     On Error GoTo Catch
     
+    Dim act As Variant: act = Empty
+    
     Dim buf As Variant, ret As Boolean
     fun.CallByPtr buf, params
-    AssertDone ret, msg
+    AssertDone True, ret, msg, errnum, act
     GoTo Escape
     
 Catch:
-    ret = IsEmpty(errnum) Or Err.Number = errnum
+    act = Err.Number
+    ret = IsEmpty(errnum) Or act = errnum
     Resume Next
     
 Escape:
@@ -241,6 +253,8 @@ Public Sub IsErrMethod( _
     
     On Error GoTo Catch
     
+    Dim act As Variant: act = Empty
+    
     Dim i As Long, ret As Boolean
     Dim ubParam As Long: ubParam = UBound(params)
     Dim ps() As Variant: ReDim ps(ubParam)
@@ -253,11 +267,12 @@ Public Sub IsErrMethod( _
     Next
     rtcCallByName obj, StrPtr(proc), VbMethod, ps
     
-    AssertDone ret, msg
+    AssertDone False, ret, msg, errnum, act
     GoTo Escape
     
 Catch:
-    ret = IsEmpty(errnum) Or Err.Number = errnum
+    act = Err.Number
+    ret = IsEmpty(errnum) Or act = errnum
     Resume Next
     
 Escape:
