@@ -82,11 +82,12 @@ Public Function ToLiteral(ByVal x As Variant) As String
         Case "Decimal":     ToLiteral = "CDec(" & x & ")"
         Case "Date":        ToLiteral = "#" & x & "#"
         Case "Boolean":     ToLiteral = x
-        Case "Error":       ToLiteral = "Error " & x.Number
+        Case "Error":       ToLiteral = "(Error)"
         Case "Empty":       ToLiteral = "(Empty)"
         Case "Null":        ToLiteral = "(Null)"
         Case "Unknown":     ToLiteral = "(Unknown)"
         Case "Nothing":     ToLiteral = "(Nothing)"
+        Case "ErrObject":   ToLiteral = "Err " & x.Number
         Case "String"
             If StrPtr(x) = 0 Then
                 ToLiteral = "(vbNullString)"
