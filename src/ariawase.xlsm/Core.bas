@@ -103,7 +103,7 @@ Public Function ToLiteral(ByVal x As Variant) As String
             Else
                 On Error Resume Next
                 ToLiteral = ty
-                ToLiteral = ToStr(x)
+                ToLiteral = x.ToStr()
             End If
     End Select
 End Function
