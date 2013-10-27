@@ -82,11 +82,11 @@ Public Function ToLiteral(ByVal x As Variant) As String
         Case "Decimal":     ToLiteral = "CDec(" & x & ")"
         Case "Date":        ToLiteral = "#" & x & "#"
         Case "Boolean":     ToLiteral = x
-        Case "Error":       ToLiteral = "(Error)"
         Case "Empty":       ToLiteral = "(Empty)"
         Case "Null":        ToLiteral = "(Null)"
-        Case "Unknown":     ToLiteral = "(Unknown)"
         Case "Nothing":     ToLiteral = "(Nothing)"
+        Case "Unknown":     ToLiteral = "(Unknown)"
+        Case "Error":       ToLiteral = "(Error)"
         Case "ErrObject":   ToLiteral = "Err " & x.Number
         Case "String"
             If StrPtr(x) = 0 Then
@@ -95,9 +95,16 @@ Public Function ToLiteral(ByVal x As Variant) As String
                 ToLiteral = """" & x & """"
             End If
         Case Else
-            On Error Resume Next
-            ToLiteral = ty
-            ToLiteral = ToStr(x)
+            If Right(ty, 2) = "()" Then
+                '' FIXME: for multidimensional array
+                Dim i As Long
+                For i = LBound(x) To UBound(x): x(i) = ToLiteral(x(i)): Next
+                ToLiteral = "Array(" & Join(x, ", ") & ")"
+            Else
+                On Error Resume Next
+                ToLiteral = ty
+                ToLiteral = ToStr(x)
+            End If
     End Select
 End Function
 
