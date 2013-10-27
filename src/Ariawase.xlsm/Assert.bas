@@ -1,4 +1,9 @@
 Attribute VB_Name = "Assert"
+''' +----                                                             --+ '''
+''' |                          Ariawase 0.5.0                           | '''
+''' |             Ariawase is free library for VBA cowboys.             | '''
+''' |        The Project Page: https://github.com/igeta/Ariawase        | '''
+''' +--                                                             ----+ '''
 Option Explicit
 Option Private Module
 
