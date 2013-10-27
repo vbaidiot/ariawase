@@ -1,42 +1,36 @@
-# ariawase
+﻿# What is Ariawase?
 
-ariawase is an open-source distributed VBA libraries.
-ariawase contains Class files, Module files and vbac (vbac.wsf).
+Ariawase is an open-source distributed VBA libraries.
+
+Ariawase contains Class files, Module files and vbac (vbac.wsf).
+
 vbac is not VBA compiler. Instead, this tiny script frees VBA code from binary files.
 
-## contents
+## Contents
 
+* build.bat
 * vbac.wsf
-* /src/ariawase.xlsm
-	* Assert.bas
-	* CdoMail.cls
-	* Core.bas
-	* Func.cls
-	* IO.bas
-	* MonkeyTest.cls
-	* Resx.bas
-	* Tuple2.cls
-	* Util.bas
-	* WinInet.bas
+* /src/Ariawase.xlsm
+  * Core.bas
+  * Util.bas
+  * IO.bas
+  * Resx.bas
+  * WinInet.bas
+  * Assert.bas
+  * Func.cls
+  * Tuple2.cls
+  * CdoMail.cls
+  * MonkeyTest.cls
 
-Usage
------------
+## Quick Start
 
-Currently, not available.
-Don't think. feel.
+Run `build.bat`, you'll get office macro-enabled file in bin directory.
 
+## Articles
 
-Official Document
------------------------
+Coming soon! Please check back.
 
-About Functions related RegExp Subroutine (in Util.bas )
-[いげ太の日記: VBA にも C# のような書式指定文字列がほしい](http://igeta-diary.blogspot.jp/2012/04/on-typical-format.html)
+## License
 
-About Tsukeawase that is the predecessor of "ariawase"
-[いげ太の日記: VBA を一括エクスポート／インポートする Tsukeawsase というツールを作った](http://igeta-diary.blogspot.jp/2011/09/tsukeawase-ver01-alpha.html)
+This software is released under the MIT License, see [LICENSE.txt](https://github.com/igeta/Ariawase/blob/master/LICENSE.txt).
 
-
-
-License
-----------------
-[ariawase/LICENSE.txt](https://github.com/igeta/ariawase/blob/master/LICENSE.txt)
