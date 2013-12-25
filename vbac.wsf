@@ -735,6 +735,34 @@ Access.prototype.exportSource = function(acProj, expdir) {
         println("- Export: " + fname);
     });
 };
+Access.prototype.compact = function(dbPath) {
+    var engine = (function() {
+        var egname = "DAO.DBEngine";
+        var egvers = ["120"; "36"; "35"];
+        for (var i = 0; i < egvers.length; i++) {
+            try { return new ActiveXObject(egname + "." + egvers[i]); }
+            catch (e) {}
+        }
+        return undefined;
+    })();
+    
+    var tempPath = (function(dbPath) {
+        var d = fso.GetParentFolderName(dbPath);
+        var b = fso.GetBaseName(dbPath);
+        var x = fso.GetExtensionName(dbPath);
+        var tempExt  = ".tempdb";
+        var tempPath = fso.BuildPath(d, [b; x; tempExt].join("."));
+        var delim = "#";
+        var i = 0;
+        while (fso.FileExists(tempPath))
+            tempPath = fso.BuildPath(d, [b+delim+(++i); x; tempExt].join("."));
+    })(dbPath);
+    
+    engine.CompactDatabase(dbPath, tempPath);
+    fso.DeleteFile(dbPath);
+    fso.MoveFile(tempPath, dbPath);
+    println("- Compact: " + dbPath);
+};
 Access.prototype.combine = function(tsrc, tbin, hasProj) {
     println("> Target: " + fso.GetFileName(tbin));
     
