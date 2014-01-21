@@ -252,6 +252,29 @@ Public Function ArrEquals(ByVal arr1 As Variant, ByVal arr2 As Variant) As Boole
 Escape:
 End Function
 
+''' @param arr1 As Variant(Of Array(Of T))
+''' @param arr2 As Variant(Of Array(Of T))
+''' @return As Integer
+Public Function ArrCompare(ByVal arr1 As Variant, ByVal arr2 As Variant) As Integer
+    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
+    
+    Dim alen1 As Long: alen1 = ArrLen(arr1)
+    Dim alen2 As Long: alen2 = ArrLen(arr2)
+    Dim alenMin As Long: alenMin = Min(alen1, alen2)
+    
+    Dim ix0 As Long: ix0 = LBound(arr1)
+    Dim pad As Long: pad = LBound(arr2) - ix0
+    
+    Dim i As Long
+    For i = ix0 To ix0 + alenMin - 1
+        ArrCompare = Compare(arr1(i), arr2(pad + i))
+        If ArrCompare <> 0 Then GoTo Escape
+    Next
+    ArrCompare = Compare(alen1, alen2)
+    
+Escape:
+End Function
+
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param val As Variant(Of T)
 ''' @param ixStart As Variant(Of Long)
