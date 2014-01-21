@@ -738,7 +738,7 @@ Access.prototype.exportSource = function(acProj, expdir) {
 Access.prototype.compact = function(dbPath) {
     var engine = (function() {
         var egname = "DAO.DBEngine";
-        var egvers = ["120"; "36"; "35"];
+        var egvers = ["120", "36", "35"];
         for (var i = 0; i < egvers.length; i++) {
             try { return new ActiveXObject(egname + "." + egvers[i]); }
             catch (e) {}
@@ -751,11 +751,11 @@ Access.prototype.compact = function(dbPath) {
         var b = fso.GetBaseName(dbPath);
         var x = fso.GetExtensionName(dbPath);
         var tempExt  = ".tempdb";
-        var tempPath = fso.BuildPath(d, [b; x; tempExt].join("."));
+        var tempPath = fso.BuildPath(d, [b, x, tempExt].join("."));
         var delim = "#";
         var i = 0;
         while (fso.FileExists(tempPath))
-            tempPath = fso.BuildPath(d, [b+delim+(++i); x; tempExt].join("."));
+            tempPath = fso.BuildPath(d, [b+delim+(++i), x, tempExt].join("."));
     })(dbPath);
     
     engine.CompactDatabase(dbPath, tempPath);
