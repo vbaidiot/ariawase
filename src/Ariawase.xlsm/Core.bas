@@ -891,7 +891,7 @@ Public Function CreateAssocArray(ParamArray arr() As Variant) As Variant
     
     ReDim aarr(Fix(UBound(arr) / 2))
     Dim i As Long
-    For i = 0 To UBound(aarr): Set aarr(i) = Init(New Tuple2, arr(2 * i), arr(2 * i + 1)): Next
+    For i = 0 To UBound(aarr): Set aarr(i) = Init(New Tuple, arr(2 * i), arr(2 * i + 1)): Next
     
 Ending:
     CreateAssocArray = aarr
@@ -923,7 +923,7 @@ Public Function DictToAssocArr(ByVal dict As Object) As Variant
     
     ReDim arr(UBound(ks))
     Dim i As Long
-    For i = 0 To dlen: Set arr(i) = Init(New Tuple2, ks(i), dict.Item(ks(i))): Next
+    For i = 0 To dlen: Set arr(i) = Init(New Tuple, ks(i), dict.Item(ks(i))): Next
     
 Ending:
     DictToAssocArr = arr

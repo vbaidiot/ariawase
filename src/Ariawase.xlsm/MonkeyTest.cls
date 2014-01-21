@@ -45,8 +45,8 @@ Public Sub Core_Test()
     Assert.AreEqualVal CDec(43), v
     Assert.IsInstanceOfTypeName "Decimal", v
     
-    Assert.AreEqualVal Core.Init(New Tuple2, "A", 4), Core.Init(New Tuple2, "A", 4)
-    Assert.AreEqualVal "Tuple2 { Item1 = A, Item2 = 4 }", ToStr(Core.Init(New Tuple2, "A", 4))
+    Assert.AreEqualVal Core.Init(New Tuple, "A", 4), Core.Init(New Tuple, "A", 4)
+    Assert.AreEqualVal "Tuple { Item1 = ""A"", Item2 = 4% }", ToStr(Core.Init(New Tuple, "A", 4))
     
     Assert.AreEqualVal True, Eq(42, 42)
     Assert.AreEqualVal True, Eq(42, 42&)
@@ -54,8 +54,8 @@ Public Sub Core_Test()
     Assert.AreEqualVal True, Eq(Empty, 0)
     Assert.AreEqualVal True, Eq(Empty, Empty)
     Assert.AreEqualVal True, Eq("", vbNullString)
-    Assert.AreEqualVal False, Eq(Core.Init(New Tuple2, "A", 4), Core.Init(New Tuple2, "A", 4))
-    Assert.AreEqualVal Empty, Eq(Core.Init(New Tuple2, "A", 4), "A4")
+    Assert.AreEqualVal False, Eq(Core.Init(New Tuple, "A", 4), Core.Init(New Tuple, "A", 4))
+    Assert.AreEqualVal Empty, Eq(Core.Init(New Tuple, "A", 4), "A4")
     
     Assert.AreEqualVal True, Equals(42, 42)
     Assert.AreEqualVal Empty, Equals(42, 42&)
@@ -63,15 +63,15 @@ Public Sub Core_Test()
     Assert.AreEqualVal Empty, Equals(Empty, 0)
     Assert.AreEqualVal True, Equals(Empty, Empty)
     Assert.AreEqualVal True, Equals("", vbNullString)
-    Assert.AreEqualVal True, Equals(Core.Init(New Tuple2, "A", 4), Core.Init(New Tuple2, "A", 4))
-    Assert.AreEqualVal Empty, Equals(Core.Init(New Tuple2, "A", 4), "A4")
+    Assert.AreEqualVal True, Equals(Core.Init(New Tuple, "A", 4), Core.Init(New Tuple, "A", 4))
+    Assert.AreEqualVal Empty, Equals(Core.Init(New Tuple, "A", 4), "A4")
     
     Assert.AreEqualVal -1, Compare(3, 9)
     Assert.AreEqualVal 0, Compare(5, 5)
     Assert.AreEqualVal 1, Compare(9, 3)
     Assert.IsErrFunc 13, Core.Init(New Func, vbVariant, AddressOf Compare, vbVariant, vbVariant), Array(0, 0&)
-    Assert.AreEqualVal -1, Compare(Core.Init(New Tuple2, 2, ".txt"), Core.Init(New Tuple2, 10, ".txt"))
-    Assert.AreEqualVal 1, Compare(Core.Init(New Tuple2, "2", ".txt"), Core.Init(New Tuple2, "10", ".txt"))
+    Assert.AreEqualVal -1, Compare(Core.Init(New Tuple, 2, ".txt"), Core.Init(New Tuple, 10, ".txt"))
+    Assert.AreEqualVal 1, Compare(Core.Init(New Tuple, "2", ".txt"), Core.Init(New Tuple, "10", ".txt"))
     
     Assert.AreEqualVal 3, Min(3, 6, 5)
     Assert.IsInstanceOfTypeName "Integer", Min(3, 6, 5)
@@ -82,6 +82,11 @@ Public Sub Core_Test()
     
     Assert.AreEqualVal True, ArrEquals(Array(0, 1, 2), Array(0, 1, 2))
     Assert.AreEqualVal False, ArrEquals(Array(0, 1, 2), Array(2, 1, 0))
+    
+    Assert.AreEqualVal 0, ArrCompare(Array(0, 1, 2), Array(0, 1, 2))
+    Assert.AreEqualVal -1, ArrCompare(Array(0, 1, 2), Array(0, 1, 3))
+    Assert.AreEqualVal -1, ArrCompare(Array(0, 1, 2), Array(0, 1, 2, 3))
+    Assert.AreEqualVal 1, ArrCompare(Array(2, 1), Array(0, 1, 2))
     
     Assert.AreEqualVal 2&, ArrIndexOf(Array("V", "B", "A"), "A")
     Assert.AreEqualVal -1&, ArrIndexOf(Array("V", "B", "A"), "Z")
