@@ -134,59 +134,61 @@ End Function
 
 ''' @param x As Variant(Of T)
 ''' @param y As Variant(Of T)
-''' @return As Variant(Of Nullable(Of Boolean))
+''' @return As Variant(Of Boolean Or Null Or Empty)
 Public Function Eq(ByVal x As Variant, ByVal y As Variant) As Variant
     Dim xIsObj As Boolean: xIsObj = IsObject(x)
     Dim yIsObj As Boolean: yIsObj = IsObject(y)
-    If xIsObj = yIsObj Then
-        If xIsObj Then
-            Eq = x Is y
-        Else
-            Eq = x = y 'Nullable
-        End If
-    Else
+    If xIsObj Xor yIsObj Then
         Eq = Empty
+    ElseIf xIsObj And yIsObj Then
+        Eq = x Is y
+    Else
+        Eq = x = y
     End If
 End Function
 
 ''' @param x As Variant(Of T)
 ''' @param y As Variant(Of T)
-''' @return As Variant(Of Nullable(Of Boolean))
+''' @return As Variant(Of Boolean Or Null Or Empty)
 Public Function Equals(ByVal x As Variant, ByVal y As Variant) As Variant
     Dim xIsObj As Boolean: xIsObj = IsObject(x)
     Dim yIsObj As Boolean: yIsObj = IsObject(y)
-    If xIsObj = yIsObj Then
-        If xIsObj Then
-            Equals = x.Equals(y)
-        Else
-            If TypeName(x) = TypeName(y) Then
-                Equals = x = y 'Nullable
-            Else
-                Equals = Empty
-            End If
-        End If
-    Else
+    If xIsObj Xor yIsObj Then
         Equals = Empty
+    ElseIf xIsObj And yIsObj Then
+        Equals = x.Equals(y)
+    Else
+        If TypeName(x) = TypeName(y) Then
+            Equals = x = y
+        ElseIf IsNull(x) Or IsNull(y) Then
+            Equals = Null
+        Else
+            Equals = Empty
+        End If
     End If
 End Function
 
 ''' @param x As Variant(Of T)
 ''' @param y As Variant(Of T)
-''' @return As Variant(Of Nullable(Of Integer))
+''' @return As Variant(Of Integer Or Null)
 Public Function Compare(ByVal x As Variant, ByVal y As Variant) As Variant
     Dim xIsObj As Boolean: xIsObj = IsObject(x)
     Dim yIsObj As Boolean: yIsObj = IsObject(y)
-    If xIsObj Xor yIsObj Then Err.Raise 13
-    
-    If xIsObj And yIsObj Then
+    If xIsObj Xor yIsObj Then
+        Err.Raise 13
+    ElseIf xIsObj And yIsObj Then
         Compare = x.Compare(y)
     Else
-        If TypeName(x) <> TypeName(y) Then Err.Raise 13
-        
-        If x = y Then Compare = 0 Else _
-        If x < y Then Compare = -1 Else _
-        If x > y Then Compare = 1 Else _
-        Compare = Null
+        If TypeName(x) = TypeName(y) Then
+            If x = y Then Compare = 0 Else _
+            If x < y Then Compare = -1 Else _
+            If x > y Then Compare = 1 Else _
+            Compare = Null
+        ElseIf IsNull(x) Or IsNull(y) Then
+            Compare = Null
+        Else
+            Err.Raise 13
+        End If
     End If
 End Function
 
@@ -232,47 +234,76 @@ End Function
 
 ''' @param arr1 As Variant(Of Array(Of T))
 ''' @param arr2 As Variant(Of Array(Of T))
-''' @return As Boolean
-Public Function ArrEquals(ByVal arr1 As Variant, ByVal arr2 As Variant) As Boolean
-    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
-    ArrEquals = False
-    
-    Dim alen As Long: alen = ArrLen(arr1)
-    If alen <> ArrLen(arr2) Then GoTo Escape
-    
-    Dim ix0 As Long: ix0 = LBound(arr1)
-    Dim pad As Long: pad = LBound(arr2) - ix0
-    
-    Dim i As Long
-    For i = ix0 To ix0 + alen - 1
-        If Not Equals(arr1(i), arr2(pad + i)) Then GoTo Escape
-    Next
-    ArrEquals = True
-    
-Escape:
-End Function
-
-''' @param arr1 As Variant(Of Array(Of T))
-''' @param arr2 As Variant(Of Array(Of T))
-''' @return As Integer
-Public Function ArrCompare(ByVal arr1 As Variant, ByVal arr2 As Variant) As Integer
+''' @return As Variant(Of Boolean Or Null)
+Public Function ArrEquals(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
     If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
     
     Dim alen1 As Long: alen1 = ArrLen(arr1)
     Dim alen2 As Long: alen2 = ArrLen(arr2)
-    Dim alenMin As Long: alenMin = Min(alen1, alen2)
+    Dim cmpLen As Integer: cmpLen = Compare(alen1, alen2)
     
     Dim ix0 As Long: ix0 = LBound(arr1)
     Dim pad As Long: pad = LBound(arr2) - ix0
+    Dim alenMin As Long: alenMin = IIf(cmpLen < 0, alen1, alen2)
     
-    Dim i As Long
+    Dim i As Long, ret As Variant
     For i = ix0 To ix0 + alenMin - 1
-        ArrCompare = Compare(arr1(i), arr2(pad + i))
-        If ArrCompare <> 0 Then GoTo Escape
+        ret = Equals(arr1(i), arr2(pad + i))
+        If ret Then Else GoTo Ending
     Next
-    ArrCompare = Compare(alen1, alen2)
     
-Escape:
+    ret = Null
+    Select Case cmpLen
+    Case Is > 0
+        For i = ix0 + alenMin To ix0 + alen1 - 1
+            If IsNull(arr1(i)) Then GoTo Ending
+        Next
+    Case Is < 0
+        For i = ix0 + alenMin To ix0 + alen2 - 1
+            If IsNull(arr2(pad + i)) Then GoTo Ending
+        Next
+    End Select
+    ret = Not CBool(cmpLen)
+    
+Ending:
+    ArrEquals = ret
+End Function
+
+''' @param arr1 As Variant(Of Array(Of T))
+''' @param arr2 As Variant(Of Array(Of T))
+''' @return As Variant(Of Integer Or Null)
+Public Function ArrCompare(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
+    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
+    
+    Dim alen1 As Long: alen1 = ArrLen(arr1)
+    Dim alen2 As Long: alen2 = ArrLen(arr2)
+    Dim cmpLen As Integer: cmpLen = Compare(alen1, alen2)
+    
+    Dim ix0 As Long: ix0 = LBound(arr1)
+    Dim pad As Long: pad = LBound(arr2) - ix0
+    Dim alenMin As Long: alenMin = IIf(cmpLen < 0, alen1, alen2)
+    
+    Dim i As Long, ret As Variant
+    For i = ix0 To ix0 + alenMin - 1
+        ret = Compare(arr1(i), arr2(pad + i))
+        If ret = 0 Then Else GoTo Ending
+    Next
+    
+    ret = Null
+    Select Case cmpLen
+    Case Is > 0
+        For i = ix0 + alenMin To ix0 + alen1 - 1
+            If IsNull(arr1(i)) Then GoTo Ending
+        Next
+    Case Is < 0
+        For i = ix0 + alenMin To ix0 + alen2 - 1
+            If IsNull(arr2(pad + i)) Then GoTo Ending
+        Next
+    End Select
+    ret = cmpLen
+    
+Ending:
+    ArrCompare = ret
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
