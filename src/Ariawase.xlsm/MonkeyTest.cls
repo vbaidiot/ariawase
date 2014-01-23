@@ -46,7 +46,10 @@ Public Sub Core_Test()
     Assert.IsInstanceOfTypeName "Decimal", v
     
     Assert.AreEqualVal Core.Init(New Tuple, "A", 4), Core.Init(New Tuple, "A", 4)
+    Assert.AreEqualVal "A", Core.Init(New Tuple, "A", 4).Item1
+    Assert.AreEqualVal 4, Core.Init(New Tuple, "A", 4).Item2
     Assert.AreEqualVal "Tuple`2 { Item1 = ""A"", Item2 = 4% }", ToStr(Core.Init(New Tuple, "A", 4))
+    Assert.AreEqualVal "Tuple`4 { Item1 = 1%, Item2 = 2&, Item3 = 3#, Item4 = 4@ }", ToStr(Core.Init(New Tuple, 1, 2&, 3#, 4@))
     
     Assert.AreEqualVal True, Eq(42, 42)
     Assert.AreEqualVal True, Eq(42, 42&)
