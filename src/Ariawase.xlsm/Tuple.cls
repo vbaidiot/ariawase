@@ -18,10 +18,6 @@ Private xxInit As Boolean
 Private xxItems As Variant
 Private xxLength As Long
 
-Public Property Get Items() As Variant
-    Items = xxItems
-End Property
-
 Public Property Get Item1() As Variant
     Dim i As Long: i = 0
     If IsObject(xxItems(i)) Then Set Item1 = xxItems(i) Else Let Item1 = xxItems(i)
@@ -53,12 +49,16 @@ Public Sub Init(ParamArray itms() As Variant)
     xxInit = True
 End Sub
 
+Public Function GetItems() As Variant
+    GetItems = xxItems
+End Function
+
 Public Function Equals(ByVal tpl As Tuple) As Boolean
-    Equals = Core.ArrEquals(xxItems, tpl.Items)
+    Equals = Core.ArrEquals(xxItems, tpl.GetItems())
 End Function
 
 Public Function Compare(ByVal tpl As Tuple) As Integer
-    Compare = Core.ArrCompare(xxItems, tpl.Items)
+    Compare = Core.ArrCompare(xxItems, tpl.GetItems())
 End Function
 
 Public Function ToStr() As String
