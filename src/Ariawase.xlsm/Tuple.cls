@@ -29,19 +29,19 @@ End Property
 
 Public Property Get Item2() As Variant
     Dim i As Long: i = 1
-    If IsObject(xxItems(i)) Then Set Item1 = xxItems(i) Else Let Item1 = xxItems(i)
+    If IsObject(xxItems(i)) Then Set Item2 = xxItems(i) Else Let Item2 = xxItems(i)
 End Property
 
 Public Property Get Item3() As Variant
     Dim i As Long: i = 2
     If xxLength <= i Then Err.Raise 380
-    If IsObject(xxItems(i)) Then Set Item1 = xxItems(i) Else Let Item1 = xxItems(i)
+    If IsObject(xxItems(i)) Then Set Item3 = xxItems(i) Else Let Item3 = xxItems(i)
 End Property
 
 Public Property Get Item4() As Variant
     Dim i As Long: i = 3
     If xxLength <= i Then Err.Raise 380
-    If IsObject(xxItems(i)) Then Set Item1 = xxItems(i) Else Let Item1 = xxItems(i)
+    If IsObject(xxItems(i)) Then Set Item4 = xxItems(i) Else Let Item4 = xxItems(i)
 End Property
 
 Public Sub Init(ParamArray itms() As Variant)
