@@ -45,6 +45,22 @@ Public Sub Core_Test()
     Assert.AreEqualVal CDec(43), v
     Assert.IsInstanceOfTypeName "Decimal", v
     
+    Assert.AreEqualVal 1&, BitFlag(False, True)
+    Assert.AreEqualVal 8&, BitFlag(True, False, False, False)
+    Assert.AreEqualVal 8&, BitFlag(1, 0, 0, 0)
+    
+    Assert.AreEqualVal CDec(4), ARound(4.4)
+    Assert.AreEqualVal CDec(5), ARound(4.5)
+    Assert.AreEqualVal CDec(2.34), ARound(2.344, 2)
+    Assert.AreEqualVal CDec(2.35), ARound(2.345, 2)
+    Assert.AreEqualVal CDec(2), ARound(2.9, 0, 10)
+    Assert.AreEqualVal CDec(3), ARound(2.1, 0, 1)
+    
+    Assert.AreEqualVal #5/1/2013#, BeginOfMonth(#5/15/2013#)
+    Assert.AreEqualVal #5/31/2013#, EndOfMonth(#5/15/2013#)
+    Assert.AreEqualVal #5/12/2013#, BeginOfWeek(#5/15/2013#)
+    Assert.AreEqualVal #5/18/2013#, EndOfWeek(#5/15/2013#)
+    
     Assert.AreEqualVal Core.Init(New Tuple, "A", 4), Core.Init(New Tuple, "A", 4)
     Assert.AreEqualVal "A", Core.Init(New Tuple, "A", 4).Item1
     Assert.AreEqualVal 4, Core.Init(New Tuple, "A", 4).Item2
@@ -137,17 +153,6 @@ Public Sub Core_Test()
         Array("1", "2", "3"), _
         ArrMap(Core.Init(New Func, vbString, AddressOf ToStr, vbVariant), Array(1, 2, 3))
     
-'     ' Function IsOdd(ByVal n As Integer) As Boolean
-'     ArrFilter(Init(New Func, vbBoolean, AddressOf IsOdd), ArrRange(1, 9))
-'     ' => Array(1, 3, 5, 7, 9)
-    
-'     ' Function Add(ByVal i As Integer, ByVal j As Integer) As Integer
-'     ArrFold(Init(New Func, AddressOf Add, vbInteger), ArrRange(1, 100), 0) '5050
-    
-'     ' Function FibFun(ByVal pair As Variant) As Variant
-'     ArrUnfold(Init(New Func, AddressOf FibFun, vbVariant, vbVariant), Array(1, 1))
-'     ' => 1, 2, 3, 5, 8, 13, 21, 34, 55, 89
-    
     Assert.AreEqualArr Array(1, 2, 3), ClctToArr(ArrToClct(Array(1, 2, 3)))
     
     Dim clct As Collection
@@ -166,31 +171,10 @@ Public Sub Core_Test()
     Assert.AreEqualVal 1, Unshift(clct)
     Assert.AreEqualArr Array(2, 3), ClctToArr(clct)
     
-    Assert.AreEqualVal 1&, BitFlag(False, True)
-    Assert.AreEqualVal 8&, BitFlag(True, False, False, False)
-    Assert.AreEqualVal 8&, BitFlag(1, 0, 0, 0)
-    
-    Assert.AreEqualVal CDec(4), ARound(4.4)
-    Assert.AreEqualVal CDec(5), ARound(4.5)
-    Assert.AreEqualVal CDec(2.34), ARound(2.344, 2)
-    Assert.AreEqualVal CDec(2.35), ARound(2.345, 2)
-    Assert.AreEqualVal CDec(2), ARound(2.9, 0, 10)
-    Assert.AreEqualVal CDec(3), ARound(2.1, 0, 1)
-    
-    Assert.AreEqualVal #5/1/2013#, BeginOfMonth(#5/15/2013#)
-    Assert.AreEqualVal #5/31/2013#, EndOfMonth(#5/15/2013#)
-    Assert.AreEqualVal #5/12/2013#, BeginOfWeek(#5/15/2013#)
-    Assert.AreEqualVal #5/18/2013#, EndOfWeek(#5/15/2013#)
-    
 '    JagArrToArr2D
 '    Arr2DToJagArr
-'    CreateAssocArray
 '    CreateDictionary
-'    AssocArrToDict
-'    DictToAssocArr
-End Sub
-
-Public Sub Util_Test()
+    
     Assert.AreEqualVal "C:\WINDOWS", UCase(Wsh.ExpandEnvironmentStrings("%windir%"))
     
     Assert.IsInstanceOfTypeName _
@@ -216,4 +200,21 @@ Public Sub Util_Test()
     Dim s As String
     CreateStdRegProv().GetStringValue HKEY_CLASSES_ROOT, ".txt", "Content Type", s
     Assert.AreEqualVal "text/plain", s
+End Sub
+
+Public Sub Util_Test()
+'    CreateAssocArray
+'    AssocArrToDict
+'    DictToAssocArr
+    
+'    ' Function IsOdd(ByVal n As Integer) As Boolean
+'    ArrFilter(Init(New Func, vbBoolean, AddressOf IsOdd), ArrRange(1, 9))
+'    ' => Array(1, 3, 5, 7, 9)
+    
+'    ' Function Add(ByVal i As Integer, ByVal j As Integer) As Integer
+'    ArrFold(Init(New Func, AddressOf Add, vbInteger), ArrRange(1, 100), 0) '5050
+    
+'    ' Function FibFun(ByVal pair As Variant) As Variant
+'    ArrUnfold(Init(New Func, AddressOf FibFun, vbVariant, vbVariant), Array(1, 1))
+'    ' => 1, 2, 3, 5, 8, 13, 21, 34, 55, 89
 End Sub
