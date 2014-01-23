@@ -65,6 +65,155 @@ Public Function IncrPst(ByRef n As Variant, Optional ByVal stepVal As Variant = 
     IncrPst = n: n = n + stepVal
 End Function
 
+''' @param flgs() As Variant(Of Boolean)
+''' @return As Long
+Public Function BitFlag(ParamArray flgs() As Variant) As Long
+    BitFlag = 0
+    Dim ub As Long: ub = UBound(flgs)
+    
+    Dim i As Long
+    For i = 0 To ub
+        BitFlag = BitFlag + IIf(flgs(i), 1, 0) * 2 ^ (ub - i)
+    Next
+End Function
+
+''' @param num As Variant(Of Decimal)
+''' @param digits As Integer
+''' @param rndup As Integer
+''' @return As Variant(Of Decimal)
+Public Function ARound( _
+    ByVal num As Variant, Optional ByVal digits As Integer = 0, Optional rndup As Integer = 5 _
+    ) As Variant
+    
+    If IsNumeric(num) Then num = CDec(num) Else Err.Raise 13
+    If Not (1 <= rndup And rndup <= 10) Then Err.Raise 5
+    
+    Dim n As Variant: n = CDec(10 ^ Abs(digits))
+    Dim z As Variant: z = CDec(Sgn(num) * 0.1 * (10 - rndup))
+    If digits >= 0 Then
+        ARound = Fix(num * n + z) / n
+    Else
+        ARound = Fix(num / n + z) * n
+    End If
+    
+Escape:
+End Function
+
+''' @param dt As Date
+''' @return As Date
+Public Function BeginOfMonth(ByVal dt As Date) As Date
+    BeginOfMonth = DateAdd("d", -Day(dt) + 1, dt)
+End Function
+
+''' @param dt As Date
+''' @return As Date
+Public Function EndOfMonth(ByVal dt As Date) As Date
+    EndOfMonth = DateAdd("d", -1, BeginOfMonth(DateAdd("m", 1, dt)))
+End Function
+
+''' @param dt As Date
+''' @param fstDayOfWeek As VbDayOfWeek
+''' @return As Date
+Public Function BeginOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
+    BeginOfWeek = DateAdd("d", 1 - Weekday(dt, fstDayOfWeek), dt)
+End Function
+
+''' @param dt As Date
+''' @param fstDayOfWeek As VbDayOfWeek
+''' @return As Date
+Public Function EndOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
+    EndOfWeek = DateAdd("d", 7 - Weekday(dt, fstDayOfWeek), dt)
+End Function
+
+'''
+''' NOTE: This function for Japanese. Please be customized to your language.
+'''
+''' @param s As String Is Char
+''' @return As Integer
+Private Function CharWidth(ByVal s As String) As Integer
+   Dim x As Integer: x = Asc(s) / &H100 And &HFF
+   CharWidth = IIf((&H81 <= x And x <= &H9F) Or (&HE0 <= x And x <= &HFC), 2, 1)
+End Function
+
+''' @param s As String Is Char
+''' @return As Long
+Public Function StringWidth(ByVal s As String) As Long
+    Dim w As Long: w = 0
+    
+    Dim i As Long
+    For i = 1 To Len(s)
+        w = w + CharWidth(Mid(s, i, 1))
+    Next
+    StringWidth = w
+End Function
+
+''' @param s As String
+''' @param byteLen As Long
+''' @return As String
+Public Function LeftA(ByVal s As String, ByVal byteLen As Long) As String
+    Dim ixByte As Long: ixByte = 1
+    Dim ixStr As Long:  ixStr = 1
+    While (ixByte < 1 + byteLen) And (ixStr <= Len(s))
+        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
+    Wend
+    LeftA = Left(s, ixStr - (ixByte - byteLen))
+End Function
+
+''' @param s As String
+''' @param byteLen As Long
+''' @return As String
+Public Function RightA(ByVal s As String, ByVal byteLen As Long) As String
+    Dim idxs As Object: Set idxs = CreateObject("Scripting.Dictionary")
+    Dim ixByte As Long: ixByte = 1
+    Dim ixStr As Long:  ixStr = 1
+    While ixStr <= Len(s)
+        idxs.Add ixByte, ixStr
+        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
+    Wend
+    idxs.Add ixByte, ixStr
+    
+    For byteLen = byteLen To 0 Step -1
+        If idxs.Exists(ixByte - byteLen) Then Exit For
+    Next
+    
+    RightA = Right(s, ixStr - idxs.Item(ixByte - byteLen))
+End Function
+
+''' @param s As String
+''' @param byteLen As Long
+''' @return As Variant(Of Array(Of String))
+Public Function SepA(ByVal s As String, ByVal byteLen As Long) As Variant
+    Dim ixByte As Long: ixByte = 1
+    Dim ixStr  As Long: ixStr = 1
+    Dim strLen As Long: strLen = Len(s)
+    
+    While (ixByte < 1 + byteLen) And (ixStr <= strLen)
+        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
+    Wend
+    
+    Dim n As Long: n = ixStr - (ixByte - byteLen)
+    SepA = Array(Left(s, n), Mid(s, n + 1, strLen))
+End Function
+
+''' @param obj As Object Is T
+''' @param args As Variant()
+''' @return As Object Is T
+Public Function Init(ByVal obj As Object, ParamArray params() As Variant) As Object
+    Dim i As Long
+    Dim ubParam As Long: ubParam = UBound(params)
+    Dim ps() As Variant: ReDim ps(ubParam)
+    For i = 0 To ubParam
+        If IsObject(params(i)) Then
+            Set ps(i) = params(i)
+        Else
+            Let ps(i) = params(i)
+        End If
+    Next
+    rtcCallByName obj, StrPtr("Init"), VbMethod, ps
+    
+    Set Init = obj
+End Function
+
 Public Function ToStr(ByVal x As Variant) As String
     If IsObject(x) Then
         On Error Resume Next
@@ -111,25 +260,6 @@ Public Function ToLiteral(ByVal x As Variant) As String
                 ToLiteral = x.ToStr()
             End If
     End Select
-End Function
-
-''' @param obj As Object Is T
-''' @param args As Variant()
-''' @return As Object Is T
-Public Function Init(ByVal obj As Object, ParamArray params() As Variant) As Object
-    Dim i As Long
-    Dim ubParam As Long: ubParam = UBound(params)
-    Dim ps() As Variant: ReDim ps(ubParam)
-    For i = 0 To ubParam
-        If IsObject(params(i)) Then
-            Set ps(i) = params(i)
-        Else
-            Let ps(i) = params(i)
-        End If
-    Next
-    rtcCallByName obj, StrPtr("Init"), VbMethod, ps
-    
-    Set Init = obj
 End Function
 
 ''' @param x As Variant(Of T)
@@ -635,127 +765,6 @@ Public Function ArrRange( _
     ArrRange = arr
 End Function
 
-''' @param f As Func(Of T, U)
-''' @param arr As Variant(Of Array(Of T))
-''' @return As Variant(Of Array(Of U))
-Public Function ArrMap(ByVal f As Func, ByVal arr As Variant) As Variant
-    If Not IsArray(arr) Then Err.Raise 13
-    Dim lb As Long: lb = LBound(arr)
-    Dim ub As Long: ub = UBound(arr)
-    Dim ret As Variant
-    If ub - lb < 0 Then
-        ret = Array()
-        GoTo Ending
-    End If
-    
-    ReDim ret(lb To ub)
-    
-    Dim i As Long
-    For i = lb To ub: f.FastApply ret(i), arr(i): Next
-    
-Ending:
-    ArrMap = ret
-End Function
-
-''' @param f As Func(Of T, Boolean)
-''' @param arr As Variant(Of Array(Of T))
-''' @return As Variant(Of Array(Of T))
-Public Function ArrFilter(ByVal f As Func, ByVal arr As Variant) As Variant
-    If Not IsArray(arr) Then Err.Raise 13
-    Dim lb As Long: lb = LBound(arr)
-    Dim ub As Long: ub = UBound(arr)
-    Dim ret As Variant
-    If ub - lb < 0 Then
-        ret = Array()
-        GoTo Ending
-    End If
-    
-    ReDim ret(lb To ub)
-    
-    Dim flg As Boolean
-    Dim ixArr As Long
-    Dim ixRet As Long: ixRet = lb
-    If IsObject(arr(lb)) Then
-        For ixArr = lb To ub
-            f.FastApply flg, arr(ixArr)
-            If flg Then Set ret(IncrPst(ixRet)) = arr(ixArr)
-        Next
-    Else
-        For ixArr = lb To ub
-            f.FastApply flg, arr(ixArr)
-            If flg Then Let ret(IncrPst(ixRet)) = arr(ixArr)
-        Next
-    End If
-    
-    If ixRet > 0 Then
-        ReDim Preserve ret(lb To ixRet - 1)
-    Else
-        ret = Array()
-    End If
-    
-Ending:
-    ArrFilter = ret
-End Function
-
-''' @param f As Func(Of U, T, U)
-''' @param arr As Variant(Of Array(Of T))
-''' @param seedVal As Variant(Of U)
-''' @return As Variant(Of U)
-Public Function ArrFold(ByVal f As Func, ByVal arr As Variant, Optional ByVal seedVal As Variant _
-    ) As Variant
-    
-    If Not IsArray(arr) Then Err.Raise 13
-    
-    Dim stat As Variant
-    Dim i As Long: i = LBound(arr)
-    If IsMissing(seedVal) Then
-        stat = arr(IncrPst(i))
-    Else
-        stat = seedVal
-    End If
-    
-    For i = i To UBound(arr): f.FastApply stat, stat, arr(i): Next
-    
-    If IsObject(stat) Then
-        Set ArrFold = stat
-    Else
-        Let ArrFold = stat
-    End If
-End Function
-
-''' @param f As Func
-''' @param seedVal As Variant(Of T)
-''' @return As Variant(Of Array(Of U))
-Public Function ArrUnfold(ByVal f As Func, ByVal seedVal As Variant) As Variant
-    Dim i As Long: i = 0
-    Dim alen As Long: alen = 32
-    Dim arr As Variant: ReDim arr(alen - 1)
-    
-    Dim stat As Variant
-    If IsObject(seedVal) Then
-        f.FastApply stat, seedVal
-        Do Until IsMissing(stat(1))
-            Set arr(IncrPst(i)) = stat(0)
-            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
-            f.FastApply stat, stat(1)
-        Loop
-    Else
-        f.FastApply stat, seedVal
-        Do Until IsMissing(stat(1))
-            Let arr(IncrPst(i)) = stat(0)
-            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
-            f.FastApply stat, stat(1)
-        Loop
-    End If
-    
-    If i > 0 Then
-        ReDim Preserve arr(i - 1)
-    Else
-        arr = Array()
-    End If
-    ArrUnfold = arr
-End Function
-
 ''' @param clct As Collection(Of T)
 ''' @param val As Variant(Of T)
 Public Sub Push(ByVal clct As Collection, ByVal val As Variant)
@@ -960,132 +969,123 @@ Ending:
     DictToAssocArr = arr
 End Function
 
-''' @param flgs() As Variant(Of Boolean)
-''' @return As Long
-Public Function BitFlag(ParamArray flgs() As Variant) As Long
-    BitFlag = 0
-    Dim ub As Long: ub = UBound(flgs)
-    
-    Dim i As Long
-    For i = 0 To ub
-        BitFlag = BitFlag + IIf(flgs(i), 1, 0) * 2 ^ (ub - i)
-    Next
-End Function
-
-''' @param num As Variant(Of Decimal)
-''' @param digits As Integer
-''' @param rndup As Integer
-''' @return As Variant(Of Decimal)
-Public Function ARound( _
-    ByVal num As Variant, Optional ByVal digits As Integer = 0, Optional rndup As Integer = 5 _
-    ) As Variant
-    
-    If IsNumeric(num) Then num = CDec(num) Else Err.Raise 13
-    If Not (1 <= rndup And rndup <= 10) Then Err.Raise 5
-    
-    Dim n As Variant: n = CDec(10 ^ Abs(digits))
-    Dim z As Variant: z = CDec(Sgn(num) * 0.1 * (10 - rndup))
-    If digits >= 0 Then
-        ARound = Fix(num * n + z) / n
-    Else
-        ARound = Fix(num / n + z) * n
+''' @param f As Func(Of T, U)
+''' @param arr As Variant(Of Array(Of T))
+''' @return As Variant(Of Array(Of U))
+Public Function ArrMap(ByVal f As Func, ByVal arr As Variant) As Variant
+    If Not IsArray(arr) Then Err.Raise 13
+    Dim lb As Long: lb = LBound(arr)
+    Dim ub As Long: ub = UBound(arr)
+    Dim ret As Variant
+    If ub - lb < 0 Then
+        ret = Array()
+        GoTo Ending
     End If
     
-Escape:
-End Function
-
-''' @param dt As Date
-''' @return As Date
-Public Function BeginOfMonth(ByVal dt As Date) As Date
-    BeginOfMonth = DateAdd("d", -Day(dt) + 1, dt)
-End Function
-
-''' @param dt As Date
-''' @return As Date
-Public Function EndOfMonth(ByVal dt As Date) As Date
-    EndOfMonth = DateAdd("d", -1, BeginOfMonth(DateAdd("m", 1, dt)))
-End Function
-
-''' @param dt As Date
-''' @param fstDayOfWeek As VbDayOfWeek
-''' @return As Date
-Public Function BeginOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
-    BeginOfWeek = DateAdd("d", 1 - Weekday(dt, fstDayOfWeek), dt)
-End Function
-
-''' @param dt As Date
-''' @param fstDayOfWeek As VbDayOfWeek
-''' @return As Date
-Public Function EndOfWeek(ByVal dt As Date, Optional fstDayOfWeek As VbDayOfWeek = vbSunday) As Date
-    EndOfWeek = DateAdd("d", 7 - Weekday(dt, fstDayOfWeek), dt)
-End Function
-
-'''
-''' NOTE: This function for Japanese. Please be customized to your language.
-'''
-''' @param s As String Is Char
-''' @return As Integer
-Private Function CharWidth(ByVal s As String) As Integer
-   Dim x As Integer: x = Asc(s) / &H100 And &HFF
-   CharWidth = IIf((&H81 <= x And x <= &H9F) Or (&HE0 <= x And x <= &HFC), 2, 1)
-End Function
-
-''' @param s As String Is Char
-''' @return As Long
-Public Function StringWidth(ByVal s As String) As Long
-    Dim w As Long: w = 0
+    ReDim ret(lb To ub)
     
     Dim i As Long
-    For i = 1 To Len(s)
-        w = w + CharWidth(Mid(s, i, 1))
-    Next
-    StringWidth = w
+    For i = lb To ub: f.FastApply ret(i), arr(i): Next
+    
+Ending:
+    ArrMap = ret
 End Function
 
-''' @param s As String
-''' @param byteLen As Long
-''' @return As String
-Public Function LeftA(ByVal s As String, ByVal byteLen As Long) As String
-    Dim ixByte As Long: ixByte = 1
-    Dim ixStr As Long:  ixStr = 1
-    While (ixByte < 1 + byteLen) And (ixStr <= Len(s))
-        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
-    Wend
-    LeftA = Left(s, ixStr - (ixByte - byteLen))
+''' @param f As Func(Of T, Boolean)
+''' @param arr As Variant(Of Array(Of T))
+''' @return As Variant(Of Array(Of T))
+Public Function ArrFilter(ByVal f As Func, ByVal arr As Variant) As Variant
+    If Not IsArray(arr) Then Err.Raise 13
+    Dim lb As Long: lb = LBound(arr)
+    Dim ub As Long: ub = UBound(arr)
+    Dim ret As Variant
+    If ub - lb < 0 Then
+        ret = Array()
+        GoTo Ending
+    End If
+    
+    ReDim ret(lb To ub)
+    
+    Dim flg As Boolean
+    Dim ixArr As Long
+    Dim ixRet As Long: ixRet = lb
+    If IsObject(arr(lb)) Then
+        For ixArr = lb To ub
+            f.FastApply flg, arr(ixArr)
+            If flg Then Set ret(IncrPst(ixRet)) = arr(ixArr)
+        Next
+    Else
+        For ixArr = lb To ub
+            f.FastApply flg, arr(ixArr)
+            If flg Then Let ret(IncrPst(ixRet)) = arr(ixArr)
+        Next
+    End If
+    
+    If ixRet > 0 Then
+        ReDim Preserve ret(lb To ixRet - 1)
+    Else
+        ret = Array()
+    End If
+    
+Ending:
+    ArrFilter = ret
 End Function
 
-''' @param s As String
-''' @param byteLen As Long
-''' @return As String
-Public Function RightA(ByVal s As String, ByVal byteLen As Long) As String
-    Dim idxs As Object: Set idxs = CreateObject("Scripting.Dictionary")
-    Dim ixByte As Long: ixByte = 1
-    Dim ixStr As Long:  ixStr = 1
-    While ixStr <= Len(s)
-        idxs.Add ixByte, ixStr
-        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
-    Wend
-    idxs.Add ixByte, ixStr
+''' @param f As Func(Of U, T, U)
+''' @param arr As Variant(Of Array(Of T))
+''' @param seedVal As Variant(Of U)
+''' @return As Variant(Of U)
+Public Function ArrFold(ByVal f As Func, ByVal arr As Variant, Optional ByVal seedVal As Variant _
+    ) As Variant
     
-    For byteLen = byteLen To 0 Step -1
-        If idxs.Exists(ixByte - byteLen) Then Exit For
-    Next
+    If Not IsArray(arr) Then Err.Raise 13
     
-    RightA = Right(s, ixStr - idxs.Item(ixByte - byteLen))
+    Dim stat As Variant
+    Dim i As Long: i = LBound(arr)
+    If IsMissing(seedVal) Then
+        stat = arr(IncrPst(i))
+    Else
+        stat = seedVal
+    End If
+    
+    For i = i To UBound(arr): f.FastApply stat, stat, arr(i): Next
+    
+    If IsObject(stat) Then
+        Set ArrFold = stat
+    Else
+        Let ArrFold = stat
+    End If
 End Function
 
-''' @param s As String
-''' @param byteLen As Long
-''' @return As Variant(Of Array(Of String))
-Public Function SepA(ByVal s As String, ByVal byteLen As Long) As Variant
-    Dim ixByte As Long: ixByte = 1
-    Dim ixStr  As Long: ixStr = 1
-    Dim strLen As Long: strLen = Len(s)
+''' @param f As Func
+''' @param seedVal As Variant(Of T)
+''' @return As Variant(Of Array(Of U))
+Public Function ArrUnfold(ByVal f As Func, ByVal seedVal As Variant) As Variant
+    Dim i As Long: i = 0
+    Dim alen As Long: alen = 32
+    Dim arr As Variant: ReDim arr(alen - 1)
     
-    While (ixByte < 1 + byteLen) And (ixStr <= strLen)
-        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
-    Wend
+    Dim stat As Variant
+    If IsObject(seedVal) Then
+        f.FastApply stat, seedVal
+        Do Until IsMissing(stat(1))
+            Set arr(IncrPst(i)) = stat(0)
+            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+            f.FastApply stat, stat(1)
+        Loop
+    Else
+        f.FastApply stat, seedVal
+        Do Until IsMissing(stat(1))
+            Let arr(IncrPst(i)) = stat(0)
+            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+            f.FastApply stat, stat(1)
+        Loop
+    End If
     
-    Dim n As Long: n = ixStr - (ixByte - byteLen)
-    SepA = Array(Left(s, n), Mid(s, n + 1, strLen))
+    If i > 0 Then
+        ReDim Preserve arr(i - 1)
+    Else
+        arr = Array()
+    End If
+    ArrUnfold = arr
 End Function
