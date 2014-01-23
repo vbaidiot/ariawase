@@ -1,4 +1,4 @@
-Attribute VB_Name = "Resx"
+Attribute VB_Name = "Resource"
 ''' +----                                                             --+ '''
 ''' |                          Ariawase 0.5.0                           | '''
 ''' |             Ariawase is free library for VBA cowboys.             | '''
