@@ -183,12 +183,12 @@ Public Sub Core_Test()
     
 '    CreateRegExp
     
-    Assert.AreEqualVal "#VBA", RegExpMatch("beyond the limit of #VBA.", "#\w+")(0)
-    Assert.AreEqualArr Array("2013/5/1", "2013", "5", "1"), RegExpMatch("2013/5/1", "(\d{4})/(\d{1,2})/(\d{1,2})")
-    Assert.AreEqualVal 3&, ArrLen(ArrFlatten(RegExpGMatches("Practice! Practice! Practice!", "\w+!")))
+    Assert.AreEqualVal "#VBA", ReMatch("beyond the limit of #VBA.", "#\w+")(0)
+    Assert.AreEqualArr Array("2013/5/1", "2013", "5", "1"), ReMatch("2013/5/1", "(\d{4})/(\d{1,2})/(\d{1,2})")
+    Assert.AreEqualVal 3&, ArrLen(ArrFlatten(ReMatcheGlobal("Practice! Practice! Practice!", "\w+!")))
     Assert.AreEqualVal _
         "<li>Word</li><li>Excel</li><li>Access</li>", _
-        RegExpReplace("<p>Word</p><P>Excel</P><p>Access</p>", "<(/?)p>", "<$1li>", "ig")
+        ReReplace("<p>Word</p><P>Excel</P><p>Access</p>", "<(/?)p>", "<$1li>", "ig")
     
     Assert.AreEqualVal _
         "001 {2013/05/20} Simple is best.", _

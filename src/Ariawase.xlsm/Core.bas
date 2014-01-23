@@ -991,7 +991,7 @@ End Function
 ''' @param ptrnFind As String
 ''' @param iCase As Boolean
 ''' @return As Variant(Of Array(Of String))
-Public Function RegExpMatch( _
+Public Function ReMatch( _
     ByVal expr As String, ByVal ptrnFind As String, _
     Optional ByVal iCase As Boolean = False _
     ) As Variant
@@ -1010,14 +1010,14 @@ Public Function RegExpMatch( _
     For i = 1 To UBound(ret): ret(i) = sms.Item(i - 1): Next
     
 Ending:
-    RegExpMatch = ret
+    ReMatch = ret
 End Function
 
 ''' @param expr As String
 ''' @param ptrnFind As String
 ''' @param iCase As Boolean
 ''' @return As Variant(Of Array(Of Array(Of String)))
-Public Function RegExpGMatches( _
+Public Function ReMatcheGlobal( _
     ByVal expr As String, ByVal ptrnFind As String, _
     Optional ByVal iCase As Boolean = False _
     ) As Variant
@@ -1041,7 +1041,7 @@ Public Function RegExpGMatches( _
     Next
     
 Ending:
-    RegExpGMatches = ret
+    ReMatcheGlobal = ret
 End Function
 
 ''' @param expr As String
@@ -1049,13 +1049,13 @@ End Function
 ''' @param ptrnReplace As String
 ''' @param regexpOption As String
 ''' @return As Variant(Of Array(Of String))
-Public Function RegExpReplace( _
+Public Function ReReplace( _
     ByVal expr As String, ByVal ptrnFind As String, ByVal ptrnReplace As String, _
     Optional ByVal regexpOption As String = "" _
     ) As String
     
     Dim regex As Object: Set regex = CreateRegExp(ptrnFind, regexpOption)
-    RegExpReplace = regex.Replace(expr, ptrnReplace)
+    ReReplace = regex.Replace(expr, ptrnReplace)
 End Function
 
 ''' @param strTemplate As String
@@ -1077,7 +1077,7 @@ Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Varian
     For Each m In ms
         ix1 = m.FirstIndex + IIf(Left(m.Value, 1) <> "{", 1, 0)
         s = Mid(strTemplate, ix0, ix1 - ix0 + 1)
-        Dim mbrc As Variant: mbrc = RegExpMatch(s, "{+$")
+        Dim mbrc As Variant: mbrc = ReMatch(s, "{+$")
         Dim brcs As String:  If ArrLen(mbrc) > 0 Then brcs = mbrc(0) Else brcs = ""
         
         ret(i + 0) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
