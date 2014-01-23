@@ -1,9 +1,9 @@
 Attribute VB_Name = "Resource"
-''' +----                                                             --+ '''
-''' |                          Ariawase 0.5.0                           | '''
-''' |             Ariawase is free library for VBA cowboys.             | '''
-''' |        The Project Page: https://github.com/igeta/Ariawase        | '''
-''' +--                                                             ----+ '''
+'''+----                                                                   --+
+'''|                             Ariawase 0.6.0 Beta                         |
+'''|                Ariawase is free library for VBA cowboys.                |
+'''|           The Project Page: https://github.com/igeta/Ariawase           |
+'''+--                                                                   ----+
 Option Explicit
 Option Private Module
 

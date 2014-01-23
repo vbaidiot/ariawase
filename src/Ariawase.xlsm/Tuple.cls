@@ -7,11 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-''' +----                                                             --+ '''
-''' |                          Ariawase 0.5.0                           | '''
-''' |             Ariawase is free library for VBA cowboys.             | '''
-''' |        The Project Page: https://github.com/igeta/Ariawase        | '''
-''' +--                                                             ----+ '''
+'''+----                                                                   --+
+'''|                             Ariawase 0.6.0 Beta                         |
+'''|                Ariawase is free library for VBA cowboys.                |
+'''|           The Project Page: https://github.com/igeta/Ariawase           |
+'''+--                                                                   ----+
 Option Explicit
 
 Private xxInit As Boolean
