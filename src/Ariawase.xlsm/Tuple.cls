@@ -64,7 +64,7 @@ End Function
 Public Function ToStr() As String
     Dim s As String, i As Long
     
-    s = "Tuple { Item1 = " & Core.ToLiteral(xxItems(0))
+    s = "Tuple`" & xxLength & " { Item1 = " & Core.ToLiteral(xxItems(0))
     For i = 1 To xxLength - 1
         s = s & ", Item" & i + 1 & " = " & Core.ToLiteral(xxItems(i))
     Next
