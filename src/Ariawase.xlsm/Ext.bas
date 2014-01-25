@@ -111,7 +111,8 @@ End Function
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param seedVal As Variant(Of U)
 ''' @return As Variant(Of U)
-Public Function ArrFold(ByVal f As Func, ByVal arr As Variant, Optional ByVal seedVal As Variant _
+Public Function ArrFold( _
+    ByVal f As Func, ByVal arr As Variant, Optional ByVal seedVal As Variant _
     ) As Variant
     
     If Not IsArray(arr) Then Err.Raise 13

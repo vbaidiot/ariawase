@@ -33,15 +33,18 @@ Private Const cdoSendPassword     As String = uriCdoConf & "sendpassword"
 Private Const cdoLanguageCode     As String = uriCdoConf & "languagecode"
 
 Private xMyMailAddr As String
-Private xConf       As Object 'Is CDO.Configuration
+Private xConf As Object 'Is CDO.Configuration
 
 Private xMsg As Object 'Is CDO.Message
 
 Public Sub Configure( _
-    ByVal myMailAddr As String, Optional ByVal smtpServer As String, _
+    ByVal myMailAddr As String, _
+    Optional ByVal smtpServer As String, _
     Optional ByVal smtpAuth As CdoProtocolsAuthentication = cdoAnonymous, _
-    Optional ByVal sndUser As String, Optional ByVal sndPassword As String, _
-    Optional ByVal useSSL As Boolean = False)
+    Optional ByVal sndUser As String, _
+    Optional ByVal sndPassword As String, _
+    Optional ByVal useSSL As Boolean = False _
+    )
     
     xMyMailAddr = myMailAddr
     
@@ -56,8 +59,8 @@ Public Sub Configure( _
         .Item(cdoSendUsingMethod) = CdoSendUsing.cdoSendUsingPort
         .Item(cdoSMTPServer) = smtpAddrPort(0)
         Select Case UBound(smtpAddrPort)
-            Case 0:    .Item(cdoSMTPServerPort) = 25
-            Case 1:    .Item(cdoSMTPServerPort) = smtpAddrPort(1)
+            Case 0: .Item(cdoSMTPServerPort) = 25
+            Case 1: .Item(cdoSMTPServerPort) = smtpAddrPort(1)
             Case Else: Err.Raise 5
         End Select
         
@@ -88,7 +91,8 @@ End Function
 Public Sub SetAddress( _
     ByVal addrTo As Variant, _
     Optional ByVal addrCC As Variant = Empty, _
-    Optional ByVal addrBCC As Variant = Empty)
+    Optional ByVal addrBCC As Variant = Empty _
+    )
     
     xMsg.To = GetAddrList(addrTo)
     xMsg.CC = GetAddrList(addrCC)
@@ -98,7 +102,8 @@ End Sub
 Public Sub SetMessage( _
     ByVal msgSubject As String, ByVal msgBody As String, _
     Optional ByVal chrset As String = cdoISO_2022_JP, _
-    Optional ByVal contTransEnc As String = cdoBase64)
+    Optional ByVal contTransEnc As String = cdoBase64 _
+    )
     
     xMsg.Subject = msgSubject
     xMsg.TextBody = msgBody
@@ -107,7 +112,7 @@ Public Sub SetMessage( _
 End Sub
 
 Public Sub AddAttachments(ByVal atchFiles As Variant)
-    Dim fpath As Variant 'Is String
+    Dim fpath As Variant '(Of String)
     For Each fpath In atchFiles: xMsg.AddAttachment fpath: Next
 End Sub
 
@@ -116,7 +121,8 @@ Public Sub MakeSend()
 End Sub
 
 Public Sub QuickSend( _
-    ByVal addrTo As Variant, ByVal msgSubject As String, ByVal msgBody As String)
+    ByVal addrTo As Variant, ByVal msgSubject As String, ByVal msgBody As String _
+    )
     
     If Len(xMyMailAddr) < 1 Then Err.Raise 5
     
