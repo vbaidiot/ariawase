@@ -207,12 +207,13 @@ Public Sub Util_Test()
 '    AssocArrToDict
 '    DictToAssocArr
     
-'    ' Function IsOdd(ByVal n As Integer) As Boolean
-'    ArrFilter(Init(New Func, vbBoolean, AddressOf IsOdd), ArrRange(1, 9))
-'    ' => Array(1, 3, 5, 7, 9)
+'    Assert.AreEqualArr _
+'        Array(1, 3, 5, 7, 9), _
+'        ArrFilter(Init(New Func, vbBoolean, AddressOf IsOdd, vbInteger), ArrRange(1, 9))
     
-'    ' Function Add(ByVal i As Integer, ByVal j As Integer) As Integer
-'    ArrFold(Init(New Func, AddressOf Add, vbInteger), ArrRange(1, 100), 0) '5050
+'    Assert.AreEqualVal _
+'        5050, _
+'        ArrFold(Init(New Func, vbInteger, AddressOf Add, vbInteger, vbInteger), ArrRange(1, 100), 0)
     
 '    Assert.AreEqualArr _
 '        Array(1&, 2&, 3&, 5&, 8&, 13&, 21&, 34&, 55&, 89&), _
@@ -220,6 +221,15 @@ Public Sub Util_Test()
 End Sub
 
 #If False Then
+''' Note: copy the following codes paste onto a standard module
+Public Function IsOdd(ByVal n As Integer) As Boolean
+    IsOdd = n Mod 2 = 1
+End Function
+
+Public Function Add(ByVal x As Integer, ByVal y As Integer) As Integer
+    Add = x + y
+End Function
+
 Public Function FibFun(ByVal tpl As Tuple) As Variant
     Dim lmt As Long: lmt = 100
     
