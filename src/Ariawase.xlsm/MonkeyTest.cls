@@ -125,21 +125,19 @@ Public Sub Core_Test()
     
     Dim arr As Variant
     
-    Assert.AreEqualArr Array(1, 2, 3, 4, 5, 6, 7, 8, 9), ArrRange(1, 9)
-    
-    arr = ArrRange(1, 9)
+    arr = Array(1, 2, 3, 4, 5, 6, 7, 8, 9)
     ArrRev arr
-    Assert.AreEqualArr ArrRange(9, 1, -1), arr
+    Assert.AreEqualArr Array(9, 8, 7, 6, 5, 4, 3, 2, 1), arr
     
     arr = Array("S", "O", "R", "T")
     ArrSort arr
     Assert.AreEqualArr Array("O", "R", "S", "T"), arr
     arr = Array(2, 4, 3, 5, 6, 7, 0, 1, 9, 8)
     ArrSort arr, True
-    Assert.AreEqualArr ArrRange(0, 9), arr
+    Assert.AreEqualArr Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), arr
     arr = Array(2, 4, 3, 5, 6, 7, 0, 1, 9, 8)
     ArrSort arr, False
-    Assert.AreEqualArr ArrRange(9, 0, -1), arr
+    Assert.AreEqualArr Array(9, 8, 7, 6, 5, 4, 3, 2, 1, 0), arr
     
     Assert.AreEqualArr Array(6, 5, 3), ArrUniq(Array(6, 5, 5, 3, 6))
     
@@ -177,10 +175,6 @@ Public Sub Core_Test()
     
     Assert.AreEqualVal "C:\WINDOWS", UCase(Wsh.ExpandEnvironmentStrings("%windir%"))
     
-    Assert.IsInstanceOfTypeName _
-        "Decimal", _
-        CDec(EnumeratorToArr(Wmi.ConnectServer().ExecQuery("SELECT * FROM Win32_ComputerSystem"))(0).TotalPhysicalMemory)
-    
 '    CreateRegExp
     
     Assert.AreEqualVal "#VBA", ReMatch("beyond the limit of #VBA.", "#\w+")(0)
@@ -206,6 +200,12 @@ Public Sub Util_Test()
 '    CreateAssocArray
 '    AssocArrToDict
 '    DictToAssocArr
+    
+    Assert.IsInstanceOfTypeName _
+        "Decimal", _
+        CDec(EnumeratorToArr(Wmi.ConnectServer().ExecQuery("SELECT * FROM Win32_ComputerSystem"))(0).TotalPhysicalMemory)
+    
+    Assert.AreEqualArr Array(1, 2, 3, 4, 5, 6, 7, 8, 9), ArrRange(1, 9)
     
 '    Assert.AreEqualArr _
 '        Array(1, 3, 5, 7, 9), _
