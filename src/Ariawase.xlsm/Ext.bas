@@ -45,6 +45,47 @@ Ending:
     DictToAssocArr = arr
 End Function
 
+''' @param eobj As Enumerator(Of Object)
+''' @return As Variant(Of Array(Of Object))
+Public Function EnumeratorToArr(ByVal enumr As Object) As Variant
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
+    
+    Dim obj As Object
+    For Each obj In enumr
+        arrx.AddObj obj
+    Next
+    
+    EnumeratorToArr = arrx.GetItems()
+End Function
+
+''' @param fromVal As Variant(Of T)
+''' @param toVal As Variant(Of T)
+''' @param stepVal As Variant(Of T)
+''' @return As Variant(Of Array(Of T))
+Public Function ArrRange( _
+    ByVal fromVal As Variant, ByVal toVal As Variant, Optional ByVal stepVal As Variant = 1 _
+    ) As Variant
+    
+    If Not (IsNumeric(fromVal) And IsNumeric(toVal) And IsNumeric(stepVal)) Then Err.Raise 13
+    
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
+    
+    Select Case stepVal
+    Case Is > 0
+        Do While fromVal <= toVal
+            arrx.AddVal IncrPst(fromVal, stepVal)
+        Loop
+    Case Is < 0
+        Do While fromVal >= toVal
+            arrx.AddVal IncrPst(fromVal, stepVal)
+        Loop
+    Case Else
+        Err.Raise 5
+    End Select
+    
+    ArrRange = arrx.GetItems()
+End Function
+
 ''' @param f As Func(Of T, U)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of U))
@@ -138,31 +179,22 @@ End Function
 ''' @param seedVal As Variant(Of T)
 ''' @return As Variant(Of Array(Of U))
 Public Function ArrUnfold(ByVal f As Func, ByVal seedVal As Variant) As Variant
-    Dim i As Long: i = 0
-    Dim alen As Long: alen = 32
-    Dim arr As Variant: ReDim arr(alen - 1)
+    Dim arrx As ArrayEx: Set arrx = New ArrayEx
     
     Dim stat As Variant
     If IsObject(seedVal) Then
         f.FastApply stat, seedVal
         Do Until IsMissing(stat(1))
-            Set arr(IncrPst(i)) = stat(0)
-            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+            arrx.AddObj stat(0)
             f.FastApply stat, stat(1)
         Loop
     Else
         f.FastApply stat, seedVal
         Do Until IsMissing(stat(1))
-            Let arr(IncrPst(i)) = stat(0)
-            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
+            arrx.AddVal stat(0)
             f.FastApply stat, stat(1)
         Loop
     End If
     
-    If i > 0 Then
-        ReDim Preserve arr(i - 1)
-    Else
-        arr = Array()
-    End If
-    ArrUnfold = arr
+    ArrUnfold = arrx.GetItems()
 End Function

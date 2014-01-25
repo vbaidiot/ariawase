@@ -748,43 +748,6 @@ Ending:
     ArrFlatten = ret
 End Function
 
-''' @param fromVal As Variant(Of T)
-''' @param toVal As Variant(Of T)
-''' @param stepVal As Variant(Of T)
-''' @return As Variant(Of Array(Of T))
-Public Function ArrRange( _
-    ByVal fromVal As Variant, ByVal toVal As Variant, Optional ByVal stepVal As Variant = 1 _
-    ) As Variant
-    
-    If Not (IsNumeric(fromVal) And IsNumeric(toVal) And IsNumeric(stepVal)) Then Err.Raise 13
-    
-    Dim i As Long: i = 0
-    Dim alen As Long: alen = 32
-    Dim arr As Variant: ReDim arr(alen - 1)
-    
-    Select Case stepVal
-    Case Is > 0
-        Do While fromVal <= toVal
-            arr(IncrPst(i)) = IncrPst(fromVal, stepVal)
-            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
-        Loop
-    Case Is < 0
-        Do While fromVal >= toVal
-            arr(IncrPst(i)) = IncrPst(fromVal, stepVal)
-            If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
-        Loop
-    Case Else
-        Err.Raise 5
-    End Select
-    
-    If i > 0 Then
-        ReDim Preserve arr(i - 1)
-    Else
-        arr = Array()
-    End If
-    ArrRange = arr
-End Function
-
 ''' @param clct As Collection(Of T)
 ''' @param val As Variant(Of T)
 Public Sub Push(ByVal clct As Collection, ByVal val As Variant)
@@ -844,27 +807,6 @@ Public Function ClctToArr(ByVal clct As Collection) As Variant
     
 Ending:
     ClctToArr = arr
-End Function
-
-''' @param eobj As Enumerator(Of Object)
-''' @return As Variant(Of Array(Of Object))
-Public Function EnumeratorToArr(ByVal enumr As Object) As Variant
-    Dim i As Long: i = 0
-    Dim alen As Long: alen = 32
-    Dim arr As Variant: ReDim arr(alen - 1)
-    
-    Dim obj As Object
-    For Each obj In enumr
-        Set arr(IncrPst(i)) = obj
-        If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
-    Next
-    
-    If i > 0 Then
-        ReDim Preserve arr(i - 1)
-    Else
-        arr = Array()
-    End If
-    EnumeratorToArr = arr
 End Function
 
 ''' @param jagArr As Variant(Of Array(Of Array(Of T))
