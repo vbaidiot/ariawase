@@ -56,46 +56,46 @@ End Enum
 
 Private Const S_OK = &H0
 
-Private xxReturnType As VbVarType
+Private xReturnType As VbVarType
 #If VBA7 And Win64 Then
-Private xxAddr As LongPtr
+Private xAddr As LongPtr
 #Else
-Private xxAddr As Long
+Private xAddr As Long
 #End If
 
-Private xxParamTypeBinding As Boolean
-Private xxUbParam As Long
-Private xxParamTypes() As Integer
+Private xParamTypeBinding As Boolean
+Private xUbParam As Long
+Private xParamTypes() As Integer
 
 Private Sub EarlyBindParamTypes(ByVal paramTypes As Variant)
 '    If Not IsArray(paramTypes) Then Err.Raise 5
-    xxParamTypeBinding = False
+    xParamTypeBinding = False
     
-    xxUbParam = UBound(paramTypes)
+    xUbParam = UBound(paramTypes)
     
-    If xxUbParam >= 0 Then
+    If xUbParam >= 0 Then
         Dim i As Long
-        ReDim xxParamTypes(xxUbParam)
-        For i = 0 To xxUbParam: xxParamTypes(i) = paramTypes(i): Next
+        ReDim xParamTypes(xUbParam)
+        For i = 0 To xUbParam: xParamTypes(i) = paramTypes(i): Next
         
-        xxParamTypeBinding = True
+        xParamTypeBinding = True
     End If
 End Sub
 
 Private Sub LateBindParamTypes(ByVal params As Variant)
 '    If Not IsArray(params) Then Err.Raise 5
     
-    xxUbParam = UBound(params)
+    xUbParam = UBound(params)
     
-    If xxUbParam >= 0 Then
+    If xUbParam >= 0 Then
         Dim i As Long
-        ReDim xxParamTypes(xxUbParam)
-        For i = 0 To xxUbParam: xxParamTypes(i) = VarType(params(i)): Next
+        ReDim xParamTypes(xUbParam)
+        For i = 0 To xUbParam: xParamTypes(i) = VarType(params(i)): Next
     Else
-        ReDim xxParamTypes(0)
+        ReDim xParamTypes(0)
     End If
     
-    xxParamTypeBinding = True
+    xParamTypeBinding = True
 End Sub
 
 #If VBA7 And Win64 Then
@@ -108,8 +108,8 @@ Public Sub Init( _
     )
 #End If
     
-    xxReturnType = retrunType
-    xxAddr = addr
+    xReturnType = retrunType
+    xAddr = addr
     EarlyBindParamTypes paramTypes
 End Sub
 
@@ -121,35 +121,35 @@ Public Sub CallByPtr(ByRef returnValue As Variant, ByVal params As Variant)
 #Else
     Dim lpParams() As Long
 #End If
-    If xxUbParam >= 0 Then
+    If xUbParam >= 0 Then
         Dim i As Long
-        ReDim lpParams(xxUbParam)
-        For i = 0 To xxUbParam: lpParams(i) = VarPtr(params(i)): Next
+        ReDim lpParams(xUbParam)
+        For i = 0 To xUbParam: lpParams(i) = VarPtr(params(i)): Next
     Else
         ReDim lpParams(0)
     End If
     
     Dim stat As Long, ret As Variant
     stat = DispCallFunc( _
-        0, xxAddr, tagCALLCONV.CC_STDCALL, xxReturnType, _
-        xxUbParam + 1, xxParamTypes(0), lpParams(0), ret)
+        0, xAddr, tagCALLCONV.CC_STDCALL, xReturnType, _
+        xUbParam + 1, xParamTypes(0), lpParams(0), ret)
     If stat <> S_OK Then Err.Raise 5
     
     If IsObject(ret) Then Set returnValue = ret Else Let returnValue = ret
 End Sub
 
 Public Sub FastApply(ByRef returnValue As Variant, ParamArray params() As Variant)
-    If Not xxParamTypeBinding Then
+    If Not xParamTypeBinding Then
         LateBindParamTypes params
     End If
     CallByPtr returnValue, params
 End Sub
 
 Public Function Apply(ParamArray params() As Variant) As Variant
-    If Not xxParamTypeBinding Then
+    If Not xParamTypeBinding Then
         LateBindParamTypes params
     Else
-        If xxUbParam <> UBound(params) Then Err.Raise 5
+        If xUbParam <> UBound(params) Then Err.Raise 5
     End If
     CallByPtr Apply, params
 End Function

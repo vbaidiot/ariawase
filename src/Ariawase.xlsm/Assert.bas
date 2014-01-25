@@ -16,13 +16,13 @@ Private Const CommentLineInGeneratedProc As Long = 1
 
 Private Const ResultLineLen As Long = 76
 
-Private xxStartTime As Single
-Private xxEndTime As Single
-Private xxSuccSubCount As Long
-Private xxFailSubCount As Long
+Private xStartTime As Single
+Private xEndTime As Single
+Private xSuccSubCount As Long
+Private xFailSubCount As Long
 
-Private xxAssertIx As Long
-Private xxFailMsgs As Collection
+Private xAssertIx As Long
+Private xFailMsgs As Collection
 
 Private Property Get VBProject() As Object
     Select Case Application.Name
@@ -58,18 +58,18 @@ Private Sub TestStart(ByVal clsName As String)
     WriteResult clsName
     WriteResult String(ResultLineLen, "-")
     
-    xxSuccSubCount = 0
-    xxFailSubCount = 0
-    xxStartTime = Timer
+    xSuccSubCount = 0
+    xFailSubCount = 0
+    xStartTime = Timer
 End Sub
 
 Private Sub TestEnd()
-    xxEndTime = Timer
+    xEndTime = Timer
     
     WriteResult String(ResultLineLen, "=")
     WriteResult _
-          xxSuccSubCount & " succeeded, " & xxFailSubCount & " failed," _
-        & " took " & Format(xxEndTime - xxStartTime, "0.00") & " seconds."
+          xSuccSubCount & " succeeded, " & xFailSubCount & " failed," _
+        & " took " & Format(xEndTime - xStartTime, "0.00") & " seconds."
 End Sub
 
 Private Function CheckTestProcName(ByVal proc As String) As Boolean
@@ -81,18 +81,18 @@ Private Function CheckTestClassName(ByVal clsName As String) As Boolean
 End Function
 
 Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)
-    xxAssertIx = 1
-    Set xxFailMsgs = New Collection
+    xAssertIx = 1
+    Set xFailMsgs = New Collection
     
     CallByName obj, proc, VbMethod
     
-    If xxFailMsgs.Count < 1 Then
+    If xFailMsgs.Count < 1 Then
         WriteResult "+ " & proc
-        IncrPre xxSuccSubCount
+        IncrPre xSuccSubCount
     Else
         WriteResult "- " & proc
-        WriteResult "  " & Join(ClctToArr(xxFailMsgs), vbCrLf & "  ")
-        IncrPre xxFailSubCount
+        WriteResult "  " & Join(ClctToArr(xFailMsgs), vbCrLf & "  ")
+        IncrPre xFailSubCount
     End If
 End Sub
 
@@ -149,11 +149,11 @@ Private Sub AssertDone( _
     )
     
     If isa <> cond Then
-        Push xxFailMsgs, "[" & xxAssertIx & "] " & msg & ":"
-        Push xxFailMsgs, "  Expected: " & IIf(isa, "", "Not ") & "<" & ToLiteral(exp) & ">"
-        Push xxFailMsgs, "  But was:  <" & ToLiteral(act) & ">"
+        Push xFailMsgs, "[" & xAssertIx & "] " & msg & ":"
+        Push xFailMsgs, "  Expected: " & IIf(isa, "", "Not ") & "<" & ToLiteral(exp) & ">"
+        Push xFailMsgs, "  But was:  <" & ToLiteral(act) & ">"
     End If
-    IncrPre xxAssertIx
+    IncrPre xAssertIx
 End Sub
 
 Public Sub IsNullVal(ByVal x As Variant, Optional ByVal msg As String = "")

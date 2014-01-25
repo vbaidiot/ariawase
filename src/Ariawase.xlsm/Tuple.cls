@@ -14,59 +14,59 @@ Attribute VB_Exposed = False
 '''+--                                                                   ----+
 Option Explicit
 
-Private xxInit As Boolean
-Private xxItems As Variant
-Private xxLength As Long
+Private xInit As Boolean
+Private xItems As Variant
+Private xLength As Long
 
 Public Property Get Item1() As Variant
     Dim i As Long: i = 0
-    If IsObject(xxItems(i)) Then Set Item1 = xxItems(i) Else Let Item1 = xxItems(i)
+    If IsObject(xItems(i)) Then Set Item1 = xItems(i) Else Let Item1 = xItems(i)
 End Property
 
 Public Property Get Item2() As Variant
     Dim i As Long: i = 1
-    If IsObject(xxItems(i)) Then Set Item2 = xxItems(i) Else Let Item2 = xxItems(i)
+    If IsObject(xItems(i)) Then Set Item2 = xItems(i) Else Let Item2 = xItems(i)
 End Property
 
 Public Property Get Item3() As Variant
     Dim i As Long: i = 2
-    If xxLength <= i Then Err.Raise 380
-    If IsObject(xxItems(i)) Then Set Item3 = xxItems(i) Else Let Item3 = xxItems(i)
+    If xLength <= i Then Err.Raise 380
+    If IsObject(xItems(i)) Then Set Item3 = xItems(i) Else Let Item3 = xItems(i)
 End Property
 
 Public Property Get Item4() As Variant
     Dim i As Long: i = 3
-    If xxLength <= i Then Err.Raise 380
-    If IsObject(xxItems(i)) Then Set Item4 = xxItems(i) Else Let Item4 = xxItems(i)
+    If xLength <= i Then Err.Raise 380
+    If IsObject(xItems(i)) Then Set Item4 = xItems(i) Else Let Item4 = xItems(i)
 End Property
 
 Public Sub Init(ParamArray itms() As Variant)
-    If xxInit Then Err.Raise 5
-    xxItems = itms
-    xxLength = UBound(itms) + 1
+    If xInit Then Err.Raise 5
+    xItems = itms
+    xLength = UBound(itms) + 1
     
-    If xxLength < 2 Then Err.Raise 5
-    xxInit = True
+    If xLength < 2 Then Err.Raise 5
+    xInit = True
 End Sub
 
 Public Function ToArray() As Variant
-    ToArray = xxItems
+    ToArray = xItems
 End Function
 
 Public Function Equals(ByVal tpl As Tuple) As Boolean
-    Equals = Core.ArrEquals(xxItems, tpl.ToArray())
+    Equals = Core.ArrEquals(xItems, tpl.ToArray())
 End Function
 
 Public Function Compare(ByVal tpl As Tuple) As Integer
-    Compare = Core.ArrCompare(xxItems, tpl.ToArray())
+    Compare = Core.ArrCompare(xItems, tpl.ToArray())
 End Function
 
 Public Function ToStr() As String
     Dim s As String, i As Long
     
-    s = "Tuple`" & xxLength & " { Item1 = " & Core.ToLiteral(xxItems(0))
-    For i = 1 To xxLength - 1
-        s = s & ", Item" & i + 1 & " = " & Core.ToLiteral(xxItems(i))
+    s = "Tuple`" & xLength & " { Item1 = " & Core.ToLiteral(xItems(0))
+    For i = 1 To xLength - 1
+        s = s & ", Item" & i + 1 & " = " & Core.ToLiteral(xItems(i))
     Next
     s = s & " }"
     
