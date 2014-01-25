@@ -181,20 +181,28 @@ End Function
 Public Function ArrUnfold(ByVal f As Func, ByVal seedVal As Variant) As Variant
     Dim arrx As ArrayEx: Set arrx = New ArrayEx
     
-    Dim stat As Variant
-    If IsObject(seedVal) Then
-        f.FastApply stat, seedVal
-        Do Until IsMissing(stat(1))
-            arrx.AddObj stat(0)
-            f.FastApply stat, stat(1)
+    Dim stat As Variant '(Of Tuple`2 Or Missing)
+    f.FastApply stat, seedVal
+    If IsMissing(stat) Then GoTo Ending
+    
+    If IsObject(stat.Item1) Then
+        arrx.AddObj stat.Item1
+        
+        f.FastApply stat, stat.Item2
+        Do Until IsMissing(stat)
+            arrx.AddObj stat.Item1
+            f.FastApply stat, stat.Item2
         Loop
     Else
-        f.FastApply stat, seedVal
-        Do Until IsMissing(stat(1))
-            arrx.AddVal stat(0)
-            f.FastApply stat, stat(1)
+        arrx.AddVal stat.Item1
+        
+        f.FastApply stat, stat.Item2
+        Do Until IsMissing(stat)
+            arrx.AddVal stat.Item1
+            f.FastApply stat, stat.Item2
         Loop
     End If
     
+Ending:
     ArrUnfold = arrx.ToArray()
 End Function

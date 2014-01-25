@@ -214,13 +214,21 @@ Public Sub Util_Test()
 '    ' Function Add(ByVal i As Integer, ByVal j As Integer) As Integer
 '    ArrFold(Init(New Func, AddressOf Add, vbInteger), ArrRange(1, 100), 0) '5050
     
-'    Function FibFun(ByVal pair As Variant) As Variant
-'        Dim lmt As Long: lmt = 100
-'
-'        Dim x As Long: x = pair(0) + pair(1)
-'        FibFun = Array(pair(1), IIf(pair(1) <= lmt, Array(pair(1), x), Missing))
-'    End Function
 '    Assert.AreEqualArr _
 '        Array(1&, 2&, 3&, 5&, 8&, 13&, 21&, 34&, 55&, 89&), _
-'        ArrUnfold(Init(New Func, vbVariant, AddressOf FibFun, vbVariant), Array(1&, 1&))
+'        ArrUnfold(Init(New Func, vbVariant, AddressOf FibFun, vbObject), Init(New Tuple, 1, 1))
 End Sub
+
+#If False Then
+Public Function FibFun(ByVal tpl As Tuple) As Variant
+    Dim lmt As Long: lmt = 100
+    
+    Dim v1 As Long: v1 = tpl.Item2
+    Dim v2 As Long: v2 = tpl.Item1 + v1
+    If v1 <= lmt Then
+        Set FibFun = Init(New Tuple, v1, Init(New Tuple, v1, v2))
+    Else
+        Let FibFun = Missing
+    End If
+End Function
+#End If
