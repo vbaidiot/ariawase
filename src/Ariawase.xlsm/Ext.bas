@@ -55,7 +55,7 @@ Public Function EnumeratorToArr(ByVal enumr As Object) As Variant
         arrx.AddObj obj
     Next
     
-    EnumeratorToArr = arrx.GetItems()
+    EnumeratorToArr = arrx.ToArray()
 End Function
 
 ''' @param fromVal As Variant(Of T)
@@ -83,7 +83,7 @@ Public Function ArrRange( _
         Err.Raise 5
     End Select
     
-    ArrRange = arrx.GetItems()
+    ArrRange = arrx.ToArray()
 End Function
 
 ''' @param f As Func(Of T, U)
@@ -196,5 +196,5 @@ Public Function ArrUnfold(ByVal f As Func, ByVal seedVal As Variant) As Variant
         Loop
     End If
     
-    ArrUnfold = arrx.GetItems()
+    ArrUnfold = arrx.ToArray()
 End Function

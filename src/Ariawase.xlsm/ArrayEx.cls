@@ -39,12 +39,12 @@ Public Function AddObj(ByVal obj As Variant)
     Set xItems(xIndex) = obj
 End Function
 
-Public Function GetItems() As Variant
+Public Function ToArray() As Variant
     Dim arr As Variant: arr = xItems
     If xIndex > -1 Then
         ReDim Preserve arr(xIndex)
     Else
         arr = Array()
     End If
-    GetItems = arr
+    ToArray = arr
 End Function

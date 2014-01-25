@@ -49,16 +49,16 @@ Public Sub Init(ParamArray itms() As Variant)
     xxInit = True
 End Sub
 
-Public Function GetItems() As Variant
-    GetItems = xxItems
+Public Function ToArray() As Variant
+    ToArray = xxItems
 End Function
 
 Public Function Equals(ByVal tpl As Tuple) As Boolean
-    Equals = Core.ArrEquals(xxItems, tpl.GetItems())
+    Equals = Core.ArrEquals(xxItems, tpl.ToArray())
 End Function
 
 Public Function Compare(ByVal tpl As Tuple) As Integer
-    Compare = Core.ArrCompare(xxItems, tpl.GetItems())
+    Compare = Core.ArrCompare(xxItems, tpl.ToArray())
 End Function
 
 Public Function ToStr() As String
