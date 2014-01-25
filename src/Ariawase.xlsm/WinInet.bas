@@ -114,8 +114,11 @@ Function InternetCloseHandle Lib "wininet.dll" ( _
     ) As Long
 #End If
 
-Private Const AGENT_NAME = "Excel VBA"
 Private Const DL_BUFFER_SIZE = 10240
+
+Private Property Get AgentName() As String
+    AgentName = Replace(Application.Name, "Microsoft ", "") & " VBA"
+End Property
 
 Private Function FileNameInUrl(ByVal strUrl As String) As String
     Dim i As Integer
@@ -195,7 +198,7 @@ Public Function FileDownload(ByVal dlUrl As String, ByVal svPath As String) As S
 #Else
     Dim hOpen As Long
 #End If
-    hOpen = InternetOpen(AGENT_NAME, INTERNET_OPEN_TYPE_PRECONFIG, vbNullString, vbNullString, 0)
+    hOpen = InternetOpen(AgentName, INTERNET_OPEN_TYPE_PRECONFIG, vbNullString, vbNullString, 0)
     FileDownload = FileDownloadImpl(hOpen, dlUrl, svPath)
     InternetCloseHandle hOpen
 End Function
