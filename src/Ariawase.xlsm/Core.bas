@@ -260,8 +260,13 @@ Public Function ToLiteral(ByVal x As Variant) As String
         Case "Null":        ToLiteral = "(Null)"
         Case "Nothing":     ToLiteral = "(Nothing)"
         Case "Unknown":     ToLiteral = "(Unknown)"
-        Case "Error":       ToLiteral = "(Error)"
         Case "ErrObject":   ToLiteral = "Err " & x.Number
+        Case "Error"
+            If IsMissing(x) Then
+                ToLiteral = "(Missing)"
+            Else
+                ToLiteral = "(Error)"
+            End If
         Case "String"
             If StrPtr(x) = 0 Then
                 ToLiteral = "(vbNullString)"
