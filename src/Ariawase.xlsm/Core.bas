@@ -848,13 +848,13 @@ End Function
 
 ''' @param eobj As Enumerator(Of Object)
 ''' @return As Variant(Of Array(Of Object))
-Public Function EnumToArr(ByVal eobj As Object) As Variant
+Public Function EnumeratorToArr(ByVal enumr As Object) As Variant
     Dim i As Long: i = 0
     Dim alen As Long: alen = 32
     Dim arr As Variant: ReDim arr(alen - 1)
     
     Dim obj As Object
-    For Each obj In eobj
+    For Each obj In enumr
         Set arr(IncrPst(i)) = obj
         If i >= alen Then alen = alen * 2: ReDim Preserve arr(alen - 1)
     Next
@@ -864,7 +864,7 @@ Public Function EnumToArr(ByVal eobj As Object) As Variant
     Else
         arr = Array()
     End If
-    EnumToArr = arr
+    EnumeratorToArr = arr
 End Function
 
 ''' @param jagArr As Variant(Of Array(Of Array(Of T))

@@ -179,7 +179,7 @@ Public Sub Core_Test()
     
     Assert.IsInstanceOfTypeName _
         "Decimal", _
-        CDec(EnumToArr(Wmi.ConnectServer().ExecQuery("SELECT * FROM Win32_ComputerSystem"))(0).TotalPhysicalMemory)
+        CDec(EnumeratorToArr(Wmi.ConnectServer().ExecQuery("SELECT * FROM Win32_ComputerSystem"))(0).TotalPhysicalMemory)
     
 '    CreateRegExp
     
