@@ -104,7 +104,9 @@ Public Sub RunTestOf(ByVal clsObj As Object)
     Set procs = ProcNames(VBProject.VBComponents(clsName))
     
     TestStart clsName
-    For Each proc In procs: RunTestSub clsObj, proc: Next
+    For Each proc In procs
+        If CheckTestProcName(proc) Then RunTestSub clsObj, proc
+    Next
     TestEnd
 End Sub
 
