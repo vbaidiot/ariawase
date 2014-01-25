@@ -270,13 +270,13 @@ Public Function GetUniqueFileName(ByVal fpath As String, Optional delim As Strin
     GetUniqueFileName = fpath
 End Function
 
-Public Sub CreateRecFolder(ByVal folderPath As String)
+Public Sub CreateFolderTree(ByVal folderPath As String)
     If Not Fso.DriveExists(Fso.GetDriveName(folderPath)) Then Err.Raise 5
-    CreateRecFolderImpl folderPath
+    CreateFolderTreeImpl folderPath
 End Sub
-Private Sub CreateRecFolderImpl(ByVal folderPath As String)
+Private Sub CreateFolderTreeImpl(ByVal folderPath As String)
     If Fso.FolderExists(folderPath) Then GoTo Escape
-    CreateRecFolderImpl Fso.GetParentFolderName(folderPath)
+    CreateFolderTreeImpl Fso.GetParentFolderName(folderPath)
     Fso.CreateFolder folderPath
     
 Escape:
