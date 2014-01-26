@@ -45,15 +45,18 @@ Ending:
     DictToAssocArr = arr
 End Function
 
-''' @param eobj As Enumerator(Of Object)
-''' @return As Variant(Of Array(Of Object))
+''' @param enumr As Enumerator(Of T)
+''' @return As Variant(Of Array(Of T))
 Public Function EnumeratorToArr(ByVal enumr As Object) As Variant
     Dim arrx As ArrayEx: Set arrx = New ArrayEx
     
-    Dim obj As Object
-    For Each obj In enumr
-        arrx.AddObj obj
-    Next
+    Dim x As Object
+    For Each x In enumr: Exit For: Next
+    If IsObject(x) Then
+        For Each x In enumr: arrx.AddObj x: Next
+    Else
+        For Each x In enumr: arrx.AddVal x: Next
+    End If
     
     EnumeratorToArr = arrx.ToArray()
 End Function
