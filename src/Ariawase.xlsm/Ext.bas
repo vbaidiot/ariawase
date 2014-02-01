@@ -151,6 +151,59 @@ Ending:
     ArrFilter = ret
 End Function
 
+''' @param f As Func(Of T, K)
+''' @param arr As Variant(Of Array(Of T))
+''' @return As Variant(Of Array(Of Tuple`2(Of K, T)))
+Public Function ArrGroupBy(ByVal f As Func, ByVal arr As Variant) As Variant
+    If Not IsArray(arr) Then Err.Raise 13
+    Dim lb As Long: lb = LBound(arr)
+    Dim ub As Long: ub = UBound(arr)
+    Dim ixRet As Long: ixRet = -1
+    Dim ret As Variant
+    If ub - lb < 0 Then
+        ret = Array()
+        GoTo Ending
+    End If
+    
+    ReDim ret(ub - lb)
+    
+    Dim k As Variant, i As Long, j As Long
+    If IsObject(arr(lb)) Then
+        For i = lb To ub
+            f.FastApply k, arr(i)
+            For j = ixRet To 0 Step -1
+                If Equals(k, ret(j)(0)) Then Exit For
+            Next
+            If j < 0 Then
+                j = IncrPre(ixRet)
+                ret(j) = Array(k, New ArrayEx)
+            End If
+            ret(j)(1).AddObj arr(i)
+        Next
+    Else
+        For i = lb To ub
+            f.FastApply k, arr(i)
+            For j = ixRet To 0 Step -1
+                If Equals(k, ret(j)(0)) Then Exit For
+            Next
+            If j < 0 Then
+                j = IncrPre(ixRet)
+                ret(j) = Array(k, New ArrayEx)
+            End If
+            ret(j)(1).AddVal arr(i)
+        Next
+    End If
+    
+    ReDim Preserve ret(ixRet)
+    
+    For i = 0 To ixRet
+        Set ret(i) = Init(New Tuple, ret(i)(0), ret(i)(1).ToArray())
+    Next
+    
+Ending:
+    ArrGroupBy = ret
+End Function
+
 ''' @param f As Func(Of U, T, U)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param seedVal As Variant(Of U)
