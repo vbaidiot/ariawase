@@ -381,6 +381,18 @@ Public Function Max(ParamArray arr() As Variant) As Variant
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
+''' @return As Integer
+Public Function ArrRank(ByVal arr As Variant) As Integer
+    If Not IsArray(arr) Then Err.Raise 13
+    
+    Dim x As Long
+    Dim i As Integer: i = 0
+    On Error Resume Next
+    While Err.Number = 0: x = UBound(arr, IncrPre(i)): Wend
+    ArrRank = i - 1
+End Function
+
+''' @param arr As Variant(Of Array(Of T))
 ''' @return As Long
 Public Function ArrLen(ByVal arr As Variant, Optional ByVal dimen As Integer = 1) As Long
     If Not IsArray(arr) Then Err.Raise 13
