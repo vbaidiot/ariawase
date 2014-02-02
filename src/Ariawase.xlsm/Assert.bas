@@ -54,9 +54,9 @@ Private Sub WriteResult(ByVal res As String)
 End Sub
 
 Private Sub TestStart(ByVal clsName As String)
-    WriteResult String(ResultLineLen, "-")
+    WriteResult String$(ResultLineLen, "-")
     WriteResult clsName
-    WriteResult String(ResultLineLen, "-")
+    WriteResult String$(ResultLineLen, "-")
     
     xSuccSubCount = 0
     xFailSubCount = 0
@@ -66,18 +66,18 @@ End Sub
 Private Sub TestEnd()
     xEndTime = Timer
     
-    WriteResult String(ResultLineLen, "=")
+    WriteResult String$(ResultLineLen, "=")
     WriteResult _
           xSuccSubCount & " succeeded, " & xFailSubCount & " failed," _
-        & " took " & Format(xEndTime - xStartTime, "0.00") & " seconds."
+        & " took " & Format$(xEndTime - xStartTime, "0.00") & " seconds."
 End Sub
 
 Private Function CheckTestProcName(ByVal proc As String) As Boolean
-    CheckTestProcName = Right(proc, Len(TestProcSuffix)) = TestProcSuffix
+    CheckTestProcName = Right$(proc, Len(TestProcSuffix)) = TestProcSuffix
 End Function
 
 Private Function CheckTestClassName(ByVal clsName As String) As Boolean
-    CheckTestClassName = Right(clsName, Len(TestClassSuffix)) = TestClassSuffix
+    CheckTestClassName = Right$(clsName, Len(TestClassSuffix)) = TestClassSuffix
 End Function
 
 Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)

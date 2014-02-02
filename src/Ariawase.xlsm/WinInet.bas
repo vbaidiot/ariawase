@@ -124,11 +124,11 @@ Private Function FileNameInUrl(ByVal strUrl As String) As String
     Dim i As Integer
     
     i = InStrRev(strUrl, "/", Len(strUrl))
-    If i > 0 Then strUrl = Mid(strUrl, i + 1)
+    If i > 0 Then strUrl = Mid$(strUrl, i + 1)
     i = InStr(strUrl, "/")
-    If i > 0 Then strUrl = Mid(strUrl, 1, i - 1)
+    If i > 0 Then strUrl = Mid$(strUrl, 1, i - 1)
     i = InStr(strUrl, "?")
-    If i > 0 Then strUrl = Mid(strUrl, 1, i - 1)
+    If i > 0 Then strUrl = Mid$(strUrl, 1, i - 1)
     
     FileNameInUrl = strUrl
 End Function

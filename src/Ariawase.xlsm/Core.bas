@@ -158,7 +158,7 @@ Public Function StringWidth(ByVal s As String) As Long
     
     Dim i As Long
     For i = 1 To Len(s)
-        w = w + CharWidth(Mid(s, i, 1))
+        w = w + CharWidth(Mid$(s, i, 1))
     Next
     StringWidth = w
 End Function
@@ -170,9 +170,9 @@ Public Function LeftA(ByVal s As String, ByVal byteLen As Long) As String
     Dim ixByte As Long: ixByte = 1
     Dim ixStr As Long:  ixStr = 1
     While (ixByte < 1 + byteLen) And (ixStr <= Len(s))
-        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
+        ixByte = ixByte + CharWidth(Mid$(s, IncrPst(ixStr), 1))
     Wend
-    LeftA = Left(s, ixStr - (ixByte - byteLen))
+    LeftA = Left$(s, ixStr - (ixByte - byteLen))
 End Function
 
 ''' @param s As String
@@ -184,7 +184,7 @@ Public Function RightA(ByVal s As String, ByVal byteLen As Long) As String
     Dim ixStr As Long:  ixStr = 1
     While ixStr <= Len(s)
         idxs.Add ixByte, ixStr
-        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
+        ixByte = ixByte + CharWidth(Mid$(s, IncrPst(ixStr), 1))
     Wend
     idxs.Add ixByte, ixStr
     
@@ -192,7 +192,7 @@ Public Function RightA(ByVal s As String, ByVal byteLen As Long) As String
         If idxs.Exists(ixByte - byteLen) Then Exit For
     Next
     
-    RightA = Right(s, ixStr - idxs.Item(ixByte - byteLen))
+    RightA = Right$(s, ixStr - idxs.Item(ixByte - byteLen))
 End Function
 
 ''' @param s As String
@@ -204,11 +204,11 @@ Public Function SepA(ByVal s As String, ByVal byteLen As Long) As Variant
     Dim strLen As Long: strLen = Len(s)
     
     While (ixByte < 1 + byteLen) And (ixStr <= strLen)
-        ixByte = ixByte + CharWidth(Mid(s, IncrPst(ixStr), 1))
+        ixByte = ixByte + CharWidth(Mid$(s, IncrPst(ixStr), 1))
     Wend
     
     Dim n As Long: n = ixStr - (ixByte - byteLen)
-    SepA = Array(Left(s, n), Mid(s, n + 1, strLen))
+    SepA = Array(Left$(s, n), Mid$(s, n + 1, strLen))
 End Function
 
 ''' @param obj As Object Is T
@@ -274,7 +274,7 @@ Public Function ToLiteral(ByVal x As Variant) As String
                 ToLiteral = """" & x & """"
             End If
         Case Else
-            If Right(ty, 2) = "()" Then
+            If Right$(ty, 2) = "()" Then
                 '' FIXME: for multidimensional array
                 Dim i As Long
                 For i = LBound(x) To UBound(x): x(i) = ToLiteral(x(i)): Next
@@ -1022,14 +1022,14 @@ Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Varian
     Dim i As Long: i = 0
     Dim m As Object, s As String
     For Each m In ms
-        ix1 = m.FirstIndex + IIf(Left(m.Value, 1) <> "{", 1, 0)
-        s = Mid(strTemplate, ix0, ix1 - ix0 + 1)
+        ix1 = m.FirstIndex + IIf(Left$(m.Value, 1) <> "{", 1, 0)
+        s = Mid$(strTemplate, ix0, ix1 - ix0 + 1)
         Dim mbrc As Variant: mbrc = ReMatch(s, "{+$")
         Dim brcs As String:  If ArrLen(mbrc) > 0 Then brcs = mbrc(0) Else brcs = ""
         
         ret(i + 0) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
         If Len(brcs) Mod 2 = 0 Then
-            ret(i + 1) = Format(vals(m.SubMatches(1)), m.SubMatches(3))
+            ret(i + 1) = Format$(vals(m.SubMatches(1)), m.SubMatches(3))
         Else
             ret(i + 1) = m.SubMatches(1)
         End If
@@ -1037,7 +1037,7 @@ Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Varian
         i = i + 2
         ix0 = ix1 + Len(m.SubMatches(0)) + 1
     Next
-    s = Mid(strTemplate, ix0)
+    s = Mid$(strTemplate, ix0)
     ret(i) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
     
 Ending:
