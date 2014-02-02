@@ -250,7 +250,7 @@ Public Function Add(ByVal x As Integer, ByVal y As Integer) As Integer
     Add = x + y
 End Function
 
-Function GetItem1(ByVal tpl As Tuple) As Variant
+Public Function GetItem1(ByVal tpl As Tuple) As Variant
     GetItem1 = tpl.Item1
 End Function
 
