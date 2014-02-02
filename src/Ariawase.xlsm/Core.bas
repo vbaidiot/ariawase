@@ -274,11 +274,20 @@ Public Function ToLiteral(ByVal x As Variant) As String
                 ToLiteral = """" & x & """"
             End If
         Case Else
-            If Right$(ty, 2) = "()" Then
-                '' FIXME: for multidimensional array
-                Dim i As Long
-                For i = LBound(x) To UBound(x): x(i) = ToLiteral(x(i)): Next
-                ToLiteral = "Array(" & Join(x, ", ") & ")"
+            If IsArray(x) Then
+                Dim rnk As Integer: rnk = ArrRank(x)
+                If rnk = 1 Then
+                    Dim mx As Long: mx = 8 - 1
+                    Dim lb As Long: lb = LBound(x)
+                    Dim ub As Long: ub = UBound(x)
+                    ub = IIf(ub - lb < mx, ub, lb + mx)
+                    Dim y As Variant: ReDim y(lb To ub)
+                    Dim i As Long
+                    For i = lb To ub: y(i) = ToLiteral(x(i)): Next
+                    ToLiteral = "Array(" & Join(y, ", ") & ")"
+                Else
+                    ToLiteral = Replace(ty, "()", "(" & String(rnk, ",") & ")")
+                End If
             Else
                 On Error Resume Next
                 ToLiteral = ty
