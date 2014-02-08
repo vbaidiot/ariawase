@@ -89,10 +89,10 @@ Public Function ArrRange( _
     ArrRange = arrx.ToArray()
 End Function
 
-''' @param f As Func(Of T, U)
+''' @param fun As Func(Of T, U)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of U))
-Public Function ArrMap(ByVal f As Func, ByVal arr As Variant) As Variant
+Public Function ArrMap(ByVal fun As Func, ByVal arr As Variant) As Variant
     If Not IsArray(arr) Then Err.Raise 13
     Dim lb As Long: lb = LBound(arr)
     Dim ub As Long: ub = UBound(arr)
@@ -105,16 +105,16 @@ Public Function ArrMap(ByVal f As Func, ByVal arr As Variant) As Variant
     ReDim ret(lb To ub)
     
     Dim i As Long
-    For i = lb To ub: f.FastApply ret(i), arr(i): Next
+    For i = lb To ub: fun.FastApply ret(i), arr(i): Next
     
 Ending:
     ArrMap = ret
 End Function
 
-''' @param f As Func(Of T, Boolean)
+''' @param fun As Func(Of T, Boolean)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of T))
-Public Function ArrFilter(ByVal f As Func, ByVal arr As Variant) As Variant
+Public Function ArrFilter(ByVal fun As Func, ByVal arr As Variant) As Variant
     If Not IsArray(arr) Then Err.Raise 13
     Dim lb As Long: lb = LBound(arr)
     Dim ub As Long: ub = UBound(arr)
@@ -131,12 +131,12 @@ Public Function ArrFilter(ByVal f As Func, ByVal arr As Variant) As Variant
     Dim ixRet As Long: ixRet = lb
     If IsObject(arr(lb)) Then
         For ixArr = lb To ub
-            f.FastApply flg, arr(ixArr)
+            fun.FastApply flg, arr(ixArr)
             If flg Then Set ret(IncrPst(ixRet)) = arr(ixArr)
         Next
     Else
         For ixArr = lb To ub
-            f.FastApply flg, arr(ixArr)
+            fun.FastApply flg, arr(ixArr)
             If flg Then Let ret(IncrPst(ixRet)) = arr(ixArr)
         Next
     End If
@@ -151,10 +151,10 @@ Ending:
     ArrFilter = ret
 End Function
 
-''' @param f As Func(Of T, K)
+''' @param fun As Func(Of T, K)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of Tuple`2(Of K, T)))
-Public Function ArrGroupBy(ByVal f As Func, ByVal arr As Variant) As Variant
+Public Function ArrGroupBy(ByVal fun As Func, ByVal arr As Variant) As Variant
     If Not IsArray(arr) Then Err.Raise 13
     Dim lb As Long: lb = LBound(arr)
     Dim ub As Long: ub = UBound(arr)
@@ -170,7 +170,7 @@ Public Function ArrGroupBy(ByVal f As Func, ByVal arr As Variant) As Variant
     Dim k As Variant, i As Long, j As Long
     If IsObject(arr(lb)) Then
         For i = lb To ub
-            f.FastApply k, arr(i)
+            fun.FastApply k, arr(i)
             For j = ixRet To 0 Step -1
                 If Equals(k, ret(j)(0)) Then Exit For
             Next
@@ -182,7 +182,7 @@ Public Function ArrGroupBy(ByVal f As Func, ByVal arr As Variant) As Variant
         Next
     Else
         For i = lb To ub
-            f.FastApply k, arr(i)
+            fun.FastApply k, arr(i)
             For j = ixRet To 0 Step -1
                 If Equals(k, ret(j)(0)) Then Exit For
             Next
@@ -204,12 +204,12 @@ Ending:
     ArrGroupBy = ret
 End Function
 
-''' @param f As Func(Of U, T, U)
+''' @param fun As Func(Of U, T, U)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param seedVal As Variant(Of U)
 ''' @return As Variant(Of U)
 Public Function ArrFold( _
-    ByVal f As Func, ByVal arr As Variant, Optional ByVal seedVal As Variant _
+    ByVal fun As Func, ByVal arr As Variant, Optional ByVal seedVal As Variant _
     ) As Variant
     
     If Not IsArray(arr) Then Err.Raise 13
@@ -222,7 +222,7 @@ Public Function ArrFold( _
         stat = seedVal
     End If
     
-    For i = i To UBound(arr): f.FastApply stat, stat, arr(i): Next
+    For i = i To UBound(arr): fun.FastApply stat, stat, arr(i): Next
     
     If IsObject(stat) Then
         Set ArrFold = stat
@@ -231,31 +231,31 @@ Public Function ArrFold( _
     End If
 End Function
 
-''' @param f As Func
+''' @param fun As Func
 ''' @param seedVal As Variant(Of T)
 ''' @return As Variant(Of Array(Of U))
-Public Function ArrUnfold(ByVal f As Func, ByVal seedVal As Variant) As Variant
+Public Function ArrUnfold(ByVal fun As Func, ByVal seedVal As Variant) As Variant
     Dim arrx As ArrayEx: Set arrx = New ArrayEx
     
     Dim stat As Variant '(Of Tuple`2 Or Missing)
-    f.FastApply stat, seedVal
+    fun.FastApply stat, seedVal
     If IsMissing(stat) Then GoTo Ending
     
     If IsObject(stat.Item1) Then
         arrx.AddObj stat.Item1
         
-        f.FastApply stat, stat.Item2
+        fun.FastApply stat, stat.Item2
         Do Until IsMissing(stat)
             arrx.AddObj stat.Item1
-            f.FastApply stat, stat.Item2
+            fun.FastApply stat, stat.Item2
         Loop
     Else
         arrx.AddVal stat.Item1
         
-        f.FastApply stat, stat.Item2
+        fun.FastApply stat, stat.Item2
         Do Until IsMissing(stat)
             arrx.AddVal stat.Item1
-            f.FastApply stat, stat.Item2
+            fun.FastApply stat, stat.Item2
         Loop
     End If
     
