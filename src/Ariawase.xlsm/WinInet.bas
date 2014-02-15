@@ -120,6 +120,11 @@ Private Property Get AgentName() As String
     AgentName = Replace(Application.Name, "Microsoft ", "") & " VBA"
 End Property
 
+Private Function DecodeUri(ByVal strUrl As String) As String
+    If InStr(strUrl, "'") > 0 Then Err.Raise 5
+    DecodeUri = EvalJS("decodeURIComponent('" & strUrl & "')")
+End Function
+
 Private Function FileNameInUrl(ByVal strUrl As String) As String
     Dim i As Integer
     
@@ -130,7 +135,7 @@ Private Function FileNameInUrl(ByVal strUrl As String) As String
     i = InStr(strUrl, "?")
     If i > 0 Then strUrl = Mid$(strUrl, 1, i - 1)
     
-    FileNameInUrl = strUrl
+    FileNameInUrl = DecodeUri(strUrl)
 End Function
 
 #If VBA7 And Win64 Then
