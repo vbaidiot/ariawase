@@ -74,7 +74,7 @@ Public Sub Configure( _
 Escape:
 End Sub
 
-Public Sub MakeAsBelow()
+Public Sub NewMail()
     If Len(xMyMailAddr) < 1 Then Err.Raise 5
     
     Set xMsg = CreateObject("CDO.Message")
@@ -116,11 +116,11 @@ Public Sub AddAttachments(ByVal atchFiles As Variant)
     For Each fpath In atchFiles: xMsg.AddAttachment fpath: Next
 End Sub
 
-Public Sub MakeSend()
+Public Sub SendMail()
     xMsg.Send
 End Sub
 
-Public Sub QuickSend( _
+Public Sub QuickSendMail( _
     ByVal addrTo As Variant, ByVal msgSubject As String, ByVal msgBody As String _
     )
     
