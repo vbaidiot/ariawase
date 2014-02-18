@@ -15,13 +15,14 @@ Private xIndex As Long
 
 Private Sub Class_Initialize()
     xIndex = -1
-    xLength = 32
+    xLength = -1 + 32
     ReDim xItems(xLength - 1)
 End Sub
 
 Private Sub Extend()
     If xIndex < xLength Then GoTo Escape
-    xLength = xLength * 2
+    xLength = xLength + 1 'possible overflow (Err.Raise 6)
+    xLength = -1 + xLength + xLength
     ReDim Preserve xItems(xLength - 1)
     
 Escape:
