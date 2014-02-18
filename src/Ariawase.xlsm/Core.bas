@@ -250,6 +250,9 @@ Public Function ToLiteral(ByVal x As Variant) As String
         Case "Byte":        ToLiteral = "CByte(" & x & ")"
         Case "Integer":     ToLiteral = x & "%"
         Case "Long":        ToLiteral = x & "&"
+        #If VBA7 And Win64 Then
+        Case "LongLong":    ToLiteral = x & "^"
+        #End If
         Case "Single":      ToLiteral = x & "!"
         Case "Double":      ToLiteral = x & "#"
         Case "Currency":    ToLiteral = x & "@"
