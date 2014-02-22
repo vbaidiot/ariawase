@@ -75,13 +75,13 @@ Public Function ArrRange( _
     
     Select Case stepVal
     Case Is > 0
-        Do While fromVal <= toVal
+        While fromVal <= toVal
             arrx.AddVal IncrPst(fromVal, stepVal)
-        Loop
+        Wend
     Case Is < 0
-        Do While fromVal >= toVal
+        While fromVal >= toVal
             arrx.AddVal IncrPst(fromVal, stepVal)
-        Loop
+        Wend
     Case Else
         Err.Raise 5
     End Select
@@ -245,18 +245,18 @@ Public Function ArrUnfold(ByVal fun As Func, ByVal seedVal As Variant) As Varian
         arrx.AddObj stat.Item1
         
         fun.FastApply stat, stat.Item2
-        Do Until IsMissing(stat)
+        While Not IsMissing(stat)
             arrx.AddObj stat.Item1
             fun.FastApply stat, stat.Item2
-        Loop
+        Wend
     Else
         arrx.AddVal stat.Item1
         
         fun.FastApply stat, stat.Item2
-        Do Until IsMissing(stat)
+        While Not IsMissing(stat)
             arrx.AddVal stat.Item1
             fun.FastApply stat, stat.Item2
-        Loop
+        Wend
     End If
     
 Ending:

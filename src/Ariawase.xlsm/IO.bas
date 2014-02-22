@@ -263,10 +263,10 @@ Public Function GetUniqueFileName(ByVal fpath As String, Optional delim As Strin
     Dim x As String: x = "." & Fso.GetExtensionName(fpath)
     
     Dim n As Long: n = 0
-    Do While Fso.FileExists(fpath)
+    While Fso.FileExists(fpath)
         n = n + 1
         fpath = Fso.BuildPath(d, b & CStr(n) & x)
-    Loop
+    Wend
     GetUniqueFileName = fpath
 End Function
 
