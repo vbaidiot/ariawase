@@ -111,6 +111,34 @@ Ending:
     ArrMap = ret
 End Function
 
+''' @param fun As Func(Of T, U, R)
+''' @param arr1 As Variant(Of Array(Of T))
+''' @param arr2 As Variant(Of Array(Of U))
+''' @return As Variant(Of Array(Of R))
+Public Function ArrZip( _
+    ByVal fun As Func, ByVal arr1 As Variant, ByVal arr2 As Variant _
+    ) As Variant
+    
+    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
+    Dim lb1 As Long: lb1 = LBound(arr1)
+    Dim lb2 As Long: lb2 = LBound(arr2)
+    Dim ub0 As Long: ub0 = UBound(arr1) - lb1
+    If ub0 <> UBound(arr2) - lb2 Then Err.Raise 5
+    Dim ret As Variant
+    If ub0 < 0 Then
+        ret = Array()
+        GoTo Ending
+    End If
+    
+    ReDim ret(ub0)
+    
+    Dim i As Long
+    For i = 0 To ub0: fun.FastApply ret(i), arr1(lb1 + i), arr2(lb2 + i): Next
+    
+Ending:
+    ArrZip = ret
+End Function
+
 ''' @param fun As Func(Of T, Boolean)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @return As Variant(Of Array(Of T))

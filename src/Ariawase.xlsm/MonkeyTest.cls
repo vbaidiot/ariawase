@@ -208,6 +208,10 @@ Public Sub Util_Test()
     Assert.AreEqualArr Array(1, 2, 3, 4, 5, 6, 7, 8, 9), ArrRange(1, 9)
     
 '    Assert.AreEqualArr _
+'        Array(Init(New Tuple, "A", 1), Init(New Tuple, "B", 2)), _
+'        ArrZip(Init(New Func, vbObject, AddressOf Tuple2Of, vbVariant, vbVariant), Array("A", "B"), Array(1, 2))
+    
+'    Assert.AreEqualArr _
 '        Array(1, 3, 5, 7, 9), _
 '        ArrFilter(Init(New Func, vbBoolean, AddressOf IsOdd, vbInteger), ArrRange(1, 9))
     
@@ -242,6 +246,11 @@ End Sub
 
 #If False Then
 ''' Note: copy the following codes paste onto a standard module
+
+Public Function Tuple2Of(ByVal itm1 As Variant, ByVal itm2 As Variant) As Tuple
+    Set Tuple2Of = Init(New Tuple, itm1, itm2)
+End Function
+
 Public Function IsOdd(ByVal n As Integer) As Boolean
     IsOdd = n Mod 2 = 1
 End Function
