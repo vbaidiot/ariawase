@@ -289,14 +289,14 @@ Office.prototype.typeExtensionTable = (function () {
 Office.prototype.cleanupBinary = function(ofDoc, verbose) {
     var compos = ofDoc.VBProject.VBComponents;
     var self   = this;
-    foreachEnum(compos, function(c) {
-        if (self.isDirectiveOnly(c.CodeModule)) return false;
+    foreachEnum(compos, function(compo) {
+        if (self.isDirectiveOnly(compo.CodeModule)) return false;
         
-        var bname = c.Name;
-        if (c.Type == vbext_ct_Document)
-            c.CodeModule.DeleteLines(1, c.CodeModule.CountOfLines);
+        var bname = compo.Name;
+        if (compo.Type == vbext_ct_Document)
+            compo.CodeModule.DeleteLines(1, compo.CodeModule.CountOfLines);
         else
-            compos.Remove(c);
+            compos.Remove(compo);
         if (!!verbose)
             println("- Cleanup: " + bname);
     });
