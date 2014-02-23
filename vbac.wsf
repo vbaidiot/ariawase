@@ -817,7 +817,11 @@ Command.prototype.clear = function clear() {
     var h = this.__helper;
     h.iterTarget(
         function() { return conf.getBins(); },
-        function(path) { h.createOffice(path)[h.commandName](path); });
+        function(path) {
+            var office = h.createOffice(path);
+            var param  = h.parameter;
+            office[param.commandType](path);
+        });
 };
 
 var CommandHelper = function(param) {
