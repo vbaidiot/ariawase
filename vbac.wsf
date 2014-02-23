@@ -290,13 +290,14 @@ Office.prototype.cleanupBinary = function(ofDoc, verbose) {
     var compos = ofDoc.VBProject.VBComponents;
     var self   = this;
     foreachEnum(compos, function(compo) {
-        if (self.isDirectiveOnly(compo.CodeModule)) return false;
-        
         var bname = compo.Name;
-        if (compo.Type == vbext_ct_Document)
+        if (compo.Type == vbext_ct_Document) {
+            if (self.isDirectiveOnly(compo.CodeModule)) return false;
             compo.CodeModule.DeleteLines(1, compo.CodeModule.CountOfLines);
-        else
+        }
+        else {
             compos.Remove(compo);
+        }
         if (!!verbose)
             println("- Cleanup: " + bname);
     });
@@ -349,7 +350,9 @@ Office.prototype.importProject = function(impdir, vbproj) {
 Office.prototype.exportSource = function(ofDoc, expdir) {
     var self = this;
     foreachEnum(ofDoc.VBProject.VBComponents, function(compo) {
-        if (self.isDirectiveOnly(compo.CodeModule)) return false;
+        if (compo.Type == vbext_ct_Document) {
+            if (self.isDirectiveOnly(compo.CodeModule)) return false;
+        }
         
         var xname = self.typeExtensionTable[compo.Type.toString()];
         var bname = compo.Name;
