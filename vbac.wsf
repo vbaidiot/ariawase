@@ -233,6 +233,9 @@ VBAProjFile.prototype.write = function() {
 };
 
 var Office = function() {};
+Office.prototype.setCmdParam = function(cmdParam) {
+    this.cmdParam = cmdParam;
+};
 Office.prototype.isDirectiveOnly = function(codeModule) {
     var ml = codeModule.CountOfLines;
     var dl = codeModule.CountOfDeclarationLines;
@@ -368,10 +371,11 @@ Office.prototype.exportProject = function(vbproj, expdir) {
     proj.write();
     println("- Export: " + proj.fileName);
 };
-Office.prototype.combine = function(tsrc, tbin, hasProj) {
+Office.prototype.combine = function(tsrc, tbin) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
+    var hasProj = this.cmdParam.vbaproj;
     this.loanOfOfficeDocument(tbin, true, function(ofDoc) {
         self.cleanupBinary(ofDoc);
         if (hasProj) self.importProject(tsrc, ofDoc.VBProject);
@@ -381,10 +385,11 @@ Office.prototype.combine = function(tsrc, tbin, hasProj) {
     
     println();
 };
-Office.prototype.decombine = function(tbin, tsrc, hasProj) {
+Office.prototype.decombine = function(tbin, tsrc) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
+    var hasProj = this.cmdParam.vbaproj;
     this.loanOfOfficeDocument(tbin, false, function(ofDoc) {
         self.cleanupSource(tsrc);
         if (hasProj) self.exportProject(ofDoc.VBProject, tsrc);
@@ -766,10 +771,11 @@ Access.prototype.compact = function(dbPath) {
     fso.MoveFile(tempPath, dbPath);
     println("- Compact: " + dbPath);
 };
-Access.prototype.combine = function(tsrc, tbin, hasProj) {
+Access.prototype.combine = function(tsrc, tbin) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
+    var hasProj = this.cmdParam.vbaproj;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupBinary(acProj);
         if (hasProj) self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject);
@@ -778,10 +784,11 @@ Access.prototype.combine = function(tsrc, tbin, hasProj) {
     
     println();
 };
-Access.prototype.decombine = function(tbin, tsrc, hasProj) {
+Access.prototype.decombine = function(tbin, tsrc) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
+    var hasProj = this.cmdParam.vbaproj;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupSource(tsrc);
         if (hasProj) self.exportProject(acProj.Application.VBE.ActiveVBProject, tsrc);
@@ -832,16 +839,23 @@ var CommandHelper = function(param) {
     this.command = new Command(this);
 };
 CommandHelper.prototype.createOffice = function(fname) {
+    var office;
     switch (fso.GetExtensionName(fname)) {
     case 'doc': case 'dot': case 'docm': case 'dotm':
-        return new Word();
+        office = new Word();
+        break;
     case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm':
-        return new Excel();
+        office = new Excel();
+        break;
     case 'mdb': case 'accdb':
-        return new Access();
+        office = new Access();
+        break;
     default:
-        return new Dummy();
+        office = new Dummy();
+        break;
     }
+    office.setCmdParam(this.parameter);
+    return office;
 };
 CommandHelper.prototype.isTempFile = function(fname) {
     return fname.substring(0, 2) == '~$';
@@ -866,7 +880,7 @@ CommandHelper.prototype.combineImpl = function(fromDir, toDir, getPaths) {
         var toPath  = fso.BuildPath(toDir, fso.GetFileName(fromPath));
         var office  = self.createOffice(fromPath);
         var param   = self.parameter;
-        office[param.commandType](fromPath, toPath, param.vbaproj);
+        office[param.commandType](fromPath, toPath);
     });
 };
 CommandHelper.prototype.hasCommand = function(cmdType) {
