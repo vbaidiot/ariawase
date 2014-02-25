@@ -891,7 +891,7 @@ CommandHelper.prototype.combineImpl = function(fromDir, toDir, getPaths) {
 };
 CommandHelper.prototype.hasCommand = function(cmdType) {
     return cmdType in this.command
-        && this.command[cmdType] != this;
+        && cmdType.substr(0, 2) != '__';
 };
 CommandHelper.prototype.runCommand = function() {
     var cmd = this.command;
