@@ -375,10 +375,9 @@ Office.prototype.combine = function(tsrc, tbin) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
-    var hasProj = this.cmdParam.vbaproj;
     this.loanOfOfficeDocument(tbin, true, function(ofDoc) {
         self.cleanupBinary(ofDoc);
-        if (hasProj) self.importProject(tsrc, ofDoc.VBProject);
+        if (self.cmdParam.vbaproj) self.importProject(tsrc, ofDoc.VBProject);
         self.importSource(tsrc, ofDoc);
         ofDoc.Save();
     });
@@ -389,10 +388,9 @@ Office.prototype.decombine = function(tbin, tsrc) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
-    var hasProj = this.cmdParam.vbaproj;
     this.loanOfOfficeDocument(tbin, false, function(ofDoc) {
         self.cleanupSource(tsrc);
-        if (hasProj) self.exportProject(ofDoc.VBProject, tsrc);
+        if (self.cmdParam.vbaproj) self.exportProject(ofDoc.VBProject, tsrc);
         self.exportSource(ofDoc, tsrc);
     });
     
@@ -775,10 +773,9 @@ Access.prototype.combine = function(tsrc, tbin) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
-    var hasProj = this.cmdParam.vbaproj;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupBinary(acProj);
-        if (hasProj) self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject);
+        if (self.cmdParam.vbaproj) self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject);
         self.importSource(tsrc, acProj);
     });
     
@@ -788,10 +785,9 @@ Access.prototype.decombine = function(tbin, tsrc) {
     println("> Target: " + fso.GetFileName(tbin));
     
     var self = this;
-    var hasProj = this.cmdParam.vbaproj;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupSource(tsrc);
-        if (hasProj) self.exportProject(acProj.Application.VBE.ActiveVBProject, tsrc);
+        if (self.cmdParam.vbaproj) self.exportProject(acProj.Application.VBE.ActiveVBProject, tsrc);
         self.exportSource(acProj, tsrc);
     });
     
