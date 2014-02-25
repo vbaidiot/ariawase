@@ -161,8 +161,6 @@ var Config = function() {
 Config.prototype.getBins = function() { return fso.GetFolder(this.bin).Files; };
 Config.prototype.getSrcs = function() { return fso.GetFolder(this.src).SubFolders; };
 
-var conf = new Config();
-
 var VBAProjFile = function(vbproj, srcdir) {
     this.vbproj   = vbproj;
     this.fileName = 'App.vbaproj';
@@ -816,26 +814,31 @@ Access.prototype.clear = function(tbin) {
 
 var Command = function(helper) {
     this.__helper = helper;
+    this.__config = new Config();
 };
 Command.prototype.__helper = null;
+Command.prototype.__config = null;
 Command.prototype.help = function() {
     println(getResource('HelpMessage'));
 };
 Command.prototype.combine = function() {
-    var h = this.__helper;
-    h.combineImpl(conf.src, conf.bin, function() { return conf.getSrcs(); });
+    var hlp  = this.__helper;
+    var conf = this.__config;
+    hlp.combineImpl(conf.src, conf.bin, function() { return conf.getSrcs(); });
 };
 Command.prototype.decombine = function() {
-    var h = this.__helper;
-    h.combineImpl(conf.bin, conf.src, function() { return conf.getBins(); });
+    var hlp  = this.__helper;
+    var conf = this.__config;
+    hlp.combineImpl(conf.bin, conf.src, function() { return conf.getBins(); });
 };
 Command.prototype.clear = function clear() {
-    var h = this.__helper;
-    h.iterTarget(
+    var hlp  = this.__helper;
+    var conf = this.__config;
+    hlp.iterTarget(
         function() { return conf.getBins(); },
         function(path) {
-            var office = h.createOffice(path);
-            var param  = h.parameter;
+            var office = hlp.createOffice(path);
+            var param  = hlp.parameter;
             office[param.commandType](path);
         });
 };
