@@ -8,15 +8,19 @@
 <example></example>
 </runtime>
 <resource id="HelpMessage">
-vbac (version 0.5.0)
+vbac (version 0.6.0 Beta)
 
-Usage: cscript vbac.wsf &lt;command&gt; [&lt;args&gt;]
+Usage: cscript vbac.wsf &lt;command&gt; [&lt;options&gt;]
 
 Commands:
   combine     Import all VBComponents
   decombine   Export all VBComponents
   clear       Remove all VBComponents
   help        Display this help message
+
+Options:
+  /vbaproj    Use .vbaproj file (It's buggy! Please FIXME.)
+  /dbcompact  With Access DB compaction
 </resource>
 <script language="JScript">
 <![CDATA[
@@ -769,7 +773,7 @@ Access.prototype.compact = function(dbPath) {
     engine.CompactDatabase(dbPath, tempPath);
     fso.DeleteFile(dbPath);
     fso.MoveFile(tempPath, dbPath);
-    println("- Compact: " + dbPath);
+    println("- Compact: " + fso.GetFileName(dbPath));
 };
 Access.prototype.combine = function(tsrc, tbin) {
     println("> Target: " + fso.GetFileName(tbin));
@@ -780,6 +784,8 @@ Access.prototype.combine = function(tsrc, tbin) {
         if (self.cmdParam.vbaproj) self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject);
         self.importSource(tsrc, acProj);
     });
+    
+    if (this.cmdParam.dbCompact) this.compact(tbin);
     
     println();
 };
@@ -792,6 +798,8 @@ Access.prototype.decombine = function(tbin, tsrc) {
         if (self.cmdParam.vbaproj) self.exportProject(acProj.Application.VBE.ActiveVBProject, tsrc);
         self.exportSource(acProj, tsrc);
     });
+    
+    if (this.cmdParam.dbCompact) this.compact(tbin);
     
     println();
 };
@@ -910,7 +918,8 @@ function main(args) {
         new CmdParam({
             defaultParameterName: "commandType",
             commandType: "help",
-            vbaproj:     false
+            vbaproj:     false,
+            dbCompact:   false
         })
         .parse(args);
     var h = new CommandHelper(param);
