@@ -127,23 +127,23 @@ CmdParam.prototype.parse = function(args) {
     var pname = this.defaultParameterName;
     for (var i = 0; i < args.length; i++) {
         switch (args[i].charAt(0)) {
-            case '-': case '/':
-                pname = args[i].substring(1);
-                switch (typename(this.get(pname))) {
-                    case 'Boolean':   this.set(pname, true); break;
-                    default:          break;
-                }
-                break;
-            default:
-                switch (typename(this.get(pname))) {
-                    case 'Undefined': break;
-                    case 'Array':     this.get(pname).push(args[i]);        break;
-                    case 'Boolean':   this.set(pname, Boolean(args[i]));    break;
-                    case 'Number':    this.set(pname, Number(args[i]));     break;
-                  //case 'Date':      this.set(pname, Date.parse(args[i])); break;
-                    default:          this.set(pname, args[i]); break;
-                }
-                break;
+        case '-': case '/':
+            pname = args[i].substring(1);
+            switch (typename(this.get(pname))) {
+            case 'Boolean':   this.set(pname, true); break;
+            default:          break;
+            }
+            break;
+        default:
+            switch (typename(this.get(pname))) {
+            case 'Undefined': break;
+            case 'Array':     this.get(pname).push(args[i]);        break;
+            case 'Boolean':   this.set(pname, Boolean(args[i]));    break;
+            case 'Number':    this.set(pname, Number(args[i]));     break;
+          //case 'Date':      this.set(pname, Date.parse(args[i])); break;
+            default:          this.set(pname, args[i]); break;
+            }
+            break;
         }
     }
     return this.parameters;
