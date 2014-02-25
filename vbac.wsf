@@ -756,12 +756,13 @@ Access.prototype.compact = function(dbPath) {
         var d = fso.GetParentFolderName(dbPath);
         var b = fso.GetBaseName(dbPath);
         var x = fso.GetExtensionName(dbPath);
-        var tempExt  = ".tempdb";
+        var tempExt  = "tempdb";
         var tempPath = fso.BuildPath(d, [b, x, tempExt].join("."));
         var delim = "#";
         var i = 0;
         while (fso.FileExists(tempPath))
             tempPath = fso.BuildPath(d, [b+delim+(++i), x, tempExt].join("."));
+        return tempPath;
     })(dbPath);
     
     engine.CompactDatabase(dbPath, tempPath);
