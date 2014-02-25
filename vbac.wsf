@@ -609,7 +609,7 @@ Access.prototype.getDbProperty = function(db, propName) {
     return prop;
 };
 Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
-    var acApp, acProj, ret;
+    var acApp, acDb, ret;
     
     try {
         acApp = new ActiveXObject("Access.Application");
@@ -620,12 +620,13 @@ Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
         else
             acApp.OpenCurrentDatabase(path);
         
-        var startUp = this.getDbProperty(acApp.CurrentDb(), "StartUpForm");
+        acDb = acApp.CurrentDB();
+        var startUp = this.getDbProperty(acDb, "StartUpForm");
         if (startUp !== undefined) acApp.DoCmd.Close(acForm, startUp.Value);
         
         ret = callback(acApp.CurrentProject);
-    } finally { if (acApp.CurrentDB() != null) acApp.CurrentDB().Close(); }
-    } finally { if (acApp != null)             acApp.Quit(); }
+    } finally { if (acDb  != null) acDb.Close(); }
+    } finally { if (acApp != null) { acApp.CloseCurrentDatabase(); acApp.Quit(); } }
     
     return ret;
 };
