@@ -13,14 +13,16 @@ vbac (version 0.6.0 Beta)
 Usage: cscript vbac.wsf &lt;command&gt; [&lt;options&gt;]
 
 Commands:
-  combine     Import all VBComponents
-  decombine   Export all VBComponents
-  clear       Remove all VBComponents
-  help        Display this help message
+  combine           Import all VBComponents
+  decombine         Export all VBComponents
+  clear             Remove all VBComponents
+  help              Display this help message
 
 Options:
-  /vbaproj    Use .vbaproj file (It's buggy! Please FIXME.)
-  /dbcompact  With Access DB compaction
+  /binary &lt;dir&gt;     Directory name of macro-enabled Office file (default: bin)
+  /source &lt;dir&gt;     Directory name of source code (default: src)
+  /vbaproj          Use .vbaproj file (It's buggy! Please FIXME.)
+  /dbcompact        With Access DB compaction
 </resource>
 <script language="JScript">
 <![CDATA[
@@ -153,10 +155,10 @@ CmdParam.prototype.parse = function(args) {
     return this.parameters;
 };
 
-var Config = function() {
+var Config = function(binary, source) {
     this.root = fso.GetParentFolderName(scriptPath);
-    this.bin  = fso.BuildPath(this.root, 'bin');
-    this.src  = fso.BuildPath(this.root, 'src');
+    this.bin  = fso.BuildPath(this.root, binary);
+    this.src  = fso.BuildPath(this.root, source);
 };
 Config.prototype.getBins = function() { return fso.GetFolder(this.bin).Files; };
 Config.prototype.getSrcs = function() { return fso.GetFolder(this.src).SubFolders; };
@@ -813,8 +815,9 @@ Access.prototype.clear = function(tbin) {
 };
 
 var Command = function(helper) {
+    var p = helper.parameter;
     this.__helper = helper;
-    this.__config = new Config();
+    this.__config = new Config(p.binary, p.source);
 };
 Command.prototype.__helper = null;
 Command.prototype.__config = null;
@@ -921,6 +924,8 @@ function main(args) {
         new CmdParam({
             defaultParameterName: "commandType",
             commandType: "help",
+            binary:      "bin",
+            source:      "src",
             vbaproj:     false,
             dbCompact:   false
         })
