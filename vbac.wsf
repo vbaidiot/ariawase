@@ -815,28 +815,25 @@ Access.prototype.clear = function(tbin) {
 };
 
 var Command = function(helper) {
-    var p = helper.parameter;
     this.__helper = helper;
-    this.__config = new Config(p.binary, p.source);
 };
 Command.prototype.__helper = null;
-Command.prototype.__config = null;
 Command.prototype.help = function() {
     println(getResource('HelpMessage'));
 };
 Command.prototype.combine = function() {
     var hlp  = this.__helper;
-    var conf = this.__config;
+    var conf = hlp.config;
     hlp.combineImpl(conf.src, conf.bin, function() { return conf.getSrcs(); });
 };
 Command.prototype.decombine = function() {
     var hlp  = this.__helper;
-    var conf = this.__config;
+    var conf = hlp.config;
     hlp.combineImpl(conf.bin, conf.src, function() { return conf.getBins(); });
 };
 Command.prototype.clear = function clear() {
     var hlp  = this.__helper;
-    var conf = this.__config;
+    var conf = hlp.config;
     hlp.iterTarget(
         function() { return conf.getBins(); },
         function(path) {
@@ -848,6 +845,7 @@ Command.prototype.clear = function clear() {
 
 var CommandHelper = function(param) {
     this.parameter = param;
+    this.config  = new Config(param.binary, param.source);
     this.command = new Command(this);
 };
 CommandHelper.prototype.createOffice = function(fname) {
@@ -897,7 +895,7 @@ CommandHelper.prototype.combineImpl = function(fromDir, toDir, getPaths) {
 };
 CommandHelper.prototype.hasCommand = function(cmdType) {
     return cmdType in this.command
-        && cmdType.substr(0, 2) != '__';
+        && this.command[cmdType] != this;
 };
 CommandHelper.prototype.runCommand = function() {
     var cmd = this.command;
