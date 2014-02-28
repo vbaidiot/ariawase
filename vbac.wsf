@@ -19,8 +19,8 @@ Commands:
   help              Display this help message
 
 Options:
-  /binary &lt;dir&gt;     Directory name of macro-enabled Office file (default: bin)
-  /source &lt;dir&gt;     Directory name of source code (default: src)
+  /binary &lt;dir&gt;     Directory name of macro-enabled Office files (default: bin)
+  /source &lt;dir&gt;     Directory name of source code files (default: src)
   /vbaproj          Use .vbaproj file (It's buggy! Please FIXME.)
   /dbcompact        With Access DB compaction
 </resource>
