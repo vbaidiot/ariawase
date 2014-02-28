@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <package>
-<comment>vbac is not VBA compiler. Instead, this tiny script frees VBA code from binary files.</comment>
+<comment>
+The vbac is not VBA compiler.
+Instead, this tiny script frees VBA code from binary files.
+This script is distributed as part of the Ariawase library.
+
+The Project Page: https://github.com/igeta/Ariawase
+</comment>
 <job id="">
 <?job error="true" debug="false" ?>
 <runtime>
