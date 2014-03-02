@@ -25,8 +25,8 @@ Commands:
   help              Display this help message
 
 Options:
-  /binary &lt;dir&gt;     Directory name of macro-enabled Office files (default: bin)
-  /source &lt;dir&gt;     Directory name of source code files (default: src)
+  /binary &lt;dir&gt;     Directory of macro-enabled Office files (default: bin)
+  /source &lt;dir&gt;     Directory of source code files (default: src)
   /vbaproj          Use .vbaproj file (It's buggy! Please FIXME.)
   /dbcompact        With Access DB compaction
 </resource>
@@ -115,6 +115,17 @@ var typename = function(obj) {
     return Object.prototype.toString.call(obj).slice(8, -1);
 };
 
+var isPathRooted = function(path) {
+    if (!path) return false;
+    
+    var p1 = path.substr(0, 1);
+    if (p1 == '\\' || p1 == '/') return true;
+    var p2 = path.substr(1, 1);
+    if (p2 == ':') return true;
+    
+    return false;
+};
+
 var CmdParam = function(paramObj) {
     this.defaultParameterName = paramObj.defaultParameterName;
     delete paramObj.defaultParameterName;
@@ -162,9 +173,9 @@ CmdParam.prototype.parse = function(args) {
 };
 
 var Config = function(binary, source) {
-    this.root = fso.GetParentFolderName(scriptPath);
-    this.bin  = fso.BuildPath(this.root, binary);
-    this.src  = fso.BuildPath(this.root, source);
+    var root = fso.GetParentFolderName(scriptPath);
+    this.bin = (isPathRooted(binary)) ? binary : fso.BuildPath(root, binary);
+    this.src = (isPathRooted(source)) ? source : fso.BuildPath(root, source);
 };
 Config.prototype.getBins = function() { return fso.GetFolder(this.bin).Files; };
 Config.prototype.getSrcs = function() { return fso.GetFolder(this.src).SubFolders; };
