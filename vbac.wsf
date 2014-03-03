@@ -25,8 +25,8 @@ Commands:
   help              Display this help message
 
 Options:
-  /binary &lt;dir&gt;     Directory of macro-enabled Office files (default: bin)
-  /source &lt;dir&gt;     Directory of source code files (default: src)
+  /binary:&lt;dir&gt;     Directory of macro-enabled Office files (default: bin)
+  /source:&lt;dir&gt;     Directory of source code files (default: src)
   /vbaproj          Use .vbaproj file (It's buggy! Please FIXME.)
   /dbcompact        With Access DB compaction
 </resource>
@@ -146,26 +146,43 @@ CmdParam.prototype.set = function(paramName, value) {
     var pname = this.paramNames[paramName.toLowerCase()];
     this.parameters[pname] = value;
 };
+CmdParam.prototype.parseName = function(pname) {
+    switch (typename(this.get(pname))) {
+    case 'Boolean':   this.set(pname, true); break;
+    default:          break;
+    }
+};
+CmdParam.prototype.parseValue = function(pname, arg) {
+    switch (typename(this.get(pname))) {
+    case 'Undefined': break;
+    case 'Array':     this.get(pname).push(arg);        break;
+    case 'Boolean':   this.set(pname, Boolean(arg));    break;
+    case 'Number':    this.set(pname, Number(arg));     break;
+  //case 'Date':      this.set(pname, Date.parse(arg)); break;
+    default:          this.set(pname, arg); break;
+    }
+};
 CmdParam.prototype.parse = function(args) {
     var pname = this.defaultParameterName;
     for (var i = 0; i < args.length; i++) {
         switch (args[i].charAt(0)) {
         case '-': case '/':
+            var v = undefined;
             pname = args[i].substring(1);
-            switch (typename(this.get(pname))) {
-            case 'Boolean':   this.set(pname, true); break;
-            default:          break;
+            
+            var j = -1;
+            if (j < 0) j = pname.indexOf(':');
+            if (j < 0) j = pname.indexOf('=');
+            if (j > -1) {
+                v     = pname.substring(j + 1);
+                pname = pname.substring(0, j);
             }
+            
+            this.parseName(pname);
+            if (v !== undefined) this.parseValue(pname, v);
             break;
         default:
-            switch (typename(this.get(pname))) {
-            case 'Undefined': break;
-            case 'Array':     this.get(pname).push(args[i]);        break;
-            case 'Boolean':   this.set(pname, Boolean(args[i]));    break;
-            case 'Number':    this.set(pname, Number(args[i]));     break;
-          //case 'Date':      this.set(pname, Date.parse(args[i])); break;
-            default:          this.set(pname, args[i]); break;
-            }
+            this.parseValue(pname, args[i]);
             break;
         }
     }
