@@ -153,7 +153,10 @@ Public Function BomSize(ByVal chrset As String) As Integer
     End Select
 End Function
 
-Public Sub SaveToFileWithoutBom(ByVal strm As Object, ByVal fpath As String, ByVal opSave As SaveOptionsEnum)
+Public Sub SaveToFileWithoutBom( _
+    ByVal strm As Object, ByVal fpath As String, ByVal opSave As SaveOptionsEnum _
+    )
+    
     If TypeName(strm) <> "Stream" Then Err.Raise 13
     If strm.Type <> adTypeText Then Err.Raise 5
     
@@ -176,7 +179,10 @@ Public Sub SaveToFileWithoutBom(ByVal strm As Object, ByVal fpath As String, ByV
     strm.LineSeparator = lnsep
 End Sub
 
-Public Sub RemoveBom(ByVal fpath As String, ByVal chrset As String, ByVal linsep As LineSeparatorsEnum)
+Public Sub RemoveBom( _
+    ByVal fpath As String, ByVal chrset As String, ByVal linsep As LineSeparatorsEnum _
+    )
+    
     Dim strm As Object: Set strm = CreateAdoDbStream(chrset, linsep)
     strm.Open
     strm.LoadFromFile fpath
@@ -199,7 +205,10 @@ Public Function ChangeCharset(ByVal strm As Object, ByVal chrset As String) As O
     Set ChangeCharset = strmZ
 End Function
 
-Public Sub ChangeFileCharset(ByVal fpath As String, ByVal crrChrset As String, ByVal chgChrset As String)
+Public Sub ChangeFileCharset( _
+    ByVal fpath As String, ByVal crrChrset As String, ByVal chgChrset As String _
+    )
+    
     Dim strm As Object: Set strm = CreateAdoDbStream(adTypeText, crrChrset)
     strm.Open
     strm.LoadFromFile fpath
@@ -208,7 +217,10 @@ Public Sub ChangeFileCharset(ByVal fpath As String, ByVal crrChrset As String, B
     strm.Close
 End Sub
 
-Public Function ChangeLineSeparator(ByVal strm As Object, ByVal linsep As LineSeparatorsEnum) As Object
+Public Function ChangeLineSeparator( _
+    ByVal strm As Object, ByVal linsep As LineSeparatorsEnum _
+    ) As Object
+    
     If TypeName(strm) <> "Stream" Then Err.Raise 13
     If strm.Type <> adTypeText Then Err.Raise 5
     
@@ -257,7 +269,10 @@ Public Function GetTempFilePath( _
     Loop While Fso.FileExists(GetTempFilePath)
 End Function
 
-Public Function GetUniqueFileName(ByVal fpath As String, Optional delim As String = "_") As String
+Public Function GetUniqueFileName( _
+    ByVal fpath As String, Optional delim As String = "_" _
+    ) As String
+    
     Dim d As String: d = Fso.GetParentFolderName(fpath)
     Dim b As String: b = Fso.GetBaseName(fpath) & delim
     Dim x As String: x = "." & Fso.GetExtensionName(fpath)
