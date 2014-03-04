@@ -7,6 +7,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'''+----                                                                   --+
+'''|                             Ariawase 0.6.0 Beta                         |
+'''|                Ariawase is free library for VBA cowboys.                |
+'''|          The Project Page: https://github.com/vbaidiot/Ariawase         |
+'''+--                                                                   ----+
 Option Explicit
 
 Private xItems As Variant
