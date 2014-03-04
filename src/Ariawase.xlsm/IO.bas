@@ -249,6 +249,23 @@ Public Sub ChangeFileLineSeparator( _
     strm.Close
 End Sub
 
+Public Function IsPathRooted(ByVal fpath As String) As Boolean
+    Dim s As String
+    s = Left(fpath, 1)
+    If s = "\" Or s = "/" Then
+        IsPathRooted = True
+        GoTo Escape
+    End If
+    s = Mid(fpath, 2, 1)
+    If s = ":" Then
+        IsPathRooted = True
+        GoTo Escape
+    End If
+    IsPathRooted = False
+    
+Escape:
+End Function
+
 Public Function GetSpecialFolder(ByVal spFolder As Variant) As String
     If IsNumeric(spFolder) Then
         GetSpecialFolder = Fso.GetSpecialFolder(spFolder)
