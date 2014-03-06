@@ -244,37 +244,37 @@ End Function
 
 ''' @param x As Variant
 ''' @return As String
-Public Function ToLiteral(ByVal x As Variant) As String
+Public Function Dump(ByVal x As Variant) As String
     Dim ty As String: ty = TypeName(x)
     Select Case ty
-        Case "Byte":        ToLiteral = "CByte(" & x & ")"
-        Case "Integer":     ToLiteral = x & "%"
-        Case "Long":        ToLiteral = x & "&"
+        Case "Byte":        Dump = "CByte(" & x & ")"
+        Case "Integer":     Dump = x & "%"
+        Case "Long":        Dump = x & "&"
         #If VBA7 And Win64 Then
-        Case "LongLong":    ToLiteral = x & "^"
+        Case "LongLong":    Dump = x & "^"
         #End If
-        Case "Single":      ToLiteral = x & "!"
-        Case "Double":      ToLiteral = x & "#"
-        Case "Currency":    ToLiteral = x & "@"
-        Case "Decimal":     ToLiteral = "CDec(" & x & ")"
-        Case "Date":        ToLiteral = "#" & x & "#"
-        Case "Boolean":     ToLiteral = x
-        Case "Empty":       ToLiteral = "(Empty)"
-        Case "Null":        ToLiteral = "(Null)"
-        Case "Nothing":     ToLiteral = "(Nothing)"
-        Case "Unknown":     ToLiteral = "(Unknown)"
-        Case "ErrObject":   ToLiteral = "Err " & x.Number
+        Case "Single":      Dump = x & "!"
+        Case "Double":      Dump = x & "#"
+        Case "Currency":    Dump = x & "@"
+        Case "Decimal":     Dump = "CDec(" & x & ")"
+        Case "Date":        Dump = "#" & x & "#"
+        Case "Boolean":     Dump = x
+        Case "Empty":       Dump = "(Empty)"
+        Case "Null":        Dump = "(Null)"
+        Case "Nothing":     Dump = "(Nothing)"
+        Case "Unknown":     Dump = "(Unknown)"
+        Case "ErrObject":   Dump = "Err " & x.Number
         Case "Error"
             If IsMissing(x) Then
-                ToLiteral = "(Missing)"
+                Dump = "(Missing)"
             Else
-                ToLiteral = "(Error)"
+                Dump = "(Error)"
             End If
         Case "String"
             If StrPtr(x) = 0 Then
-                ToLiteral = "(vbNullString)"
+                Dump = "(vbNullString)"
             Else
-                ToLiteral = """" & x & """"
+                Dump = """" & x & """"
             End If
         Case Else
             If IsArray(x) Then
@@ -286,15 +286,15 @@ Public Function ToLiteral(ByVal x As Variant) As String
                     ub = IIf(ub - lb < mx, ub, lb + mx)
                     Dim y As Variant: ReDim y(lb To ub)
                     Dim i As Long
-                    For i = lb To ub: y(i) = ToLiteral(x(i)): Next
-                    ToLiteral = "Array(" & Join(y, ", ") & ")"
+                    For i = lb To ub: y(i) = Dump(x(i)): Next
+                    Dump = "Array(" & Join(y, ", ") & ")"
                 Else
-                    ToLiteral = Replace(ty, "()", "(" & String(rnk, ",") & ")")
+                    Dump = Replace(ty, "()", "(" & String(rnk, ",") & ")")
                 End If
             Else
                 On Error Resume Next
-                ToLiteral = ty
-                ToLiteral = x.ToStr()
+                Dump = ty
+                Dump = x.ToStr()
             End If
     End Select
 End Function

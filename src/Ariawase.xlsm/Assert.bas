@@ -150,8 +150,8 @@ Private Sub AssertDone( _
     
     If isa <> cond Then
         Push xFailMsgs, "[" & xAssertIx & "] " & msg & ":"
-        Push xFailMsgs, "  Expected: " & IIf(isa, "", "Not ") & "<" & ToLiteral(exp) & ">"
-        Push xFailMsgs, "  But was:  <" & ToLiteral(act) & ">"
+        Push xFailMsgs, "  Expected: " & IIf(isa, "", "Not ") & "<" & Dump(exp) & ">"
+        Push xFailMsgs, "  But was:  <" & Dump(act) & ">"
     End If
     IncrPre xAssertIx
 End Sub
