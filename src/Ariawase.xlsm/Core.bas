@@ -280,14 +280,19 @@ Public Function Dump(ByVal x As Variant) As String
             If IsArray(x) Then
                 Dim rnk As Integer: rnk = ArrRank(x)
                 If rnk = 1 Then
-                    Dim mx As Long: mx = 8 - 1
                     Dim lb As Long: lb = LBound(x)
                     Dim ub As Long: ub = UBound(x)
-                    ub = IIf(ub - lb < mx, ub, lb + mx)
-                    Dim y As Variant: ReDim y(lb To ub)
-                    Dim i As Long
-                    For i = lb To ub: y(i) = Dump(x(i)): Next
-                    Dump = "Array(" & Join(y, ", ") & ")"
+                    Dim ar As Variant
+                    If ub - lb < 0 Then
+                        ar = Array()
+                    Else
+                        Dim mx As Long: mx = 8 - 1
+                        ub = IIf(ub - lb < mx, ub, lb + mx)
+                        ReDim ar(lb To ub)
+                        Dim i As Long
+                        For i = lb To ub: ar(i) = Dump(x(i)): Next
+                    End If
+                    Dump = "Array(" & Join(ar, ", ") & ")"
                 Else
                     Dump = Replace(ty, "()", "(" & String(rnk, ",") & ")")
                 End If
