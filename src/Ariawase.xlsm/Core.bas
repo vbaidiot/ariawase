@@ -268,7 +268,7 @@ Public Function Dump(ByVal x As Variant) As String
             If IsMissing(x) Then
                 Dump = "(Missing)"
             Else
-                Dump = "(Error)"
+                Dump = "CVErr(" & ReMatch(CStr(x), "\d+")(0) & ")"
             End If
         Case "String"
             If StrPtr(x) = 0 Then
