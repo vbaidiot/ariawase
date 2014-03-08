@@ -246,61 +246,63 @@ End Function
 ''' @return As String
 Public Function Dump(ByVal x As Variant) As String
     Dim ty As String: ty = TypeName(x)
+    
     Select Case ty
-        Case "Byte":        Dump = "CByte(" & x & ")"
-        Case "Integer":     Dump = x & "%"
-        Case "Long":        Dump = x & "&"
-        #If VBA7 And Win64 Then
-        Case "LongLong":    Dump = x & "^"
-        #End If
-        Case "Single":      Dump = x & "!"
-        Case "Double":      Dump = x & "#"
-        Case "Currency":    Dump = x & "@"
-        Case "Decimal":     Dump = "CDec(" & x & ")"
-        Case "Date":        Dump = "#" & x & "#"
-        Case "Boolean":     Dump = x
-        Case "Empty":       Dump = "(Empty)"
-        Case "Null":        Dump = "(Null)"
-        Case "Nothing":     Dump = "(Nothing)"
-        Case "Unknown":     Dump = "Unknown"
-        Case "ErrObject":   Dump = "Err " & x.Number
-        Case "Error"
-            If IsMissing(x) Then
-                Dump = "(Missing)"
-            Else
-                Dump = "CVErr(" & ReMatch(CStr(x), "\d+")(0) & ")"
-            End If
-        Case "String"
-            If StrPtr(x) = 0 Then
-                Dump = "(vbNullString)"
-            Else
-                Dump = """" & x & """"
-            End If
-        Case Else
-            If IsArray(x) Then
-                Dim rnk As Integer: rnk = ArrRank(x)
-                If rnk = 1 Then
-                    Dim lb As Long: lb = LBound(x)
-                    Dim ub As Long: ub = UBound(x)
-                    Dim ar As Variant
-                    If ub - lb < 0 Then
-                        ar = Array()
-                    Else
-                        Dim mx As Long: mx = 8 - 1
-                        ub = IIf(ub - lb < mx, ub, lb + mx)
-                        ReDim ar(lb To ub)
-                        Dim i As Long
-                        For i = lb To ub: ar(i) = Dump(x(i)): Next
-                    End If
-                    Dump = "Array(" & Join(ar, ", ") & ")"
+    Case "Byte":        Dump = "CByte(" & x & ")"
+    Case "Integer":     Dump = x & "%"
+    Case "Long":        Dump = x & "&"
+    #If VBA7 And Win64 Then
+    Case "LongLong":    Dump = x & "^"
+    #End If
+    Case "Single":      Dump = x & "!"
+    Case "Double":      Dump = x & "#"
+    Case "Currency":    Dump = x & "@"
+    Case "Decimal":     Dump = "CDec(" & x & ")"
+    Case "Date":        Dump = "#" & x & "#"
+    Case "Boolean":     Dump = x
+    Case "String"
+        If StrPtr(x) = 0 Then
+            Dump = "(vbNullString)"
+        Else
+            Dump = """" & x & """"
+        End If
+    Case "Empty", "Null", "Nothing"
+        Dump = "(" & ty & ")"
+    Case "Error"
+        If IsMissing(x) Then
+            Dump = "(Missing)"
+        Else
+            Dump = "CVErr(" & ReMatch(CStr(x), "\d+")(0) & ")"
+        End If
+    Case "ErrObject"
+        Dump = "Err " & x.Number
+    Case "Unknown"
+        Dump = ty
+    Case Else
+        If IsArray(x) Then
+            Dim rnk As Integer: rnk = ArrRank(x)
+            If rnk = 1 Then
+                Dim lb As Long: lb = LBound(x)
+                Dim ub As Long: ub = UBound(x)
+                Dim ar As Variant
+                If ub - lb < 0 Then
+                    ar = Array()
                 Else
-                    Dump = Replace(ty, "()", "(" & String(rnk, ",") & ")")
+                    Dim mx As Long: mx = 8 - 1
+                    ub = IIf(ub - lb < mx, ub, lb + mx)
+                    ReDim ar(lb To ub)
+                    Dim i As Long
+                    For i = lb To ub: ar(i) = Dump(x(i)): Next
                 End If
+                Dump = "Array(" & Join(ar, ", ") & ")"
             Else
-                On Error Resume Next
-                Dump = ty
-                Dump = x.ToStr()
+                Dump = Replace(ty, "()", "(" & String(rnk, ",") & ")")
             End If
+        Else
+            On Error Resume Next
+            Dump = ty
+            Dump = x.ToStr()
+        End If
     End Select
 End Function
 
