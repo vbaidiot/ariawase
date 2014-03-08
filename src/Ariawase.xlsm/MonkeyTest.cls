@@ -183,6 +183,9 @@ Public Sub Core_Test()
     Assert.AreEqualVal _
         "<li>Word</li><li>Excel</li><li>Access</li>", _
         ReReplace("<p>Word</p><P>Excel</P><p>Access</p>", "<(/?)p>", "<$1li>", "ig")
+    Assert.AreEqualVal _
+        "WScript.Echo(""Hello!"")", _
+        ReTrim(vbTab & "WScript.Echo(""Hello!"");" & vbCrLf, "[\s;]")
     
     Assert.AreEqualVal _
         "001 {2013/05/20} Simple is best.", _

@@ -1036,6 +1036,21 @@ Public Function ReReplace( _
     ReReplace = regex.Replace(expr, ptrnReplace)
 End Function
 
+''' @param expr As String
+''' @param ptrnFind As String
+''' @param iCase As Boolean
+''' @return As String
+Public Function ReTrim( _
+    ByVal expr As String, ByVal ptrnFind As String, _
+    Optional ByVal iCase As Boolean = False _
+    ) As String
+    
+    ptrnFind = "^(?:" & ptrnFind & ")+|(?:" & ptrnFind & ")+$"
+    
+    Dim regex As Object: Set regex = CreateRegExp(ptrnFind, IIf(iCase, "i", "") & "g")
+    ReTrim = regex.Replace(expr, "")
+End Function
+
 ''' @param strTemplate As String
 ''' @param vals() As Variant
 ''' @return As String
