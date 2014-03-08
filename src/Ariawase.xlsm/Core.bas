@@ -262,7 +262,7 @@ Public Function Dump(ByVal x As Variant) As String
         Case "Empty":       Dump = "(Empty)"
         Case "Null":        Dump = "(Null)"
         Case "Nothing":     Dump = "(Nothing)"
-        Case "Unknown":     Dump = "(Unknown)"
+        Case "Unknown":     Dump = "Unknown"
         Case "ErrObject":   Dump = "Err " & x.Number
         Case "Error"
             If IsMissing(x) Then
