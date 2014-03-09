@@ -215,17 +215,24 @@ End Function
 ''' @param params As Variant()
 ''' @return As Object Is T
 Public Function Init(ByVal obj As Object, ParamArray params() As Variant) As Object
-    Dim i As Long
-    Dim ubParam As Long: ubParam = UBound(params)
-    Dim ps() As Variant: ReDim ps(ubParam)
-    For i = 0 To ubParam
-        If IsObject(params(i)) Then
-            Set ps(i) = params(i)
-        Else
-            Let ps(i) = params(i)
-        End If
-    Next
-    rtcCallByName obj, StrPtr("Init"), VbMethod, ps
+    Dim ub As Long: ub = UBound(params)
+    
+    If ub < 0 Then
+        obj.Init
+    Else
+        Dim ps() As Variant: ReDim ps(ub)
+        
+        Dim i As Long
+        For i = 0 To ub
+            If IsObject(params(i)) Then
+                Set ps(i) = params(i)
+            Else
+                Let ps(i) = params(i)
+            End If
+        Next
+        
+        rtcCallByName obj, StrPtr("Init"), VbMethod, ps
+    End If
     
     Set Init = obj
 End Function
