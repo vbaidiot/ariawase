@@ -208,7 +208,6 @@ var Config = function(binary, source, binbak) {
     var root = fso.GetParentFolderName(scriptPath);
     this.bin = (isPathRooted(binary)) ? binary : fso.BuildPath(root, binary);
     this.src = (isPathRooted(source)) ? source : fso.BuildPath(root, source);
-    binbak.flag = false; // It's guard for internal impl
     this.bak = (!binbak.flag) ? undefined
              : (isPathRooted(binbak.value)) ? binbak.value
              : fso.BuildPath(root, binbak.value);
@@ -989,6 +988,10 @@ function main(args) {
             dbCompact:   false
         })
         .parse(args);
+    
+    // It's guard for internal impl. If necessary, you can comment out to enable this feature.
+    param.binbak.flag = false;
+    
     var h = new CommandHelper(param);
     h.runCommand();
 }
