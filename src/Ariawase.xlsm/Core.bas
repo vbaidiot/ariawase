@@ -234,12 +234,23 @@ End Function
 ''' @return As String
 Public Function ToStr(ByVal x As Variant) As String
     If IsObject(x) Then
-        On Error Resume Next
-        ToStr = TypeName(x)
+        On Error GoTo Err438
         ToStr = x.ToStr()
+        On Error GoTo 0
     Else
         ToStr = x
     End If
+    
+    GoTo Escape
+    
+Err438:
+    Dim e As ErrObject: Set e = Err
+    Select Case e.Number
+        Case 438: ToStr = TypeName(x): Resume Next
+        Case Else: Err.Raise e.Number, e.Source, e.Description, e.HelpFile, e.HelpContext
+    End Select
+    
+Escape:
 End Function
 
 ''' @param x As Variant
@@ -299,9 +310,7 @@ Public Function Dump(ByVal x As Variant) As String
                 Dump = Replace(ty, "()", "(" & String(rnk, ",") & ")")
             End If
         Else
-            On Error Resume Next
-            Dump = ty
-            Dump = x.ToStr()
+            Dump = ToStr(x)
         End If
     End Select
 End Function
