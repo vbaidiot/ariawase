@@ -355,6 +355,7 @@ Office.prototype.cleanupBinary = function(ofDoc, verbose) {
     var self   = this;
     foreachEnum(compos, function(compo) {
         var bname = compo.Name;
+        //if (!(compo.Type.toString() in self.typeExtensionTable)) return false;
         if (compo.Type == vbext_ct_Document) {
             if (self.isDirectiveOnly(compo.CodeModule)) return false;
             compo.CodeModule.DeleteLines(1, compo.CodeModule.CountOfLines);
@@ -362,8 +363,7 @@ Office.prototype.cleanupBinary = function(ofDoc, verbose) {
         else {
             compos.Remove(compo);
         }
-        if (!!verbose)
-            println("- Cleanup: " + bname);
+        if (!!verbose) println("- Cleanup: " + bname);
     });
 };
 Office.prototype.cleanupSource = function(dir, verbose) {
@@ -376,10 +376,10 @@ Office.prototype.cleanupSource = function(dir, verbose) {
     foreachEnum(fso.GetFolder(dir).Files, function(fl) {
         var fname = fso.GetFileName(fl.Path);
         var xname = fso.GetExtensionName(fl.Path);
-        if (xname in self.extensionTypeTable)
-            fl.Delete();
-        if (!!verbose)
-            println("- Cleanup: " + fname);
+        if (!(xname in self.extensionTypeTable)) return false;
+        
+        fl.Delete();
+        if (!!verbose) println("- Cleanup: " + fname);
     });
 };
 Office.prototype.importComponent = function(path, ofDoc) {
@@ -414,6 +414,7 @@ Office.prototype.importProject = function(impdir, vbproj) {
 Office.prototype.exportSource = function(ofDoc, expdir) {
     var self = this;
     foreachEnum(ofDoc.VBProject.VBComponents, function(compo) {
+        //if (!(compo.Type.toString() in self.typeExtensionTable)) return false;
         if (compo.Type == vbext_ct_Document) {
             if (self.isDirectiveOnly(compo.CodeModule)) return false;
         }
@@ -730,15 +731,18 @@ Access.prototype.iterAllObjects = function(acApp, action) {
     //var acData = acApp.CurrentData;
     //for (i = 0; i < acData.AllQueries.Count; i++) objs.push(acData.AllQueries.item(i));
     
-    for (i = 0; i < objs.length; i++) action(objs[i], i);
+    for (i = 0; i < objs.length; i++) {
+        if (!!action(objs[i], i)) break;
+    }
 };
 Access.prototype.cleanupBinary = function(acProj, verbose) {
     var acApp = acProj.Application;
     this.iterAllObjects(acApp, function(obj) {
         var name = obj.Name;
+        if (!(obj.Type.toString() in self.typeExtensionTable)) return false;
+        
         acApp.DoCmd.DeleteObject(obj.Type, name);
-        if (!!verbose)
-            println("- Cleanup: " + name);
+        if (!!verbose) println("- Cleanup: " + name);
     });
 };
 Access.prototype.cleanupSource = function(dir, verbose) {
@@ -751,10 +755,10 @@ Access.prototype.cleanupSource = function(dir, verbose) {
     foreachEnum(fso.GetFolder(dir).Files, function(fl) {
         var fname = fso.GetFileName(fl.Path);
         var xname = fso.GetExtensionName(fl.Path);
-        if (xname in self.extensionTypeTable)
-            fl.Delete();
-        if (!!verbose)
-            println("- Cleanup: " + fname);
+        if (!(xname in self.extensionTypeTable)) return false;
+        
+        fl.Delete();
+        if (!!verbose) println("- Cleanup: " + fname);
     });
 };
 Access.prototype.importSource = function(impdir, acProj) {
@@ -766,19 +770,18 @@ Access.prototype.importSource = function(impdir, acProj) {
         var fname = fso.GetFileName(path);
         var xname = fso.GetExtensionName(path);
         var bname = fso.GetBaseName(path);
+        if (!(xname in self.extensionTypeTable)) return false;
         
-        if (xname in self.extensionTypeTable) {
-            var typ = self.extensionTypeTable[xname];
-            if (typ == acModule) {
-                var c = compos.Import(path);
-                c.Name = bname;
-                acApp.DoCmd.Save(typ, bname);
-            }
-            else {
-                acApp.LoadFromText(typ, bname, path);
-            }
-            println("- Import: " + fname);
+        var typ = self.extensionTypeTable[xname];
+        if (typ == acModule) {
+            var c = compos.Import(path);
+            c.Name = bname;
+            acApp.DoCmd.Save(typ, bname);
         }
+        else {
+            acApp.LoadFromText(typ, bname, path);
+        }
+        println("- Import: " + fname);
     });
 };
 Access.prototype.exportSource = function(acProj, expdir) {
@@ -787,6 +790,7 @@ Access.prototype.exportSource = function(acProj, expdir) {
     var self   = this;
     this.iterAllObjects(acApp, function(obj) {
         var bname = obj.Name;
+        if (!(obj.Type.toString() in self.typeExtensionTable)) return false;
         if (!self.isValidFileName(bname)) {
             println("! Warning: skip export. object '" + bname + "' is invalid file name");
             return false;
@@ -941,7 +945,7 @@ CommandHelper.prototype.iterTarget = function(getPaths, action) {
     var self = this;
     foreachEnum(getPaths(), function(fl) {
         if (self.isTempFile(fl.Name)) return false;
-        action(fl.Path);
+        return action(fl.Path);
     });
 };
 CommandHelper.prototype.combineImpl = function(fromDir, toDir, getPaths) {
