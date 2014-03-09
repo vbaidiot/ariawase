@@ -25,14 +25,15 @@ Commands:
   help              Display this help message
 
 Options:
-  /binary:&lt;dir&gt;     Directory of macro-enabled Office files (default: bin)
-  /source:&lt;dir&gt;     Directory of source code files (default: src)
+  /binary:&lt;dir&gt;     Specify directory of macro-enabled Office files
+                    (default: bin)
+  /source:&lt;dir&gt;     Specify directory of source code files
+                    (default: src)
   /vbaproj          Use .vbaproj file (It's buggy! Please FIXME.)
   /dbcompact        With Access DB compaction
 </resource>
 <script language="JScript">
 <![CDATA[
-
 // Enumerations:
 //   Word   - http://msdn.microsoft.com/en-us/library/office/jj684104.aspx
 //   Excel  - http://msdn.microsoft.com/en-us/library/office/ff838815.aspx
@@ -107,8 +108,9 @@ var foreachEnum = function(collection, callback) {
 var dateTimeString = function(dt) {
     var g = function(y) { return (y < 2000) ? 1900 + y : y; };
     var f = function(n) { return (n < 10) ? "0" + n : n.toString(); };
-    return g(dt.getYear())  + f(dt.getMonth() + 1) + f(dt.getDate())
-         + f(dt.getHours()) + f(dt.getMinutes())   + f(dt.getSeconds());
+    var ymd = g(dt.getYear())  + f(dt.getMonth() + 1) + f(dt.getDate());
+    var hns = f(dt.getHours()) + f(dt.getMinutes())   + f(dt.getSeconds());
+    return ymd + " " + hns;
 };
 
 var typename = function(obj) {
@@ -124,6 +126,15 @@ var isPathRooted = function(path) {
     if (p2 == ':') return true;
     
     return false;
+};
+
+var Conditional = function(val) {
+    this.flag  = false;
+    this.value = val;
+};
+Conditional.prototype.change = function(val) {
+    this.flag  = true;
+    if (val !== undefined) this.value = val;
 };
 
 var CmdParam = function(paramObj) {
@@ -147,19 +158,23 @@ CmdParam.prototype.set = function(paramName, value) {
     this.parameters[pname] = value;
 };
 CmdParam.prototype.parseName = function(pname) {
+    // the 'Object' assumed Conditional class
     switch (typename(this.get(pname))) {
-    case 'Boolean':   this.set(pname, true); break;
-    default:          break;
+    case 'Boolean':     this.set(pname, true);      break;
+    case 'Object':      this.get(pname).change();   break;
+    default:            break;
     }
 };
 CmdParam.prototype.parseValue = function(pname, arg) {
+    // the 'Object' assumed Conditional class
     switch (typename(this.get(pname))) {
-    case 'Undefined': break;
-    case 'Array':     this.get(pname).push(arg);        break;
-    case 'Boolean':   this.set(pname, Boolean(arg));    break;
-    case 'Number':    this.set(pname, Number(arg));     break;
-  //case 'Date':      this.set(pname, Date.parse(arg)); break;
-    default:          this.set(pname, arg); break;
+    case 'Undefined':   break;
+    case 'Array':       this.get(pname).push(arg);        break;
+    case 'Boolean':     this.set(pname, Boolean(arg));    break;
+    case 'Number':      this.set(pname, Number(arg));     break;
+  //case 'Date':        this.set(pname, Date.parse(arg)); break;
+    case 'Object':      this.get(pname).change(arg);      break; //FIXME: type of value is string only?
+    default:            this.set(pname, arg); break;
     }
 };
 CmdParam.prototype.parse = function(args) {
@@ -189,10 +204,14 @@ CmdParam.prototype.parse = function(args) {
     return this.parameters;
 };
 
-var Config = function(binary, source) {
+var Config = function(binary, source, binbak) {
     var root = fso.GetParentFolderName(scriptPath);
     this.bin = (isPathRooted(binary)) ? binary : fso.BuildPath(root, binary);
     this.src = (isPathRooted(source)) ? source : fso.BuildPath(root, source);
+    binbak.flag = false; // It's guard for internal impl
+    this.bak = (!binbak.flag) ? undefined
+             : (isPathRooted(binbak.value)) ? binbak.value
+             : fso.BuildPath(root, binbak.value);
 };
 Config.prototype.getBins = function() { return fso.GetFolder(this.bin).Files; };
 Config.prototype.getSrcs = function() { return fso.GetFolder(this.src).SubFolders; };
@@ -858,6 +877,13 @@ Command.prototype.help = function() {
 Command.prototype.combine = function() {
     var hlp  = this.__helper;
     var conf = hlp.config;
+    if (conf.bak !== undefined) {
+        if (!fso.FolderExists(conf.bak)) fso.CreateFolder(conf.bak);
+        
+        var bkdir = fso.BuildPath(conf.bak, dateTimeString(new Date()));
+        fso.CreateFolder(bkdir);
+        fso.CopyFile(fso.BuildPath(conf.bin, "*.*"), bkdir + "\\");
+    }
     hlp.combineImpl(conf.src, conf.bin, function() { return conf.getSrcs(); });
 };
 Command.prototype.decombine = function() {
@@ -879,7 +905,7 @@ Command.prototype.clear = function clear() {
 
 var CommandHelper = function(param) {
     this.parameter = param;
-    this.config  = new Config(param.binary, param.source);
+    this.config  = new Config(param.binary, param.source, param.binbak);
     this.command = new Command(this);
 };
 CommandHelper.prototype.createOffice = function(fname) {
@@ -958,6 +984,7 @@ function main(args) {
             commandType: "help",
             binary:      "bin",
             source:      "src",
+            binbak:      new Conditional("bak"),
             vbaproj:     false,
             dbCompact:   false
         })
@@ -967,7 +994,6 @@ function main(args) {
 }
 
 main(args);
-
 ]]>
 </script>
 </job>
