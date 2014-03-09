@@ -289,6 +289,11 @@ VBAProjFile.prototype.write = function() {
 };
 
 var Office = function() {};
+Office.prototype.progID1 = undefined;
+Office.prototype.progID2 = "Application";
+Office.prototype.getProgID = function() {
+    return (this.progID1 !== undefined) ? this.progID1 + "." + this.progID2 : undefined;
+};
 Office.prototype.setCmdParam = function(cmdParam) {
     this.cmdParam = cmdParam;
 };
@@ -472,6 +477,7 @@ Dummy.prototype.clear     = function() {};
 
 var Word = function() {};
 Word.prototype = new Office();
+Word.prototype.progID1 = "Word";
 Word.prototype.createOpenFile = function(wdApp, path) {
     var wdSaveFormat;
     var vernum = parseInt(wdApp.Version);
@@ -508,7 +514,7 @@ Word.prototype.loanOfOfficeDocument = function(path, isCreate, callback) {
     var wdApp, wdDoc, ret;
     
     try {
-        wdApp = new ActiveXObject("Word.Application");
+        wdApp = new ActiveXObject(this.getProgID());
         wdApp.DisplayAlerts = false;
         //wdApp.EnableEvents  = false; //In Word, Application class does not have this property
     try {
@@ -555,6 +561,7 @@ Word.prototype.importDocument = function(path, wdDoc) {
 
 var Excel = function() {};
 Excel.prototype = new Office();
+Excel.prototype.progID1 = "Excel";
 Excel.prototype.createOpenFile = function(xlApp, path) {
     var xlFileFormat;
     var vernum = parseInt(xlApp.Version);
@@ -591,7 +598,7 @@ Excel.prototype.loanOfOfficeDocument = function(path, isCreate, callback) {
     var xlApp, xlBook, ret;
     
     try {
-        xlApp = new ActiveXObject("Excel.Application");
+        xlApp = new ActiveXObject(this.getProgID());
         xlApp.DisplayAlerts = false;
         xlApp.EnableEvents  = false;
     try {
@@ -638,6 +645,7 @@ Excel.prototype.importDocument = function(path, xlBook) {
 
 var Access = function() {};
 Access.prototype = new Office();
+Access.prototype.progID1 = "Access";
 Access.prototype.createOpenFile = function(acApp, path) {
     var dbFormat;
     var vernum = parseInt(acApp.SysCmd(acSysCmdAccessVer));
@@ -668,7 +676,7 @@ Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
     var acApp, acDb, ret;
     
     try {
-        acApp = new ActiveXObject("Access.Application");
+        acApp = new ActiveXObject(this.getProgID());
         acApp.Visible = false;
     try {
         if (isCreate)
