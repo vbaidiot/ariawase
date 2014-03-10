@@ -350,6 +350,8 @@ Office.prototype.typeExtensionTable = (function () {
     tbl[vbext_ct_Document]    = 'dcm';
     return tbl;
 })();
+Office.prototype.addTargetType = function(typ) {
+};
 Office.prototype.cleanupBinary = function(ofDoc, verbose) {
     var compos = ofDoc.VBProject.VBComponents;
     var self   = this;
@@ -703,8 +705,6 @@ Access.prototype.extensionTypeTable = (function() {
     tbl['frm'] = acForm;
     tbl['rpt'] = acReport;
     tbl['mcr'] = acMacro;
-    // NOTE: If you need to support queries, please uncomment the following code.
-    //tbl['qry'] = acQuery;
     return tbl;
 })();
 Access.prototype.typeExtensionTable = (function() {
@@ -713,10 +713,20 @@ Access.prototype.typeExtensionTable = (function() {
     tbl[acForm]   = 'frm';
     tbl[acReport] = 'rpt';
     tbl[acMacro]  = 'mcr';
-    // NOTE: If you need to support queries, please uncomment the following code.
-    //tbl[acQuery]  = 'qry';
     return tbl;
 })();
+Access.prototype.addTargetType = function(acTyp) {
+    var ext = undefined;
+    switch (acTyp) {
+    case acQuery: ext = 'qry'; break;
+    default: break;
+    }
+    
+    if (ext !== undefined) {
+        this.extensionTypeTable[ext] = acTyp;
+        this.typeExtensionTable[acTyp] = ext;
+    }
+};
 Access.prototype.iterAllObjects = function(acApp, action) {
     var i;
     var objs = new Array();
@@ -727,9 +737,8 @@ Access.prototype.iterAllObjects = function(acApp, action) {
     for (i = 0; i < acProj.AllReports.Count; i++) objs.push(acProj.AllReports.item(i));
     for (i = 0; i < acProj.AllMacros.Count;  i++) objs.push(acProj.AllMacros.item(i));
     
-    // NOTE: If you need to support queries, please uncomment the following code.
-    //var acData = acApp.CurrentData;
-    //for (i = 0; i < acData.AllQueries.Count; i++) objs.push(acData.AllQueries.item(i));
+    var acData = acApp.CurrentData;
+    for (i = 0; i < acData.AllQueries.Count; i++) objs.push(acData.AllQueries.item(i));
     
     for (i = 0; i < objs.length; i++) {
         if (!!action(objs[i], i)) break;
@@ -930,6 +939,7 @@ CommandHelper.prototype.createOffice = function(fname) {
         break;
     case 'mdb': case 'accdb':
         office = new Access();
+        if (this.parameter.incQuery) office.addTargetType(acQuery);
         break;
     default:
         office = new Dummy();
@@ -997,12 +1007,14 @@ function main(args) {
             source:      "src",
             binbak:      new Conditional("bak"),
             vbaproj:     false,
+            incQuery:    false,
             dbCompact:   false
         })
         .parse(args);
     
     // It's guard for internal impl. If necessary, you can comment out to enable this feature.
     param.binbak.flag = false;
+    param.incQuery = false;
     
     var h = new CommandHelper(param);
     h.runCommand();
