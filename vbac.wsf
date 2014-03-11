@@ -746,6 +746,7 @@ Access.prototype.iterAllObjects = function(acApp, action) {
 };
 Access.prototype.cleanupBinary = function(acProj, verbose) {
     var acApp = acProj.Application;
+    var self  = this;
     this.iterAllObjects(acApp, function(obj) {
         var name = obj.Name;
         if (!(obj.Type.toString() in self.typeExtensionTable)) return false;
