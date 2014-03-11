@@ -157,50 +157,56 @@ CmdParam.prototype.set = function(paramName, value) {
     var pname = this.paramNames[paramName.toLowerCase()];
     this.parameters[pname] = value;
 };
-CmdParam.prototype.parseName = function(pname) {
+CmdParam.prototype.setParam = function(pname, arg) {
     // the 'Object' assumed Conditional class
     switch (typename(this.get(pname))) {
-    case 'Boolean':     this.set(pname, true);      break;
-    case 'Object':      this.get(pname).change();   break;
-    default:            break;
-    }
-};
-CmdParam.prototype.parseValue = function(pname, arg) {
-    // the 'Object' assumed Conditional class
-    switch (typename(this.get(pname))) {
-    case 'Undefined':   break;
-    case 'Array':       this.get(pname).push(arg);        break;
-    case 'Boolean':     this.set(pname, Boolean(arg));    break;
-    case 'Number':      this.set(pname, Number(arg));     break;
-  //case 'Date':        this.set(pname, Date.parse(arg)); break;
-    case 'Object':      this.get(pname).change(arg);      break; //FIXME: type of value is string only?
-    default:            this.set(pname, arg); break;
+    case 'Boolean':
+        if (arg == undefined) arg = true;
+        this.set(pname, Boolean(arg));
+        break;
+    case 'Number':
+        this.set(pname, Number(arg));
+        break;
+  //case 'Date':
+  //    this.set(pname, Date.parse(arg));
+  //    break;
+    case 'Object':
+        this.get(pname).change(arg); //FIXME: type of value is string only?
+        break;
+    case 'Array':
+        this.get(pname).push(arg);   //FIXME: type of value is string only?
+        break;
+    case 'Undefined':
+        break;
+    default:
+        this.set(pname, arg);
+        break;
     }
 };
 CmdParam.prototype.parse = function(args) {
     var pname = this.defaultParameterName;
     for (var i = 0; i < args.length; i++) {
+        var value = undefined;
+        
         switch (args[i].charAt(0)) {
         case '-': case '/':
-            var v = undefined;
             pname = args[i].substring(1);
-            
             var j = -1;
             if (j < 0) j = pname.indexOf(':');
             if (j < 0) j = pname.indexOf('=');
             if (j > -1) {
-                v     = pname.substring(j + 1);
+                value = pname.substring(j + 1);
                 pname = pname.substring(0, j);
             }
-            
-            this.parseName(pname);
-            if (v !== undefined) this.parseValue(pname, v);
             break;
         default:
-            this.parseValue(pname, args[i]);
+            value = args[i];
             break;
         }
+        
+        this.setParam(pname, value);
     }
+    
     return this.parameters;
 };
 
