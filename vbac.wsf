@@ -416,8 +416,10 @@ Office.prototype.importSource = function(impdir, ofDoc) {
 };
 Office.prototype.importProject = function(impdir, vbproj) {
     var proj = new VBAProjFile(vbproj, impdir);
-    proj.read();
-    println("- Import: " + proj.fileName);
+    if (fso.FileExists(proj.path)) {
+        proj.read();
+        println("- Import: " + proj.fileName);
+    }
 };
 Office.prototype.exportSource = function(ofDoc, expdir) {
     var self = this;
