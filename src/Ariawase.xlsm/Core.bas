@@ -307,12 +307,12 @@ Public Function Dump(ByVal x As Variant) As String
                     ar = Array()
                 Else
                     Dim mx As Long: mx = 8 - 1
-                    ub = IIf(ub - lb < mx, ub, lb + mx)
-                    ReDim ar(lb To ub)
+                    Dim xb As Long: xb = IIf(ub - lb < mx, ub, lb + mx)
+                    ReDim ar(lb To xb)
                     Dim i As Long
-                    For i = lb To ub: ar(i) = Dump(x(i)): Next
+                    For i = lb To xb: ar(i) = Dump(x(i)): Next
                 End If
-                Dump = "Array(" & Join(ar, ", ") & ")"
+                Dump = "Array(" & Join(ar, ", ") & IIf(xb < ub, " ...", "") & ")"
             Else
                 Dump = Replace(ty, "()", "(" & String(rnk, ",") & ")")
             End If
