@@ -371,7 +371,7 @@ Office.prototype.cleanupBinary = function(ofDoc, verbose) {
         else {
             compos.Remove(compo);
         }
-        if (!!verbose) println("- Cleanup: " + bname);
+        if (!!verbose) println("- Remove: " + bname);
     });
 };
 Office.prototype.cleanupSource = function(dir, verbose) {
@@ -387,7 +387,7 @@ Office.prototype.cleanupSource = function(dir, verbose) {
         if (!(xname in self.extensionTypeTable)) return false;
         
         fl.Delete();
-        if (!!verbose) println("- Cleanup: " + fname);
+        if (!!verbose) println("- Remove: " + fname);
     });
 };
 Office.prototype.importComponent = function(path, ofDoc) {
@@ -760,7 +760,7 @@ Access.prototype.cleanupBinary = function(acProj, verbose) {
         if (!(obj.Type.toString() in self.typeExtensionTable)) return false;
         
         acApp.DoCmd.DeleteObject(obj.Type, name);
-        if (!!verbose) println("- Cleanup: " + name);
+        if (!!verbose) println("- Remove: " + name);
     });
 };
 Access.prototype.cleanupSource = function(dir, verbose) {
@@ -776,7 +776,7 @@ Access.prototype.cleanupSource = function(dir, verbose) {
         if (!(xname in self.extensionTypeTable)) return false;
         
         fl.Delete();
-        if (!!verbose) println("- Cleanup: " + fname);
+        if (!!verbose) println("- Remove: " + fname);
     });
 };
 Access.prototype.importSource = function(impdir, acProj) {
