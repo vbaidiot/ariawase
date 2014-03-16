@@ -120,9 +120,9 @@ var typename = function(obj) {
 var isPathRooted = function(path) {
     if (!path) return false;
     
-    var p1 = path.substr(0, 1);
+    var p1 = path.substring(0, 1);
     if (p1 == '\\' || p1 == '/') return true;
-    var p2 = path.substr(1, 1);
+    var p2 = path.substring(1, 2);
     if (p2 == ':') return true;
     
     return false;
