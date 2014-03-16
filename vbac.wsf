@@ -29,7 +29,7 @@ Options:
                     (default: bin)
   /source:&lt;dir&gt;     Specify directory of source code files
                     (default: src)
-  /vbaproj          Use .vbaproj file (It's buggy! Please FIXME.)
+  /vbaproj          Use .vbaproj file
   /dbcompact        With Access DB compaction
 </resource>
 <script language="JScript">
@@ -236,7 +236,7 @@ VBAProjFile.prototype.removeAllRefs = function() {
         self.vbproj.References.Remove(ref);
     });
 };
-VBAProjFile.prototype.read = function() {
+VBAProjFile.prototype.read = function(is64BitOffice) {
     var isSection = function(line) { return line.match(/^\[.*\]$/) != null; };
     var getParam  = function(line) {
         var i = line.indexOf('=');
@@ -257,8 +257,11 @@ VBAProjFile.prototype.read = function() {
                 if (isSection(line)) break;
                 
                 var p = getParam(line);
-                // FIXME: BUG in Win8 64-bit
-                this.vbproj[p.key] = p.val;
+                // quick-fix solution
+                if (is64BitOffice && p.key == "HelpContextID")
+                    println("! Warning: can not 'VBProject.HelpContextID = \"" + p.val + "\"'. probably 64-bit Office have a bug.");
+                else
+                    this.vbproj[p.key] = p.val;
             }
             break;
         case '[Reference]':
@@ -339,6 +342,11 @@ Office.prototype.checkMacroSecurity = function(ofDoc) {
         throw ex;
     }
 };
+Office.prototype.is64Bit = function(ofApp) {
+    // ref: http://support.microsoft.com/kb/2186281
+    return parseInt(ofApp.Version) >= 14
+        && ofApp.ProductCode.substring(20, 21) == "1";
+};
 Office.prototype.extensionTypeTable = (function() {
     var tbl = {};
     tbl['bas'] = vbext_ct_StdModule;
@@ -414,10 +422,10 @@ Office.prototype.importSource = function(impdir, ofDoc) {
         if (xname == 'frm') println("- Import: " + bname + ".frx");
     });
 };
-Office.prototype.importProject = function(impdir, vbproj) {
+Office.prototype.importProject = function(impdir, vbproj, is64BitOffice) {
     var proj = new VBAProjFile(vbproj, impdir);
     if (fso.FileExists(proj.path)) {
-        proj.read();
+        proj.read(is64BitOffice);
         println("- Import: " + proj.fileName);
     }
 };
@@ -449,7 +457,10 @@ Office.prototype.combine = function(tsrc, tbin) {
     var self = this;
     this.loanOfOfficeDocument(tbin, true, function(ofDoc) {
         self.cleanupBinary(ofDoc);
-        if (self.cmdParam.vbaproj) self.importProject(tsrc, ofDoc.VBProject);
+        if (self.cmdParam.vbaproj) {
+            var is64BitOffice = self.is64Bit(ofDoc.Application);
+            self.importProject(tsrc, ofDoc.VBProject, is64BitOffice);
+        }
         self.importSource(tsrc, ofDoc);
         ofDoc.Save();
     });
@@ -863,7 +874,10 @@ Access.prototype.combine = function(tsrc, tbin) {
     var self = this;
     this.loanOfAcProj(tbin, true, function(acProj) {
         self.cleanupBinary(acProj);
-        if (self.cmdParam.vbaproj) self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject);
+        if (self.cmdParam.vbaproj) {
+            var is64BitOffice = self.is64Bit(acProj.Application);
+            self.importProject(tsrc, acProj.Application.VBE.ActiveVBProject, is64BitOffice);
+        }
         self.importSource(tsrc, acProj);
     });
     
