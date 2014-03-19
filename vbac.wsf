@@ -665,6 +665,21 @@ Excel.prototype.importDocument = function(path, xlBook) {
     compos.Remove(impCompo);
 };
 
+var Outlook = function() {};
+Outlook.prototype = new Office();
+Outlook.prototype.sadNews = function(tbin) {
+    var notSupported =
+        "Unfortunately, Outlook does not support access to VBA project from the outside.\n"
+        + "See also http://support.microsoft.com/kb/290779.";
+    
+    println("> Target: " + fso.GetFileName(tbin));
+    println(notSupported);
+    println();
+};
+Outlook.prototype.combine   = function(tsrc, tbin) { this.sadNews(tbin); };
+Outlook.prototype.decombine = function(tbin, tsrc) { this.sadNews(tbin); };
+Outlook.prototype.clear     = function(tbin)       { this.sadNews(tbin); };
+
 var Access = function() {};
 Access.prototype = new Office();
 Access.prototype.progID1 = "Access";
@@ -959,6 +974,9 @@ CommandHelper.prototype.createOffice = function(fname) {
         break;
     case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm':
         office = new Excel();
+        break;
+    case 'otm':
+        office = new Outlook();
         break;
     case 'mdb': case 'accdb':
         office = new Access();
