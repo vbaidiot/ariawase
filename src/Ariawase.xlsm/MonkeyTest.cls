@@ -16,7 +16,7 @@ Option Explicit
 
 ' Assert.RunTestOf New MonkeyTest
 
-Public Sub Core_Test()
+Public Sub CorePrim_Test()
     Dim i As Integer, n As Long, v As Variant
     
     i = 42
@@ -61,11 +61,39 @@ Public Sub Core_Test()
     Assert.AreEqualVal #5/12/2013#, BeginOfWeek(#5/15/2013#)
     Assert.AreEqualVal #5/18/2013#, EndOfWeek(#5/15/2013#)
     
-    Assert.AreEqualVal Core.Init(New Tuple, "A", 4), Core.Init(New Tuple, "A", 4)
-    Assert.AreEqualVal "A", Core.Init(New Tuple, "A", 4).Item1
-    Assert.AreEqualVal 4, Core.Init(New Tuple, "A", 4).Item2
-    Assert.AreEqualVal "Tuple`2 { Item1 = ""A"", Item2 = 4% }", ToStr(Core.Init(New Tuple, "A", 4))
-    Assert.AreEqualVal "Tuple`4 { Item1 = 1%, Item2 = 2&, Item3 = 3#, Item4 = 4@ }", ToStr(Core.Init(New Tuple, 1, 2&, 3#, 4@))
+    '' the following test are for Japanese.
+    Assert.AreEqualVal 13&, StringWidth("Testテストﾃｽﾄ")
+    Assert.AreEqualVal 27&, StringWidth("全角2ﾊﾞｲﾄ換算による文字列長")
+    Assert.AreEqualVal "全角2byte", LeftA("全角2byteで左から文字列を切り出す", 10)
+    Assert.AreEqualVal "2byteで切り出す", RightA("右から文字列を全角2byteで切り出す", 16)
+    Assert.AreEqualArr Array("LeftAと", "その余りﾀﾞﾖ"), SepA("LeftAとその余りﾀﾞﾖ", 8)
+    
+    Assert.AreEqualVal _
+        "001 {2013/05/20} Simple is best.", _
+        Formats("{0:000} {{{1:yyyy/mm/dd}}} {2}", 1, #5/20/2013#, "Simple is best.")
+End Sub
+
+Public Sub CoreAbst_Test()
+    Assert.AreEqualVal Init(New Tuple, "A", 4), Init(New Tuple, "A", 4)
+    Assert.AreEqualVal "A", Init(New Tuple, "A", 4).Item1
+    Assert.AreEqualVal 4, Init(New Tuple, "A", 4).Item2
+    
+    Assert.AreEqualVal "Tuple`2 { Item1 = ""A"", Item2 = 4% }", ToStr(Init(New Tuple, "A", 4))
+    Assert.AreEqualVal "Tuple`4 { Item1 = 1%, Item2 = 2&, Item3 = 3#, Item4 = 4@ }", ToStr(Init(New Tuple, 1, 2&, 3#, 4@))
+    
+    Assert.AreEqualVal "42%", Dump(42)
+    Assert.AreEqualVal "42&", Dump(42&)
+    Assert.AreEqualVal "3.14#", Dump(3.14)
+    Assert.AreEqualVal "#2014/03/22#", Dump(#3/22/2014#)
+    Assert.AreEqualVal """Foo""", Dump("Foo")
+    Assert.AreEqualVal """""", Dump("")
+    Assert.AreEqualVal "(vbNullString)", Dump(vbNullString)
+    Assert.AreEqualVal "(Empty)", Dump(Empty)
+    Assert.AreEqualVal "Array(1%, 2%, 3%, 4%, 5%, 6%, 7%, 8%, ...)", Dump(Array(1, 2, 3, 4, 5, 6, 7, 8, 9))
+    Dim arr2D(0, 0) As Integer
+    Assert.AreEqualVal "Integer(,)", Dump(arr2D)
+    Dim arr3D(0, 0, 0) As Long
+    Assert.AreEqualVal "Long(,,)", Dump(arr3D)
     
     Assert.AreEqualVal True, Eq(42, 42)
     Assert.AreEqualVal True, Eq(42, 42&)
@@ -75,8 +103,8 @@ Public Sub Core_Test()
     Assert.IsNullVal Eq(Null, Empty)
     Assert.IsNullVal Eq(Null, Null)
     Assert.AreEqualVal True, Eq("", vbNullString)
-    Assert.AreEqualVal False, Eq(Core.Init(New Tuple, "A", 4), Core.Init(New Tuple, "A", 4))
-    Assert.AreEqualVal Empty, Eq(Core.Init(New Tuple, "A", 4), "A4")
+    Assert.AreEqualVal False, Eq(Init(New Tuple, "A", 4), Init(New Tuple, "A", 4))
+    Assert.AreEqualVal Empty, Eq(Init(New Tuple, "A", 4), "A4")
     
     Assert.AreEqualVal True, Equals(42, 42)
     Assert.AreEqualVal Empty, Equals(42, 42&)
@@ -86,22 +114,30 @@ Public Sub Core_Test()
     Assert.AreEqualVal True, Equals("", vbNullString)
     Assert.IsNullVal Equals(Null, Empty)
     Assert.IsNullVal Equals(Null, Null)
-    Assert.AreEqualVal True, Equals(Core.Init(New Tuple, "A", 4), Core.Init(New Tuple, "A", 4))
-    Assert.AreEqualVal Empty, Equals(Core.Init(New Tuple, "A", 4), "A4")
+    Assert.AreEqualVal True, Equals(Init(New Tuple, "A", 4), Init(New Tuple, "A", 4))
+    Assert.AreEqualVal Empty, Equals(Init(New Tuple, "A", 4), "A4")
     
     Assert.AreEqualVal -1, Compare(3, 9)
     Assert.AreEqualVal 0, Compare(5, 5)
     Assert.AreEqualVal 1, Compare(9, 3)
     Assert.IsNullVal Compare(Null, Empty)
     Assert.IsNullVal Compare(Null, Null)
-    Assert.IsErrFunc 13, Core.Init(New Func, vbVariant, AddressOf Compare, vbVariant, vbVariant), Array(0, 0&)
-    Assert.AreEqualVal -1, Compare(Core.Init(New Tuple, 2, ".txt"), Core.Init(New Tuple, 10, ".txt"))
-    Assert.AreEqualVal 1, Compare(Core.Init(New Tuple, "2", ".txt"), Core.Init(New Tuple, "10", ".txt"))
+    Assert.IsErrFunc 13, Init(New Func, vbVariant, AddressOf Compare, vbVariant, vbVariant), Array(0, 0&)
+    Assert.AreEqualVal -1, Compare(Init(New Tuple, 2, ".txt"), Init(New Tuple, 10, ".txt"))
+    Assert.AreEqualVal 1, Compare(Init(New Tuple, "2", ".txt"), Init(New Tuple, "10", ".txt"))
     
     Assert.AreEqualVal 3, Min(3, 6, 5)
     Assert.IsInstanceOfTypeName "Integer", Min(3, 6, 5)
     Assert.AreEqualVal 6, Max(3, 6, 5)
     Assert.IsInstanceOfTypeName "Integer", Max(3, 6, 5)
+End Sub
+
+Public Sub CoreEnumr_Test()
+    Dim arr2D(0, 0) As Integer
+    Dim arr3D(0, 0, 0) As Long
+    Assert.AreEqualVal 1, ArrRank(Array())
+    Assert.AreEqualVal 2, ArrRank(arr2D)
+    Assert.AreEqualVal 3, ArrRank(arr3D)
     
     Assert.AreEqualVal 3&, ArrLen(Array("V", "B", "A"))
     
@@ -147,35 +183,58 @@ Public Sub Core_Test()
     
     Assert.AreEqualArr Array(1, 2, 3, 4, 5), ArrFlatten(Array(Array(1, 2), Array(3), Array(4, 5)))
     
-    Assert.AreEqualArr _
-        Array("1", "2", "3"), _
-        ArrMap(Core.Init(New Func, vbString, AddressOf ToStr, vbVariant), Array(1, 2, 3))
-    
     Assert.AreEqualArr Array(1, 2, 3), ClctToArr(ArrToClct(Array(1, 2, 3)))
     
     Dim clct As Collection
     
-    Set clct = New Collection
+    Set clct = ArrToClct(Array(0))
     Push clct, 3
-    Assert.AreEqualArr Array(3), ClctToArr(clct)
+    Assert.AreEqualArr Array(0, 3), ClctToArr(clct)
     Push clct, 4
-    Assert.AreEqualArr Array(3, 4), ClctToArr(clct)
+    Assert.AreEqualArr Array(0, 3, 4), ClctToArr(clct)
     Assert.AreEqualVal 4, Pop(clct)
-    Assert.AreEqualArr Array(3), ClctToArr(clct)
+    Assert.AreEqualArr Array(0, 3), ClctToArr(clct)
     Shift clct, 2
-    Assert.AreEqualArr Array(2, 3), ClctToArr(clct)
+    Assert.AreEqualArr Array(2, 0, 3), ClctToArr(clct)
     Shift clct, 1
-    Assert.AreEqualArr Array(1, 2, 3), ClctToArr(clct)
+    Assert.AreEqualArr Array(1, 2, 0, 3), ClctToArr(clct)
     Assert.AreEqualVal 1, Unshift(clct)
-    Assert.AreEqualArr Array(2, 3), ClctToArr(clct)
+    Assert.AreEqualArr Array(2, 0, 3), ClctToArr(clct)
     
-'    JagArrToArr2D
-'    Arr2DToJagArr
-'    CreateDictionary
+    Dim vArr2D As Variant
+    vArr2D = JagArrToArr2D(Array(Array(1, 2, 3), Array(4, 5, 6)))
+    Assert.AreEqualVal 2&, ArrLen(vArr2D, 1)
+    Assert.AreEqualVal 3&, ArrLen(vArr2D, 2)
+    Assert.AreEqualVal 1, vArr2D(0, 0)
+    Assert.AreEqualVal 2, vArr2D(0, 1)
+    Assert.AreEqualVal 3, vArr2D(0, 2)
+    Assert.AreEqualVal 4, vArr2D(1, 0)
+    Assert.AreEqualVal 5, vArr2D(1, 1)
+    Assert.AreEqualVal 6, vArr2D(1, 2)
     
+    Dim jagArr As Variant
+    jagArr = Arr2DToJagArr(vArr2D)
+    Assert.AreEqualVal 2&, ArrLen(jagArr)
+    Assert.AreEqualArr Array(1, 2, 3), jagArr(0)
+    Assert.AreEqualArr Array(4, 5, 6), jagArr(1)
+    
+    Dim dict As Object
+    Set dict = CreateDictionary("One", 1, "Two", 2, "Three", 3)
+    Assert.AreEqualVal 3&, dict.Count
+    Assert.AreEqualVal 1, dict!One
+    Assert.AreEqualVal 2, dict!Two
+    Assert.AreEqualVal 3, dict!Three
+End Sub
+
+Public Sub CoreXLib_Test()
     Assert.AreEqualVal "C:\WINDOWS", UCase(Wsh.ExpandEnvironmentStrings("%windir%"))
+    Assert.AreEqualVal 0&, Wmi.Security_.Privileges.Count
     
-'    CreateRegExp
+    Dim regex As Object
+    Set regex = CreateRegExp(".*", "ig")
+    Assert.AreEqualVal ".*", regex.Pattern
+    Assert.AreEqualVal True, regex.Global
+    Assert.AreEqualVal True, regex.IgnoreCase
     
     Assert.AreEqualVal "#VBA", ReMatch("beyond the limit of #VBA.", "#\w+")(0)
     Assert.AreEqualArr Array("2013/5/1", "2013", "5", "1"), ReMatch("2013/5/1", "(\d{4})/(\d{1,2})/(\d{1,2})")
@@ -187,10 +246,6 @@ Public Sub Core_Test()
         "WScript.Echo(""Hello!"")", _
         ReTrim(vbTab & "WScript.Echo(""Hello!"");" & vbCrLf, "[\s;]")
     
-    Assert.AreEqualVal _
-        "001 {2013/05/20} Simple is best.", _
-        Formats("{0:000} {{{1:yyyy/mm/dd}}} {2}", 1, #5/20/2013#, "Simple is best.")
-    
     Assert.AreEqualVal "7", EvalVBS("""3"" + 4")
     Assert.AreEqualVal "34", EvalJS("""3"" + 4")
     
@@ -200,15 +255,35 @@ Public Sub Core_Test()
 End Sub
 
 Public Sub Util_Test()
-'    CreateAssocArray
-'    AssocArrToDict
-'    DictToAssocArr
+    Dim aarr As Variant, dict As Object
+    
+    aarr = CreateAssocArray("One", 1, "Two", 2, "Three", 3)
+    Assert.AreEqualVal 3&, ArrLen(aarr)
+    Assert.AreEqualVal Init(New Tuple, "One", 1), aarr(0)
+    Assert.AreEqualVal Init(New Tuple, "Two", 2), aarr(1)
+    Assert.AreEqualVal Init(New Tuple, "Three", 3), aarr(2)
+    
+    Set dict = AssocArrToDict(aarr)
+    Assert.AreEqualVal 3&, dict.Count
+    Assert.AreEqualVal 1, dict!One
+    Assert.AreEqualVal 2, dict!Two
+    Assert.AreEqualVal 3, dict!Three
+    
+    aarr = DictToAssocArr(dict)
+    Assert.AreEqualVal 3&, ArrLen(aarr)
+    Assert.AreEqualVal Init(New Tuple, "One", 1), aarr(0)
+    Assert.AreEqualVal Init(New Tuple, "Two", 2), aarr(1)
+    Assert.AreEqualVal Init(New Tuple, "Three", 3), aarr(2)
     
     Assert.IsInstanceOfTypeName _
         "Decimal", _
         CDec(EnumeratorToArr(Wmi.ConnectServer().ExecQuery("SELECT * FROM Win32_ComputerSystem"))(0).TotalPhysicalMemory)
     
     Assert.AreEqualArr Array(1, 2, 3, 4, 5, 6, 7, 8, 9), ArrRange(1, 9)
+    
+    Assert.AreEqualArr _
+        Array("1", "2", "3"), _
+        ArrMap(Init(New Func, vbString, AddressOf ToStr, vbVariant), Array(1, 2, 3))
     
 '    Assert.AreEqualArr _
 '        Array(Init(New Tuple, "A", 1), Init(New Tuple, "B", 2)), _
