@@ -2,7 +2,7 @@
 <package>
 <comment>
 The vbac is not VBA compiler.
-Instead, this tiny script frees VBA code from binary files.
+Instead, this unsophisticated script frees VBA code from binary files.
 This script is distributed as part of the Ariawase library.
 
 The Project Page: https://github.com/vbaidiot/Ariawase
