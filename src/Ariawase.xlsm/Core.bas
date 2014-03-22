@@ -312,9 +312,9 @@ Public Function Dump(ByVal x As Variant) As String
                     Dim i As Long
                     For i = lb To xb: ar(i) = Dump(x(i)): Next
                 End If
-                Dump = "Array(" & Join(ar, ", ") & IIf(xb < ub, " ...", "") & ")"
+                Dump = "Array(" & Join(ar, ", ") & IIf(xb < ub, ", ...", "") & ")"
             Else
-                Dump = Replace(ty, "()", "(" & String(rnk, ",") & ")")
+                Dump = Replace(ty, "()", "(" & String(rnk - 1, ",") & ")")
             End If
         Else
             Dump = ToStr(x)
