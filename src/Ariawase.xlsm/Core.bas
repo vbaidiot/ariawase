@@ -315,7 +315,7 @@ Public Function Dump(ByVal x As Variant) As String
     Case "Double":      Dump = x & "#"
     Case "Currency":    Dump = x & "@"
     Case "Decimal":     Dump = "CDec(" & x & ")"
-    Case "Date":        Dump = "#" & x & "#"
+    Case "Date":        Dump = "#" & Month(x) & "/" & Day(x) & "/" & Year(x) & "#"
     Case "Boolean":     Dump = x
     Case "String"
         If StrPtr(x) = 0 Then
