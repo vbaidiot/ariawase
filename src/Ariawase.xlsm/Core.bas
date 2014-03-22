@@ -211,6 +211,45 @@ Public Function SepA(ByVal s As String, ByVal byteLen As Long) As Variant
     SepA = Array(Left$(s, n), Mid$(s, n + 1, strLen))
 End Function
 
+''' @param strTemplate As String
+''' @param vals() As Variant
+''' @return As String
+Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Variant) As String
+    Dim re As Object: Set re = CreateRegExp("(?:[^\{])?(\{(\d+)(:(.*?[^\}]?))?\})", "g")
+    Dim ms As Object: Set ms = re.Execute(strTemplate)
+    
+    Dim ret As Variant: ret = Array()
+    If ms.Count < 1 Then GoTo Ending
+    
+    ReDim ret(2 * ms.Count)
+    Dim ix0 As Long: ix0 = 1
+    Dim ix1 As Long: ix1 = 1
+    
+    Dim i As Long: i = 0
+    Dim m As Object, s As String
+    For Each m In ms
+        ix1 = m.FirstIndex + IIf(Left$(m.Value, 1) <> "{", 1, 0)
+        s = Mid$(strTemplate, ix0, ix1 - ix0 + 1)
+        Dim mbrc As Variant: mbrc = ReMatch(s, "{+$")
+        Dim brcs As String:  If ArrLen(mbrc) > 0 Then brcs = mbrc(0) Else brcs = ""
+        
+        ret(i + 0) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
+        If Len(brcs) Mod 2 = 0 Then
+            ret(i + 1) = Format$(vals(m.SubMatches(1)), m.SubMatches(3))
+        Else
+            ret(i + 1) = m.SubMatches(1)
+        End If
+        
+        i = i + 2
+        ix0 = ix1 + Len(m.SubMatches(0)) + 1
+    Next
+    s = Mid$(strTemplate, ix0)
+    ret(i) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
+    
+Ending:
+    Formats = Join(ret, "")
+End Function
+
 ''' @param obj As Object Is T
 ''' @param params As Variant()
 ''' @return As Object Is T
@@ -1065,45 +1104,6 @@ Public Function ReTrim( _
     
     Dim regex As Object: Set regex = CreateRegExp(ptrnFind, IIf(iCase, "i", "") & "g")
     ReTrim = regex.Replace(expr, "")
-End Function
-
-''' @param strTemplate As String
-''' @param vals() As Variant
-''' @return As String
-Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Variant) As String
-    Dim re As Object: Set re = CreateRegExp("(?:[^\{])?(\{(\d+)(:(.*?[^\}]?))?\})", "g")
-    Dim ms As Object: Set ms = re.Execute(strTemplate)
-    
-    Dim ret As Variant: ret = Array()
-    If ms.Count < 1 Then GoTo Ending
-    
-    ReDim ret(2 * ms.Count)
-    Dim ix0 As Long: ix0 = 1
-    Dim ix1 As Long: ix1 = 1
-    
-    Dim i As Long: i = 0
-    Dim m As Object, s As String
-    For Each m In ms
-        ix1 = m.FirstIndex + IIf(Left$(m.Value, 1) <> "{", 1, 0)
-        s = Mid$(strTemplate, ix0, ix1 - ix0 + 1)
-        Dim mbrc As Variant: mbrc = ReMatch(s, "{+$")
-        Dim brcs As String:  If ArrLen(mbrc) > 0 Then brcs = mbrc(0) Else brcs = ""
-        
-        ret(i + 0) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
-        If Len(brcs) Mod 2 = 0 Then
-            ret(i + 1) = Format$(vals(m.SubMatches(1)), m.SubMatches(3))
-        Else
-            ret(i + 1) = m.SubMatches(1)
-        End If
-        
-        i = i + 2
-        ix0 = ix1 + Len(m.SubMatches(0)) + 1
-    Next
-    s = Mid$(strTemplate, ix0)
-    ret(i) = Replace(Replace(s, "{{", "{"), "}}", "}") 'FIXME: check non-escape brace
-    
-Ending:
-    Formats = Join(ret, "")
 End Function
 
 Private Function EvalScript(ByVal expr As String, ByVal lang As String) As String
