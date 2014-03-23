@@ -8,7 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '''+----                                                                   --+
-'''|                             Ariawase 0.6.0 Beta                         |
+'''|                             Ariawase 0.6.0                              |
 '''|                Ariawase is free library for VBA cowboys.                |
 '''|          The Project Page: https://github.com/vbaidiot/Ariawase         |
 '''+--                                                                   ----+

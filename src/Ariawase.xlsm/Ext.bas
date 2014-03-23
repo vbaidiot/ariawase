@@ -1,6 +1,6 @@
 Attribute VB_Name = "Ext"
 '''+----                                                                   --+
-'''|                             Ariawase 0.6.0 Beta                         |
+'''|                             Ariawase 0.6.0                              |
 '''|                Ariawase is free library for VBA cowboys.                |
 '''|          The Project Page: https://github.com/vbaidiot/Ariawase         |
 '''+--                                                                   ----+
