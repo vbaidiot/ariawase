@@ -315,8 +315,12 @@ Public Function Dump(ByVal x As Variant) As String
     Case "Double":      Dump = x & "#"
     Case "Currency":    Dump = x & "@"
     Case "Decimal":     Dump = "CDec(" & x & ")"
-    Case "Date":        Dump = "#" & Month(x) & "/" & Day(x) & "/" & Year(x) & "#"
     Case "Boolean":     Dump = x
+    Case "Date":
+        Dim d As String, t As String
+        If Abs(x) >= 1 Then d = Month(x) & "/" & Day(x) & "/" & Year(x)
+        If Abs(x - Fix(x)) > 0 Then t = Format(x, "h:nn:ss AM/PM")
+        Dump = "#" & Trim(d & " " & t) & "#"
     Case "String"
         If StrPtr(x) = 0 Then
             Dump = "(vbNullString)"
