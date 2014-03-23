@@ -298,25 +298,27 @@ Public Sub Util_Test()
 '        Array(1, 3, 5, 7, 9), _
 '        ArrFilter(Init(New Func, vbBoolean, AddressOf IsOdd, vbInteger), ArrRange(1, 9))
     
-'    '' FIXME: This test does not work.
-'    Assert.AreEqualArr _
+'    Dim lkup As Variant
+'    lkup = ArrGroupBy( _
+'        Init(New Func, vbVariant, AddressOf GetItem1, vbObject), _
 '        Array( _
-'            Init(New Tuple, "A", Array( _
-'                Init(New Tuple, "A", 1), Init(New Tuple, "A", 2), Init(New Tuple, "A", 3), Init(New Tuple, "A", 4) _
-'                )), _
-'            Init(New Tuple, "B", Array( _
-'                Init(New Tuple, "B", 4), Init(New Tuple, "B", 3), Init(New Tuple, "B", 2), Init(New Tuple, "B", 1) _
-'                )), _
-'            Init(New Tuple, "C", Array( _
-'                Init(New Tuple, "C", 3), Init(New Tuple, "C", 1), Init(New Tuple, "C", 2) _
-'                ))), _
-'        ArrGroupBy( _
-'            Init(New Func, vbVariant, AddressOf GetItem1, vbObject), _
-'            Array( _
-'                Init(New Tuple, "A", 1), Init(New Tuple, "B", 4), Init(New Tuple, "C", 3), _
-'                Init(New Tuple, "A", 2), Init(New Tuple, "B", 3), Init(New Tuple, "C", 1), _
-'                Init(New Tuple, "A", 3), Init(New Tuple, "B", 2), Init(New Tuple, "C", 2), _
-'                Init(New Tuple, "A", 4), Init(New Tuple, "B", 1)))
+'            Init(New Tuple, "A", 1), Init(New Tuple, "B", 4), Init(New Tuple, "C", 3), _
+'            Init(New Tuple, "A", 2), Init(New Tuple, "B", 3), Init(New Tuple, "C", 1), _
+'            Init(New Tuple, "A", 3), Init(New Tuple, "B", 2), Init(New Tuple, "C", 2), _
+'            Init(New Tuple, "A", 4), Init(New Tuple, "B", 1)))
+'    Assert.AreEqualVal 3&, ArrLen(lkup)
+'    Assert.AreEqualVal "A", lkup(0).Item1
+'    Assert.AreEqualVal "B", lkup(1).Item1
+'    Assert.AreEqualVal "C", lkup(2).Item1
+'    Assert.AreEqualArr _
+'        Array(Init(New Tuple, "A", 1), Init(New Tuple, "A", 2), Init(New Tuple, "A", 3), Init(New Tuple, "A", 4)), _
+'        lkup(0).Item2
+'    Assert.AreEqualArr _
+'        Array(Init(New Tuple, "B", 4), Init(New Tuple, "B", 3), Init(New Tuple, "B", 2), Init(New Tuple, "B", 1)), _
+'        lkup(1).Item2
+'    Assert.AreEqualArr _
+'        Array(Init(New Tuple, "C", 3), Init(New Tuple, "C", 1), Init(New Tuple, "C", 2)), _
+'        lkup(2).Item2
     
 '    Assert.AreEqualVal _
 '        5050, _
