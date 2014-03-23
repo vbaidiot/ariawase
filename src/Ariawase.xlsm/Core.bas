@@ -102,7 +102,7 @@ Public Function IsInt(ByVal num As Variant) As Boolean
     IsInt = num = Fix(num)
 End Function
 
-''' @param num As Variant(Of Decimal)
+''' @param num As Variant(Of Numeric)
 ''' @param digits As Integer
 ''' @param rndup As Integer
 ''' @return As Variant(Of Decimal)
@@ -110,9 +110,10 @@ Public Function ARound( _
     ByVal num As Variant, Optional ByVal digits As Integer = 0, Optional rndup As Integer = 5 _
     ) As Variant
     
-    If IsNumeric(num) Then num = CDec(num) Else Err.Raise 13
+    If Not IsNumeric(num) Then Err.Raise 13
     If Not (1 <= rndup And rndup <= 10) Then Err.Raise 5
     
+    num = CDec(num)
     Dim n As Variant: n = CDec(10 ^ Abs(digits))
     Dim z As Variant: z = CDec(Sgn(num) * 0.1 * (10 - rndup))
     If digits >= 0 Then
