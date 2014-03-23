@@ -93,6 +93,15 @@ Public Function BitFlag(ParamArray flgs() As Variant) As Long
     Next
 End Function
 
+''' @param num As Variant(Of Numeric Or Date)
+''' @return As Boolean
+Public Function IsInt(ByVal num As Variant) As Boolean
+    If IsDate(num) Then num = CDbl(num)
+    If Not IsNumeric(num) Then Err.Raise 13
+    
+    IsInt = num = Fix(num)
+End Function
+
 ''' @param num As Variant(Of Decimal)
 ''' @param digits As Integer
 ''' @param rndup As Integer
@@ -323,7 +332,7 @@ Public Function Dump(ByVal x As Variant) As String
     Case "Date":
         Dim d As String, t As String
         If Abs(x) >= 1 Then d = Month(x) & "/" & Day(x) & "/" & Year(x)
-        If Abs(x - Fix(x)) > 0 Then t = Format(x, "h:nn:ss AM/PM")
+        If Not IsInt(x) Then t = Format(x, "h:nn:ss AM/PM")
         Dump = "#" & Trim(d & " " & t) & "#"
     Case "String"
         If StrPtr(x) = 0 Then

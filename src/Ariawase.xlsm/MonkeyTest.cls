@@ -49,6 +49,8 @@ Public Sub CorePrim_Test()
     Assert.AreEqualVal 8&, BitFlag(True, False, False, False)
     Assert.AreEqualVal 8&, BitFlag(1, 0, 0, 0)
     
+    Assert.AreEqualVal True, IsInt(7#)
+    Assert.AreEqualVal False, IsInt(7.01)
     Assert.AreEqualVal CDec(4), ARound(4.4)
     Assert.AreEqualVal CDec(5), ARound(4.5)
     Assert.AreEqualVal CDec(2.34), ARound(2.344, 2)
