@@ -114,6 +114,8 @@ var dateTimeString = function(dt) {
 };
 
 var typename = function(obj) {
+    if (obj === undefined) return 'Undefined';
+    if (obj == null) return 'Null';
     return Object.prototype.toString.call(obj).slice(8, -1);
 };
 
@@ -179,7 +181,7 @@ CmdParam.prototype.setParam = function(pname, arg) {
     case 'Undefined':
         break;
     default:
-        this.set(pname, arg);
+        this.set(pname, arg || "");
         break;
     }
 };
