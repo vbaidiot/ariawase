@@ -161,7 +161,7 @@ CmdParam.prototype.setParam = function(pname, arg) {
     // the 'Object' assumed Conditional class
     switch (typename(this.get(pname))) {
     case 'Boolean':
-        if (arg == undefined) arg = true;
+        if (arg === undefined) arg = true;
         this.set(pname, Boolean(arg));
         break;
     case 'Number':
