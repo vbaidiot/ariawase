@@ -180,28 +180,28 @@ Public Sub IsNotInstanceOfTypeName( _
     AssertDone False, expType = t, msg, expType, t
 End Sub
 
-Public Sub AreEqVal( _
+Public Sub AreEq( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     AssertDone True, Eq(exp, act), msg, exp, act
 End Sub
 
-Public Sub AreNotEqVal( _
+Public Sub AreNotEq( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     AssertDone False, Eq(exp, act), msg, exp, act
 End Sub
 
-Public Sub AreEqualVal( _
+Public Sub AreEqual( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
     AssertDone True, Equals(exp, act), msg, exp, act
 End Sub
 
-Public Sub AreNotEqualVal( _
+Public Sub AreNotEqual( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
