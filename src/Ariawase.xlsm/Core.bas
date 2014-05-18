@@ -44,9 +44,9 @@ Function rtcCallByName Lib "VBE6.DLL" ( _
     ) As Variant
 #End If
 
-''' @seealso WScript.Shell http://msdn.microsoft.com/ja-jp/library/cc364436.aspx
+''' @seealso WScript.Shell http://msdn.microsoft.com/en-us/library/aew9yb99.aspx (/ja-jp/library/cc364436.aspx)
 ''' @seealso WbemScripting.SWbemLocator http://msdn.microsoft.com/en-us/library/windows/desktop/aa393719.aspx
-''' @seealso VBScript.RegExp http://msdn.microsoft.com/ja-jp/library/cc392403.aspx
+''' @seealso VBScript.RegExp http://msdn.microsoft.com/en-us/library/yab2dx62.aspx (/ja-jp/library/cc392403.aspx)
 
 Public Enum HKeyEnum
     HKEY_CLASSES_ROOT = &H80000000
