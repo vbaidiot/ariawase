@@ -89,7 +89,7 @@ Public Function BitFlag(ParamArray flgs() As Variant) As Long
     
     Dim i As Long
     For i = 0 To ub
-        BitFlag = BitFlag + IIf(flgs(i), 1, 0) * 2 ^ (ub - i)
+        BitFlag = BitFlag + Abs(flgs(i)) * 2 ^ (ub - i)
     Next
 End Function
 
@@ -158,7 +158,7 @@ End Function
 ''' @return As Integer
 Private Function CharWidth(ByVal s As String) As Integer
    Dim x As Integer: x = Asc(s) / &H100 And &HFF
-   CharWidth = IIf((&H81 <= x And x <= &H9F) Or (&HE0 <= x And x <= &HFC), 2, 1)
+   CharWidth = 1 + Abs((&H81 <= x And x <= &H9F) Or (&HE0 <= x And x <= &HFC))
 End Function
 
 ''' @param s As String Is Char
@@ -238,7 +238,7 @@ Public Function Formats(ByVal strTemplate As String, ParamArray vals() As Varian
     Dim i As Long: i = 0
     Dim m As Object, s As String
     For Each m In ms
-        ix1 = m.FirstIndex + IIf(Left$(m.Value, 1) <> "{", 1, 0)
+        ix1 = m.FirstIndex + Abs(Left$(m.Value, 1) <> "{")
         s = Mid$(strTemplate, ix0, ix1 - ix0 + 1)
         Dim mbrc As Variant: mbrc = ReMatch(s, "{+$")
         Dim brcs As String:  If ArrLen(mbrc) > 0 Then brcs = mbrc(0) Else brcs = ""
@@ -715,7 +715,7 @@ Private Sub ObjArrISort(arr As Variant, lb As Long, orderAsc As Boolean)
     For i = lb + 1 To UBound(arr)
         j = i
         Do While j > lb
-            If Compare(arr(j - 1), arr(j)) * IIf(orderAsc, 1, -1) <= 0 Then Exit Do
+            If Compare(arr(j - 1), arr(j)) * (Abs(orderAsc) * 2 - 1) <= 0 Then Exit Do
             Set x = arr(j): Set arr(j) = arr(j - 1): Set arr(j - 1) = x
             j = j - 1
         Loop
@@ -726,7 +726,7 @@ Private Sub ValArrISort(arr As Variant, lb As Long, orderAsc As Boolean)
     For i = lb + 1 To UBound(arr)
         j = i
         Do While j > lb
-            If Compare(arr(j - 1), arr(j)) * IIf(orderAsc, 1, -1) <= 0 Then Exit Do
+            If Compare(arr(j - 1), arr(j)) * (Abs(orderAsc) * 2 - 1) <= 0 Then Exit Do
             Let x = arr(j): Let arr(j) = arr(j - 1): Let arr(j - 1) = x
             j = j - 1
         Loop
@@ -740,7 +740,7 @@ Private Function ArrMergeSw( _
     
     If i1 > ub1 Then ArrMergeSw = False Else _
     If i2 > ub2 Then ArrMergeSw = True Else _
-    ArrMergeSw = Compare(arr1(i1), arr2(i2)) * IIf(orderAsc, 1, -1) < 1
+    ArrMergeSw = Compare(arr1(i1), arr2(i2)) * (Abs(orderAsc) * 2 - 1) < 1
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
