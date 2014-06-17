@@ -110,10 +110,11 @@ End Property
 
 ''' @return As String
 Public Property Get ExecPath() As String
-    Select Case Application.Name
-        Case "Microsoft Word":   ExecPath = Application.MacroContainer.Path
-        Case "Microsoft Excel":  ExecPath = Application.ThisWorkbook.Path
-        Case "Microsoft Access": ExecPath = Application.CurrentProject.Path
+    Dim app As Object: Set app = Application
+    Select Case app.Name
+        Case "Microsoft Word":   ExecPath = app.MacroContainer.Path
+        Case "Microsoft Excel":  ExecPath = app.ThisWorkbook.Path
+        Case "Microsoft Access": ExecPath = app.CurrentProject.Path
         Case Else: Err.Raise 17
     End Select
 End Property
