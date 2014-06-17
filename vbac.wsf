@@ -506,16 +506,17 @@ Word.prototype.createOpenFile = function(wdApp, path) {
     var wdSaveFormat;
     var vernum = parseInt(wdApp.Version);
     switch (fso.GetExtensionName(path)) {
-    case 'doc':  case 'dot':
-        wdSaveFormat = wdFormatTemplate97;
-        break;
-    case 'docm': case 'dotm':
-        wdSaveFormat = wdFormatXMLTemplateMacroEnabled;
-        break;
-    default:
-        wdSaveFormat = (vernum < 12) ? wdFormatDocument97 : wdFormatXMLDocumentMacroEnabled;
-        path        += (vernum < 12) ? '.doc'      : '.docm';
-        break;
+    case 'doc':  wdSaveFormat = wdFormatDocument97;
+                 break;
+    case 'dot':  wdSaveFormat = wdFormatTemplate97;
+                 break;
+    case 'docm': wdSaveFormat = wdFormatXMLDocumentMacroEnabled;
+                 break;
+    case 'dotm': wdSaveFormat = wdFormatXMLTemplateMacroEnabled;
+                 break;
+    default:     wdSaveFormat = (vernum < 12) ? wdFormatDocument97 : wdFormatXMLDocumentMacroEnabled;
+                 path        += (vernum < 12) ? '.doc'             : '.docm';
+                 break;
     }
     
     var wdDoc;
