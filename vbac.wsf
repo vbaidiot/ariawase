@@ -867,6 +867,10 @@ Access.prototype.compact = function(dbPath) {
         }
         return undefined;
     })();
+    if (engine === undefined) {
+        println("! Compact: Do nothing, because cannot make DAO.DBEngine object.");
+        return;
+    }
     
     var tempPath = (function(dbPath) {
         var d = fso.GetParentFolderName(dbPath);
