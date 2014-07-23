@@ -867,7 +867,7 @@ Access.prototype.compact = function(dbPath) {
         }
         return undefined;
     })();
-
+    
     var tempPath = (function(dbPath) {
         var d = fso.GetParentFolderName(dbPath);
         var b = fso.GetBaseName(dbPath);
