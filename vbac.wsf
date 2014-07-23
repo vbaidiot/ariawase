@@ -938,7 +938,7 @@ Command.prototype.help = function() {
 Command.prototype.combine = function() {
     var hlp  = this.__helper;
     var conf = hlp.config;
-    if (conf.bak !== undefined) {
+    if (conf.bak !== undefined && fso.FolderExists(conf.bin)) {
         if (!fso.FolderExists(conf.bak)) fso.CreateFolder(conf.bak);
         
         var bkdir = fso.BuildPath(conf.bak, dateTimeString(new Date()));
