@@ -719,10 +719,12 @@ Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
         acApp = new ActiveXObject(this.getProgID());
         acApp.Visible = false;
     try {
-        if (isCreate)
-            this.createOpenFile(acApp, path);
-        else
-            acApp.OpenCurrentDatabase(path);
+        if (!!path) {
+            if (isCreate)
+                this.createOpenFile(acApp, path);
+            else
+                acApp.OpenCurrentDatabase(path);
+        }
         
         acDb = acApp.CurrentDB();
         var startUp = this.getDbProperty(acDb, "StartUpForm");
@@ -730,7 +732,7 @@ Access.prototype.loanOfAcProj = function(path, isCreate, callback) {
         
         ret = callback(acApp.CurrentProject);
     } finally { if (acDb  != null) acDb.Close(); }
-    } finally { if (acApp != null) { acApp.CloseCurrentDatabase(); acApp.Quit(); } }
+    } finally { if (acApp != null) { if (acDb != null) acApp.CloseCurrentDatabase(); acApp.Quit(); } }
     
     return ret;
 };
@@ -857,8 +859,8 @@ Access.prototype.exportSource = function(acProj, expdir) {
         println("- Export: " + fname);
     });
 };
-Access.prototype.compact = function(dbPath) {
-    var engine = (function() {
+Access.prototype.compact = function(dbPath, acApp) {
+    var engine = (!!acApp) ? acApp.DBEngine : (function() {
         var egname = "DAO.DBEngine";
         var egvers = ["120", "36", "35"];
         for (var i = 0; i < egvers.length; i++) {
@@ -898,8 +900,9 @@ Access.prototype.combine = function(tsrc, tbin) {
         }
         self.importSource(tsrc, acProj);
     });
-    
-    if (this.cmdParam.dbCompact) this.compact(tbin);
+    this.loanOfAcProj(undefined, false, function(acProj) {
+        if (self.cmdParam.dbCompact) self.compact(tbin, acProj.Application);
+    });
     
     println();
 };
@@ -912,8 +915,9 @@ Access.prototype.decombine = function(tbin, tsrc) {
         if (self.cmdParam.vbaproj) self.exportProject(acProj.Application.VBE.ActiveVBProject, tsrc);
         self.exportSource(acProj, tsrc);
     });
-    
-    if (this.cmdParam.dbCompact) this.compact(tbin);
+    this.loanOfAcProj(undefined, false, function(acProj) {
+        if (self.cmdParam.dbCompact) self.compact(tbin, acProj.Application);
+    });
     
     println();
 };
