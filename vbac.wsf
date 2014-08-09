@@ -855,7 +855,12 @@ Access.prototype.exportSource = function(acProj, expdir) {
         }
         
         var fname = bname + "." + xname;
-        acApp.SaveAsText(obj.Type, bname, fso.BuildPath(expdir, fname));
+        var path  = fso.BuildPath(expdir, fname);
+        if (obj.Type == acModule)
+            compos(obj.Name).Export(path);
+        else
+            acApp.SaveAsText(obj.Type, bname, path);
+        
         println("- Export: " + fname);
     });
 };
