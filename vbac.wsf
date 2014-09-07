@@ -48,6 +48,7 @@ var wdFormatXMLTemplateMacroEnabled = 15 //.dotm
 // XlFileFormat
 var xlExcel9795 = 43; //.xls 97-2003 format in Excel 2003 or prev
 var xlExcel8    = 56; //.xls 97-2003 format in Excel 2007
+var xlExcel12   = 50; //.xlsb
 var xlOpenXMLWorkbookMacroEnabled = 52; //.xlsm
 
 // AcNewDatabaseFormat
@@ -594,6 +595,9 @@ Excel.prototype.createOpenFile = function(xlApp, path) {
     case 'xls':  case 'xla':  case 'xlt':
         xlFileFormat = (vernum < 12) ? xlExcel9795 : xlExcel8;
         break;
+    case 'xlsb':
+        xlFileFormat = xlExcel12;
+        break;
     case 'xlsm': case 'xlam': case 'xltm':
         xlFileFormat = xlOpenXMLWorkbookMacroEnabled;
         break;
@@ -984,7 +988,7 @@ CommandHelper.prototype.createOffice = function(fname) {
     case 'doc': case 'dot': case 'docm': case 'dotm':
         office = new Word();
         break;
-    case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm':
+    case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm': case 'xlsb':
         office = new Excel();
         break;
     case 'otm':
