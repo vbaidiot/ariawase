@@ -594,7 +594,7 @@ Excel.prototype.createOpenFile = function(xlApp, path) {
     case 'xls':  case 'xla':  case 'xlt':
         xlFileFormat = (vernum < 12) ? xlExcel9795 : xlExcel8;
         break;
-    case 'xlsm': case 'xlam': case 'xltm': case 'xlsb':
+    case 'xlsm': case 'xlam': case 'xltm':
         xlFileFormat = xlOpenXMLWorkbookMacroEnabled;
         break;
     default:
@@ -984,7 +984,7 @@ CommandHelper.prototype.createOffice = function(fname) {
     case 'doc': case 'dot': case 'docm': case 'dotm':
         office = new Word();
         break;
-    case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm': case 'xlsb':
+    case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm':
         office = new Excel();
         break;
     case 'otm':
