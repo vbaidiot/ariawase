@@ -303,6 +303,36 @@ Public Function GetUniqueFileName( _
     GetUniqueFileName = fpath
 End Function
 
+Public Function GetAllFolders(ByVal folderPath As String) As Variant
+    Dim ret As Collection: Set ret = New Collection
+    GetAllFoldersImpl folderPath, ret
+    GetAllFolders = ClctToArr(ret)
+End Function
+Private Sub GetAllFoldersImpl(ByVal folderPath As String, ByVal ret As Collection)
+    Dim d As Object: Set d = Fso.GetFolder(folderPath)
+    
+    Dim sd As Object
+    For Each sd In d.SubFolders
+        ret.Add sd.Path
+        GetAllFoldersImpl sd.Path, ret
+    Next
+End Sub
+
+Public Function GetAllFiles(ByVal folderPath As String) As Variant
+    Dim ret As Collection: Set ret = New Collection
+    GetAllFilesImpl folderPath, ret
+    GetAllFiles = ClctToArr(ret)
+End Function
+Private Sub GetAllFilesImpl(ByVal folderPath As String, ByVal ret As Collection)
+    Dim d As Object: Set d = Fso.GetFolder(folderPath)
+    
+    Dim fl As Object
+    For Each fl In d.Files: ret.Add fl.Path: Next
+    
+    Dim sd As Object
+    For Each sd In d.SubFolders: GetAllFilesImpl sd.Path, ret: Next
+End Sub
+
 Public Sub CreateFolderTree(ByVal folderPath As String)
     If Not Fso.DriveExists(Fso.GetDriveName(folderPath)) Then Err.Raise 5
     CreateFolderTreeImpl folderPath
