@@ -981,19 +981,33 @@ var CommandHelper = function(param) {
     this.config  = new Config(param.binary, param.source, param.binbak);
     this.command = new Command(this);
 };
-CommandHelper.prototype.createOffice = function(fname) {
-    var office;
+CommandHelper.prototype.getAppName = function(fname) {
     switch (fso.GetExtensionName(fname)) {
     case 'doc': case 'dot': case 'docm': case 'dotm':
+        return 'Word';
+    case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm': case 'xlsb':
+        return 'Excel';
+    case 'otm':
+        return 'Outlook';
+    case 'mdb': case 'accdb':
+        return 'Access';
+    default:
+        return undefined;
+    }
+};
+CommandHelper.prototype.createOffice = function(fname) {
+    var office;
+    switch (this.getAppName(fname)) {
+    case 'Word':
         office = new Word();
         break;
-    case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm': case 'xlsb':
+    case 'Excel':
         office = new Excel();
         break;
-    case 'otm':
+    case 'Outlook':
         office = new Outlook();
         break;
-    case 'mdb': case 'accdb':
+    case 'Access':
         office = new Access();
         if (this.parameter.incQuery) office.addTargetType(acQuery);
         break;
