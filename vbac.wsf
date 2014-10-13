@@ -787,6 +787,23 @@ Access.prototype.iterAllObjects = function(acApp, action) {
         if (!!action(objs[i], i)) break;
     }
 };
+Access.prototype.getAcDocs = function(acApp) {
+    var acDb;
+    try {
+        acDb = acApp.CurrentDB();
+        var docs = new Array();
+        var conts = ['Modules', 'Forms', 'Reports', 'Scripts'];
+        var c2eTable = this.containerExtensionTable;
+        for (var i = 0; i < conts.length; i++) {
+            var cont = conts[i];
+            foreachEnum(acDb.Containers(cont).Documents, function(doc) {
+                docs.push({ container: cont, name: doc.Name });
+            });
+        }
+    } finally { if (acDb != null) acDb.Close(); }
+    
+    return docs;
+};
 Access.prototype.cleanupBinary = function(acProj, verbose) {
     var acApp = acProj.Application;
     var self  = this;
@@ -973,6 +990,30 @@ Command.prototype.clear = function() {
         function(path) {
             var office = hlp.createOffice(path);
             office.clear(path);
+        });
+};
+Command.prototype.acdoc = function() {
+    var hlp  = this.__helper;
+    var conf = hlp.config;
+    
+    hlp.iterTarget(
+        function() { return conf.getBins(); },
+        function(path) {
+            if (hlp.getAppName(path) != 'Access') return false;
+            
+            println("> Target: " + fso.GetFileName(path));
+            var docs;
+            var acc = hlp.createOffice(path);
+            acc.loanOfAcProj(path, true, function(acProj) {
+                var acApp = acProj.Application;
+                docs = acc.getAcDocs(acApp);
+            });
+            
+            for (var i = 0; i < docs.length; i++) {
+                var doc = docs[i];
+                println("- " + doc.container + ": " + doc.name);
+            }
+            println();
         });
 };
 
