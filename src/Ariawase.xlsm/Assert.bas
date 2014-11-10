@@ -223,6 +223,14 @@ Public Sub AreNotEqualArr( _
     AssertDone False, ArrEquals(exp, act), msg, exp, act
 End Sub
 
+Public Sub Fail(Optional ByVal msg As String = "")
+    If Len(msg) > 0 Then
+        Err.Raise 1004, AssertModule, msg
+    Else
+        Err.Raise 1004, AssertModule
+    End If
+End Sub
+
 Public Sub IsErrFunc( _
     ByVal errnum As Variant, _
     ByVal fun As Func, ByVal params As Variant, _
