@@ -279,6 +279,39 @@ Public Function ArrFold( _
     End If
 End Function
 
+''' @param fun As Func(Of U, T, U)
+''' @param arr As Variant(Of Array(Of T))
+''' @param seed As Variant(Of U)
+''' @return As Variant(Of Array(Of U))
+Public Function ArrScan( _
+    ByVal fun As Func, ByVal arr As Variant, Optional ByVal seed As Variant _
+    ) As Variant
+    
+    If Not IsArray(arr) Then Err.Raise 13
+    
+    Dim isObj As Boolean
+    Dim stat As Variant
+    Dim i As Long: i = LBound(arr)
+    ArrFoldPrep arr, seed, i, stat, isObj
+    
+    Dim stats As ArrayEx: Set stats = New ArrayEx
+    If isObj Then
+        stats.AddObj stat
+        For i = i To UBound(arr)
+            fun.FastApply stat, stat, arr(i)
+            stats.AddObj stat
+        Next
+    Else
+        stats.AddVal stat
+        For i = i To UBound(arr)
+            fun.FastApply stat, stat, arr(i)
+            stats.AddVal stat
+        Next
+    End If
+    
+    ArrScan = stats.ToArray
+End Function
+
 ''' @param fun As Func
 ''' @param seed As Variant(Of T)
 ''' @return As Variant(Of Array(Of U))

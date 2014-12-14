@@ -325,6 +325,10 @@ Public Sub Util_Test()
 '        ArrFold(Init(New Func, vbInteger, AddressOf Add, vbInteger, vbInteger), ArrRange(1, 100), 0)
     
 '    Assert.AreEqualArr _
+'        Array(0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55), _
+'        ArrScan(Init(New Func, vbInteger, AddressOf Add, vbInteger, vbInteger), ArrRange(1, 10), 0)
+    
+'    Assert.AreEqualArr _
 '        Array(1&, 2&, 3&, 5&, 8&, 13&, 21&, 34&, 55&, 89&), _
 '        ArrUnfold(Init(New Func, vbVariant, AddressOf FibFun, vbObject), Init(New Tuple, 1, 1))
 End Sub
