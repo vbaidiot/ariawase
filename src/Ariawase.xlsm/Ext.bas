@@ -232,6 +232,28 @@ Ending:
     ArrGroupBy = ret
 End Function
 
+Private Sub ArrFoldPrep( _
+    arr As Variant, seed As Variant, i As Long, stat As Variant, _
+    Optional isObj As Boolean _
+    )
+    
+    If IsObject(seed) Then
+        Set stat = seed
+    Else
+        Let stat = seed
+    End If
+    
+    If IsMissing(stat) Then
+        isObj = IsObject(arr(i))
+        If isObj Then
+            Set stat = arr(i)
+        Else
+            Let stat = arr(i)
+        End If
+        i = i + 1
+    End If
+End Sub
+
 ''' @param fun As Func(Of U, T, U)
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param seed As Variant(Of U)
@@ -244,23 +266,11 @@ Public Function ArrFold( _
     
     Dim stat As Variant
     Dim i As Long: i = LBound(arr)
+    ArrFoldPrep arr, seed, i, stat
     
-    If IsMissing(seed) Then
-        If IsObject(arr(i)) Then
-            Set seed = arr(i)
-        Else
-            Let seed = arr(i)
-        End If
-        i = i + 1
-    End If
-    
-    If IsObject(seed) Then
-        Set stat = seed
-    Else
-        Let stat = seed
-    End If
-    
-    For i = i To UBound(arr): fun.FastApply stat, stat, arr(i): Next
+    For i = i To UBound(arr)
+        fun.FastApply stat, stat, arr(i)
+    Next
     
     If IsObject(stat) Then
         Set ArrFold = stat
