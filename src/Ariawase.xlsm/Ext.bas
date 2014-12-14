@@ -244,10 +244,20 @@ Public Function ArrFold( _
     
     Dim stat As Variant
     Dim i As Long: i = LBound(arr)
+    
     If IsMissing(seedVal) Then
-        stat = arr(IncrPst(i))
+        If IsObject(arr(i)) Then
+            Set seedVal = arr(i)
+        Else
+            Let seedVal = arr(i)
+        End If
+        i = i + 1
+    End If
+    
+    If IsObject(seedVal) Then
+        Set stat = seedVal
     Else
-        stat = seedVal
+        Let stat = seedVal
     End If
     
     For i = i To UBound(arr): fun.FastApply stat, stat, arr(i): Next
