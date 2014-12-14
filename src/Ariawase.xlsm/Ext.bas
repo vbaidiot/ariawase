@@ -234,10 +234,10 @@ End Function
 
 ''' @param fun As Func(Of U, T, U)
 ''' @param arr As Variant(Of Array(Of T))
-''' @param seedVal As Variant(Of U)
+''' @param seed As Variant(Of U)
 ''' @return As Variant(Of U)
 Public Function ArrFold( _
-    ByVal fun As Func, ByVal arr As Variant, Optional ByVal seedVal As Variant _
+    ByVal fun As Func, ByVal arr As Variant, Optional ByVal seed As Variant _
     ) As Variant
     
     If Not IsArray(arr) Then Err.Raise 13
@@ -245,19 +245,19 @@ Public Function ArrFold( _
     Dim stat As Variant
     Dim i As Long: i = LBound(arr)
     
-    If IsMissing(seedVal) Then
+    If IsMissing(seed) Then
         If IsObject(arr(i)) Then
-            Set seedVal = arr(i)
+            Set seed = arr(i)
         Else
-            Let seedVal = arr(i)
+            Let seed = arr(i)
         End If
         i = i + 1
     End If
     
-    If IsObject(seedVal) Then
-        Set stat = seedVal
+    If IsObject(seed) Then
+        Set stat = seed
     Else
-        Let stat = seedVal
+        Let stat = seed
     End If
     
     For i = i To UBound(arr): fun.FastApply stat, stat, arr(i): Next
@@ -270,13 +270,13 @@ Public Function ArrFold( _
 End Function
 
 ''' @param fun As Func
-''' @param seedVal As Variant(Of T)
+''' @param seed As Variant(Of T)
 ''' @return As Variant(Of Array(Of U))
-Public Function ArrUnfold(ByVal fun As Func, ByVal seedVal As Variant) As Variant
+Public Function ArrUnfold(ByVal fun As Func, ByVal seed As Variant) As Variant
     Dim arrx As ArrayEx: Set arrx = New ArrayEx
     
     Dim stat As Variant '(Of Tuple`2 Or Missing)
-    fun.FastApply stat, seedVal
+    fun.FastApply stat, seed
     If IsMissing(stat) Then GoTo Ending
     
     If IsObject(stat.Item1) Then
