@@ -88,9 +88,14 @@ Private Sub LateBindParamTypes(ByVal params As Variant)
     xUbParam = UBound(params)
     
     If xUbParam >= 0 Then
-        Dim i As Long
+        Dim i As Long, ty As VbVarType
+        
         ReDim xParamTypes(xUbParam)
-        For i = 0 To xUbParam: xParamTypes(i) = VarType(params(i)): Next
+        For i = 0 To xUbParam
+            ty = VarType(params(i))
+            If (ty < 2 Or 12 < ty) And ty <> 17 Then ty = vbVariant
+            xParamTypes(i) = ty
+        Next
     Else
         ReDim xParamTypes(0)
     End If
