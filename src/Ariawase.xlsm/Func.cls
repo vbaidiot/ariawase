@@ -56,7 +56,7 @@ End Enum
 
 Private Const S_OK = &H0
 
-Private xReturnType As VbVarType
+Private xreturnTyp As VbVarType
 #If VBA7 And Win64 Then
 Private xAddr As LongPtr
 #Else
@@ -105,20 +105,20 @@ End Sub
 
 #If VBA7 And Win64 Then
 Public Sub Init( _
-    ByVal returnType As VbVarType, ByVal addr As LongPtr, ParamArray paramTypes() As Variant _
+    ByVal returnTyp As VbVarType, ByVal addr As LongPtr, ParamArray paramTypes() As Variant _
     )
 #Else
 Public Sub Init( _
-    ByVal returnType As VbVarType, ByVal addr As Long, ParamArray paramTypes() As Variant _
+    ByVal returnTyp As VbVarType, ByVal addr As Long, ParamArray paramTypes() As Variant _
     )
 #End If
     
-    xReturnType = returnType
+    xreturnTyp = returnTyp
     xAddr = addr
     EarlyBindParamTypes paramTypes
 End Sub
 
-Public Sub CallByPtr(ByRef returnValue As Variant, ByVal params As Variant)
+Public Sub CallByPtr(ByRef returnVal As Variant, ByVal params As Variant)
 '    If Not IsArray(params) Then Err.Raise 5
     
 #If VBA7 And Win64 Then
@@ -136,18 +136,18 @@ Public Sub CallByPtr(ByRef returnValue As Variant, ByVal params As Variant)
     
     Dim stat As Long, ret As Variant
     stat = DispCallFunc( _
-        0, xAddr, tagCALLCONV.CC_STDCALL, xReturnType, _
+        0, xAddr, tagCALLCONV.CC_STDCALL, xreturnTyp, _
         xUbParam + 1, xParamTypes(0), lpParams(0), ret)
     If stat <> S_OK Then Err.Raise 5
     
-    If IsObject(ret) Then Set returnValue = ret Else Let returnValue = ret
+    If IsObject(ret) Then Set returnVal = ret Else Let returnVal = ret
 End Sub
 
-Public Sub FastApply(ByRef returnValue As Variant, ParamArray params() As Variant)
+Public Sub FastApply(ByRef returnVal As Variant, ParamArray params() As Variant)
     If Not xParamTypeBinding Then
         LateBindParamTypes params
     End If
-    CallByPtr returnValue, params
+    CallByPtr returnVal, params
 End Sub
 
 Public Function Apply(ParamArray params() As Variant) As Variant

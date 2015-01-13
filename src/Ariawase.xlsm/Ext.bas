@@ -233,14 +233,14 @@ Ending:
 End Function
 
 Private Sub ArrFoldPrep( _
-    arr As Variant, seed As Variant, i As Long, stat As Variant, _
+    arr As Variant, seedv As Variant, i As Long, stat As Variant, _
     Optional isObj As Boolean _
     )
     
-    If IsObject(seed) Then
-        Set stat = seed
+    If IsObject(seedv) Then
+        Set stat = seedv
     Else
-        Let stat = seed
+        Let stat = seedv
     End If
     
     If IsMissing(stat) Then
@@ -256,17 +256,17 @@ End Sub
 
 ''' @param fun As Func(Of U, T, U)
 ''' @param arr As Variant(Of Array(Of T))
-''' @param seed As Variant(Of U)
+''' @param seedv As Variant(Of U)
 ''' @return As Variant(Of U)
 Public Function ArrFold( _
-    ByVal fun As Func, ByVal arr As Variant, Optional ByVal seed As Variant _
+    ByVal fun As Func, ByVal arr As Variant, Optional ByVal seedv As Variant _
     ) As Variant
     
     If Not IsArray(arr) Then Err.Raise 13
     
     Dim stat As Variant
     Dim i As Long: i = LBound(arr)
-    ArrFoldPrep arr, seed, i, stat
+    ArrFoldPrep arr, seedv, i, stat
     
     For i = i To UBound(arr)
         fun.FastApply stat, stat, arr(i)
@@ -281,10 +281,10 @@ End Function
 
 ''' @param fun As Func(Of U, T, U)
 ''' @param arr As Variant(Of Array(Of T))
-''' @param seed As Variant(Of U)
+''' @param seedv As Variant(Of U)
 ''' @return As Variant(Of Array(Of U))
 Public Function ArrScan( _
-    ByVal fun As Func, ByVal arr As Variant, Optional ByVal seed As Variant _
+    ByVal fun As Func, ByVal arr As Variant, Optional ByVal seedv As Variant _
     ) As Variant
     
     If Not IsArray(arr) Then Err.Raise 13
@@ -292,7 +292,7 @@ Public Function ArrScan( _
     Dim isObj As Boolean
     Dim stat As Variant
     Dim i As Long: i = LBound(arr)
-    ArrFoldPrep arr, seed, i, stat, isObj
+    ArrFoldPrep arr, seedv, i, stat, isObj
     
     Dim stats As ArrayEx: Set stats = New ArrayEx
     If isObj Then
@@ -313,13 +313,13 @@ Public Function ArrScan( _
 End Function
 
 ''' @param fun As Func
-''' @param seed As Variant(Of T)
+''' @param seedv As Variant(Of T)
 ''' @return As Variant(Of Array(Of U))
-Public Function ArrUnfold(ByVal fun As Func, ByVal seed As Variant) As Variant
+Public Function ArrUnfold(ByVal fun As Func, ByVal seedv As Variant) As Variant
     Dim arrx As ArrayEx: Set arrx = New ArrayEx
     
     Dim stat As Variant '(Of Tuple`2 Or Missing)
-    fun.FastApply stat, seed
+    fun.FastApply stat, seedv
     If IsMissing(stat) Then GoTo Ending
     
     If IsObject(stat.Item1) Then
