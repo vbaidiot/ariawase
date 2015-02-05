@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "c2sjis", "c2sjis\c2sjis.csproj", "{35B724A3-0CA5-487C-A554-1F3CB5312072}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "c2def", "c2def.csproj", "{4DFC7944-5576-459A-AF81-72C2A961BE61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{35B724A3-0CA5-487C-A554-1F3CB5312072}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35B724A3-0CA5-487C-A554-1F3CB5312072}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35B724A3-0CA5-487C-A554-1F3CB5312072}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35B724A3-0CA5-487C-A554-1F3CB5312072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DFC7944-5576-459A-AF81-72C2A961BE61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DFC7944-5576-459A-AF81-72C2A961BE61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DFC7944-5576-459A-AF81-72C2A961BE61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DFC7944-5576-459A-AF81-72C2A961BE61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,30 +4,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace c2sjis
+namespace c2def
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var sourceDirectory = Environment.CurrentDirectory + @"\" + (args.Length != 0 ?  args[0] : @"src");
+            var sourceDirectory = Environment.CurrentDirectory + @"\" + (args.Length != 0 ? args[0] : @"src");
             if (!Directory.Exists(sourceDirectory)) return;
-          
+
             var allFilePaths = Directory.GetFiles(sourceDirectory, "*", SearchOption.AllDirectories);
             var targetFileExtensions = new List<string>() { "bas", "cls" };
             allFilePaths
                 .Where(path => targetFileExtensions.Contains(Path.GetExtension(path)))
                 .Where(path => GetEncoding(path) != Encoding.GetEncoding("Shift-JIS"))
-                .ToList().ForEach(path => Convert2SJIS(path));
+                .ToList().ForEach(path => Convert2DefaultEncoding(path));
         }
 
-        private static void Convert2SJIS(string path)
+        private static void Convert2DefaultEncoding(string path)
         {
             var encoding = new TxtEnc().SetFromTextFile(path);
             var allText = File.ReadAllText(path, encoding);
-            File.WriteAllText(path, allText, encoding);
+            File.WriteAllText(path, allText, Encoding.Default);
         }
 
         private static Encoding GetEncoding(string path)

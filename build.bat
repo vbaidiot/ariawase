@@ -1,4 +1,4 @@
 @echo off
 cd %~dp0
-c2sjis.exe
+c2def.exe
 cscript //nologo vbac.wsf combine
