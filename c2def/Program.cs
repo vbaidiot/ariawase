@@ -18,7 +18,7 @@ namespace c2def
             var targetFileExtensions = new List<string>() { "bas", "cls" };
             allFilePaths
                 .Where(path => targetFileExtensions.Contains(Path.GetExtension(path)))
-                .Where(path => GetEncoding(path) != Encoding.GetEncoding("Shift-JIS"))
+                .Where(path => GetEncoding(path) != Encoding.Default)
                 .ToList().ForEach(path => Convert2DefaultEncoding(path));
         }
 
