@@ -1154,7 +1154,7 @@ End Function
 Public Function IsJagArr(ByVal arr As Variant) As Boolean
 
     If Not IsArray(arr) Then Err.Raise 13
-    If ArrRank(arr) > 1 Then IsJagArr = False: GoTo Ending
+    If ArrRank(arr) > 1 Then IsJagArr = False: GoTo Escape
     
     On Error GoTo Escape
     
@@ -1162,11 +1162,10 @@ Public Function IsJagArr(ByVal arr As Variant) As Boolean
     For Each v1 In arr
         If IsArray(v1) Then
             For Each v2 In v1
-                IsJagArr = True: GoTo Ending
+                IsJagArr = True: GoTo Escape
             Next v2
         End If
     Next v1
 
 Escape:
-Ending:
 End Function
