@@ -1150,3 +1150,23 @@ Public Function CreateStdRegProv() As Object
     Dim wmiSrv As Object: Set wmiSrv = Wmi.ConnectServer(, "root\default")
     Set CreateStdRegProv = wmiSrv.Get("StdRegProv")
 End Function
+
+Public Function IsJagArr(ByVal arr As Variant) As Boolean
+
+    If Not IsArray(arr) Then Err.Raise 13
+    If ArrRank(arr) > 1 Then IsJagArr = False: GoTo Ending
+    
+    On Error GoTo Escape
+    
+    Dim v1 As Variant, v2 As Variant
+    For Each v1 In arr
+        If IsArray(v1) Then
+            For Each v2 In v1
+                IsJagArr = True: GoTo Ending
+            Next v2
+        End If
+    Next v1
+
+Escape:
+Ending:
+End Function
