@@ -1150,3 +1150,18 @@ Public Function CreateStdRegProv() As Object
     Dim wmiSrv As Object: Set wmiSrv = Wmi.ConnectServer(, "root\default")
     Set CreateStdRegProv = wmiSrv.Get("StdRegProv")
 End Function
+
+
+Public Function IsNumericArr(ByVal arr As Variant) As Boolean
+    If Not IsArray(arr) Then Err.Raise 13
+    
+    Dim v As Variant
+    For Each v In arr
+        If Not (IsEmpty(v) Or IsNull(v)) Then
+            If Not IsNumeric(v) Then GoTo Escape 'return False
+        End If
+    Next v
+    
+    IsNumericArr = True
+Escape:
+End Function
