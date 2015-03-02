@@ -1150,3 +1150,18 @@ Public Function CreateStdRegProv() As Object
     Dim wmiSrv As Object: Set wmiSrv = Wmi.ConnectServer(, "root\default")
     Set CreateStdRegProv = wmiSrv.Get("StdRegProv")
 End Function
+
+Public Function Filter2(ByVal arr As Variant, ByVal ptrnFind As String, Optional ByVal include As Boolean = True) As Variant
+    If Not IsArray(arr) Then Err.Raise 13
+    If include Then ptrnFind = "^.*" & ptrnFind & ".*$"
+    
+    Dim v As Variant, arrx As New ArrayEx
+    For Each v In arr
+        If UBound(ReMatch(v, ptrnFind)) <> -1 Then arrx.AddVal ReMatch(v, ptrnFind)
+    Next v
+    
+    Select Case UBound(arrx.ToArray)
+        Case Is = -1:   Filter2 = Array(Array(vbNullString))
+        Case Else:      Filter2 = arrx.ToArray
+    End Select
+End Function
