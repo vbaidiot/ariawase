@@ -1150,3 +1150,37 @@ Public Function CreateStdRegProv() As Object
     Dim wmiSrv As Object: Set wmiSrv = Wmi.ConnectServer(, "root\default")
     Set CreateStdRegProv = wmiSrv.Get("StdRegProv")
 End Function
+
+Public Function ArrPlus(ByVal arr1 As Variant, arr2 As Variant) As Variant
+    
+    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
+    If (ArrRank(arr1) <> ArrRank(arr2)) And (UBound(arr1) <> UBound(arr2)) Then Err.Raise 13
+    If IsNumericArr(arr1) = False Or IsNumericArr(arr2) = False Then Err.Raise 13
+    
+    Dim arr As Variant: arr = ArrZip(Init(New Func, vbObject, AddressOf Tuple2Of, vbVariant, vbVariant), arr1, arr2)
+    ArrPlus = ArrMap(Init(New Func, vbVariant, AddressOf TplPlus, vbObject), arr)
+    
+End Function
+
+Public Function ArrMinus(ByVal arr1 As Variant, arr2 As Variant) As Variant
+    
+    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
+    If (ArrRank(arr1) <> ArrRank(arr2)) And (UBound(arr1) <> UBound(arr2)) Then Err.Raise 13
+    If IsNumericArr(arr1) = False Or IsNumericArr(arr2) = False Then Err.Raise 13
+    
+    Dim arr As Variant: arr = ArrZip(Init(New Func, vbObject, AddressOf Tuple2Of, vbVariant, vbVariant), arr1, arr2)
+    ArrMinus = ArrMap(Init(New Func, vbVariant, AddressOf TplMinus, vbObject), arr)
+    
+End Function
+
+Public Function TplPlus(ByVal tpl As Tuple) As Variant
+    TplPlus = tpl.Item1 + tpl.Item2
+End Function
+
+Public Function TplMinus(ByVal tpl As Tuple) As Variant
+    TplMinus = tpl.Item1 - tpl.Item2
+End Function
+
+Public Function Tuple2Of(ByVal itm1 As Variant, ByVal itm2 As Variant) As Tuple
+    Set Tuple2Of = Init(New Tuple, itm1, itm2)
+End Function
