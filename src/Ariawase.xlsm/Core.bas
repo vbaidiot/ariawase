@@ -1155,13 +1155,38 @@ End Function
 Public Function IsNumericArr(ByVal arr As Variant) As Boolean
     If Not IsArray(arr) Then Err.Raise 13
     
-    Dim v As Variant
-    For Each v In arr
-        If Not (IsEmpty(v) Or IsNull(v)) Then
-            If Not IsNumeric(v) Then GoTo Escape 'return False
-        End If
-    Next v
+    If IsJagArr(arr) Then
+        Dim arrx As New ArrayEx
+        ArrExplode arrx, arr
+        arr = arrx.ToArray
+    End If
     
+    Dim v As Variant
+    Select Case UBound(arr)
+    Case Is = -1: GoTo Escape
+    Case Is = 0
+        For Each v In arr
+            If Not IsNumeric(v) Then GoTo Escape
+        Next v
+    Case Else
+        For Each v In arr
+            If Not (IsEmpty(v) Or IsNull(v)) Then
+                If Not IsNumeric(v) Then GoTo Escape
+            End If
+        Next v
+    End Select
+
     IsNumericArr = True
 Escape:
 End Function
+
+Public Sub ArrExplode(ByRef arrx As ArrayEx, ByVal arr As Variant)
+    If Not IsArray(arr) Then Err.Raise 13
+    Dim v As Variant
+    For Each v In arr
+        Select Case IsArray(v)
+            Case True:  ArrExplode arrx, v
+            Case False: If IsObject(v) = True Then arrx.AddObj v Else arrx.AddVal v
+        End Select
+    Next v
+End Sub
