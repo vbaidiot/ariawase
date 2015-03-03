@@ -1154,18 +1154,31 @@ End Function
 Public Function IsJagArr(ByVal arr As Variant) As Boolean
 
     If Not IsArray(arr) Then Err.Raise 13
+    On Error GoTo Escape
     
     'Empty Array -> Err 9
-    On Error GoTo Escape
-    If ArrRank(arr) > 1 Or UBound(arr) = -1 Or UBound(arr) = 0 Then IsJagArr = False: GoTo Escape
+    If ArrRank(arr) > 1 Or UBound(arr) = -1 Then GoTo Escape
     
     'Not JagArr -> Err.raise 13
     Dim v1 As Variant, v2 As Variant
-    For Each v1 In arr
-        For Each v2 In v1
-            IsJagArr = True: GoTo Escape
-        Next v2
-    Next v1
+    Select Case UBound(arr)
+        Case Is = 0
+            For Each v1 In arr
+                If Not IsObject(v1) Then
+                    For Each v2 In v1
+                        IsJagArr = True
+                        GoTo Escape
+                    Next v2
+                End If
+            Next v1
+        Case Else
+            For Each v1 In arr
+                For Each v2 In v1
+                    IsJagArr = True
+                    GoTo Escape
+                Next v2
+            Next v1
+    End Select
 
 Escape:
 End Function
