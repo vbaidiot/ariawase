@@ -1158,7 +1158,7 @@ Public Function IsJagArr(ByVal arr As Variant) As Boolean
     
     If ArrRank(arr) > 1 Then GoTo Escape
     
-    'Not JagArr -> Err.raise 13, Empty Array -> Err 9
+    'Not JagArr -> Err.raise 13
     Dim v1 As Variant, v2 As Variant
 
     For Each v1 In arr
