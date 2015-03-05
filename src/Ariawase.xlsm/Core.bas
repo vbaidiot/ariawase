@@ -1150,19 +1150,3 @@ Public Function CreateStdRegProv() As Object
     Dim wmiSrv As Object: Set wmiSrv = Wmi.ConnectServer(, "root\default")
     Set CreateStdRegProv = wmiSrv.Get("StdRegProv")
 End Function
-
-Public Function ArrSort2(ByVal arr As Variant, Optional ByVal orderAsc As Boolean = True) As Variant
-    If Not IsArray(arr) Then Err.Raise 13
-    If ArrLen(arr) <= 1 Then GoTo Escape
-    
-    Dim ix0 As Long: ix0 = LBound(arr)
-    If IsObject(arr(ix0)) Then
-        ObjArrMSort arr, ix0, orderAsc
-    Else
-        ValArrMSort arr, ix0, orderAsc
-    End If
-    
-    ArrSort2 = arr
-    
-Escape:
-End Function
