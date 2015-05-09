@@ -12,6 +12,10 @@ Attribute VB_Exposed = False
 '''|                Ariawase is free library for VBA cowboys.                |
 '''|          The Project Page: https://github.com/vbaidiot/Ariawase         |
 '''+--                                                                   ----+
+'''***                                                                     ***
+'''***                   Respect for Akihito Yamashiro.                    ***
+'''***     Seealso: http://akihitoyamashiro.com/VBA/FunctionPointer.htm    ***
+'''***                                                                     ***
 Option Explicit
 
 #If VBA7 And Win64 Then
