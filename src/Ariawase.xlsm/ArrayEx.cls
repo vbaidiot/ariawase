@@ -54,3 +54,8 @@ Public Function ToArray() As Variant
     End If
     ToArray = arr
 End Function
+
+Public Function Popval()
+    Let xItems(xIndex) = Null
+    xIndex = xIndex - 1
+End Function
