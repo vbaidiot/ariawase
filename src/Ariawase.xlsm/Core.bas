@@ -339,7 +339,7 @@ Public Function Dump(ByVal x As Variant) As String
         If StrPtr(x) = 0 Then
             Dump = "(vbNullString)"
         Else
-            Dump = """" & x & """"
+            Dump = """" & Replace(x, """", """""") & """"
         End If
     Case "Empty", "Null", "Nothing"
         Dump = "(" & ty & ")"
