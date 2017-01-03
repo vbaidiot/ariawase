@@ -12,5 +12,4 @@ Coming soon! Please check back.
 
 ## License
 
-This software is released under the MIT License, see [LICENSE.txt](https://github.com/igeta/Ariawase/blob/master/LICENSE.txt).
-
+This software is released under the MIT License, see [LICENSE.txt](./LICENSE.txt).
