@@ -14,7 +14,7 @@ The Project Page: https://github.com/vbaidiot/Ariawase
 <example></example>
 </runtime>
 <resource id="HelpMessage">
-vbac (version 0.6.0)
+vbac (version 0.9.0)
 
 Usage: cscript vbac.wsf &lt;command&gt; [&lt;options&gt;]
 

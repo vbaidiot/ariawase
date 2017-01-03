@@ -1,6 +1,6 @@
 Attribute VB_Name = "IO"
 '''+----                                                                   --+
-'''|                             Ariawase 0.6.0                              |
+'''|                             Ariawase 0.9.0                              |
 '''|                Ariawase is free library for VBA cowboys.                |
 '''|          The Project Page: https://github.com/vbaidiot/Ariawase         |
 '''+--                                                                   ----+
