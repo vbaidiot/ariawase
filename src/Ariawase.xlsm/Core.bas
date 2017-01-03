@@ -312,11 +312,6 @@ End Function
 ''' @param x As Variant
 ''' @return As String
 Public Function Dump(ByVal x As Variant) As String
-    If IsObject(x) Then
-        Dump = ToStr(x)
-        GoTo Escape
-    End If
-    
     Dim ty As String: ty = TypeName(x)
     Select Case ty
     Case "Boolean":     Dump = x
@@ -337,49 +332,46 @@ Public Function Dump(ByVal x As Variant) As String
         Dump = "#" & Trim(d & " " & t) & "#"
     Case "String"
         If StrPtr(x) = 0 Then
-            Dump = "(vbNullString)"
+            Dump = "vbNullString"
         Else
             Dump = """" & Replace(x, """", """""") & """"
         End If
-    Case "Empty", "Null", "Nothing"
-        Dump = "(" & ty & ")"
     Case "Error"
         If IsMissing(x) Then
-            Dump = "(Missing)"
+            Dump = "Missing"
         Else
             Dump = "CVErr(" & ReMatch(CStr(x), "\d+")(0) & ")"
         End If
     Case "ErrObject"
         Dump = "Err " & x.Number
-    Case "Unknown"
+    Case "Empty", "Null", "Nothing", "Unknown"
         Dump = ty
     Case Else
-        If Not IsArray(x) Then
-            Dump = ""
-            GoTo Escape
-        End If
-        
-        Dim rnk As Integer: rnk = ArrRank(x)
-        If rnk = 1 Then
-            Dim lb As Long: lb = LBound(x)
-            Dim ub As Long: ub = UBound(x)
-            Dim ar As Variant
-            If ub - lb < 0 Then
-                ar = Array()
+        If IsObject(x) Then
+            Dump = ToStr(x)
+        ElseIf IsArray(x) Then
+            Dim rnk As Integer: rnk = ArrRank(x)
+            If rnk = 1 Then
+                Dim lb As Long: lb = LBound(x)
+                Dim ub As Long: ub = UBound(x)
+                Dim ar As Variant
+                If ub - lb < 0 Then
+                    ar = Array()
+                Else
+                    Dim mx As Long: mx = 8 - 1
+                    Dim xb As Long: xb = IIf(ub - lb < mx, ub, lb + mx)
+                    ReDim ar(lb To xb)
+                    Dim i As Long
+                    For i = lb To xb: ar(i) = Dump(x(i)): Next
+                End If
+                Dump = "Array(" & Join(ar, ", ") & IIf(xb < ub, ", ...", "") & ")"
             Else
-                Dim mx As Long: mx = 8 - 1
-                Dim xb As Long: xb = IIf(ub - lb < mx, ub, lb + mx)
-                ReDim ar(lb To xb)
-                Dim i As Long
-                For i = lb To xb: ar(i) = Dump(x(i)): Next
+                Dump = Replace(ty, "()", "(" & String(rnk - 1, ",") & ")")
             End If
-            Dump = "Array(" & Join(ar, ", ") & IIf(xb < ub, ", ...", "") & ")"
         Else
-            Dump = Replace(ty, "()", "(" & String(rnk - 1, ",") & ")")
+            Err.Raise 51
         End If
     End Select
-    
-Escape:
 End Function
 
 ''' @param x As Variant(Of T)
