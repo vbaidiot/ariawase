@@ -261,7 +261,7 @@ Public Sub CoreXLib_Test()
     Assert.AreEqual "text/plain", s
 End Sub
 
-Public Sub Util_Test()
+Public Sub Ext_Test()
     Dim aarr As Variant, dict As Object
     
     aarr = CreateAssocArray("One", 1, "Two", 2, "Three", 3)
