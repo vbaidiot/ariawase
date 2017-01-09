@@ -82,6 +82,7 @@ Public Sub CoreAbst_Test()
     
     Assert.AreEqual "Tuple`2 { Item1 = ""A"", Item2 = 4% }", ToStr(Init(New Tuple, "A", 4))
     Assert.AreEqual "Tuple`4 { Item1 = 1%, Item2 = 2&, Item3 = 3#, Item4 = 4@ }", ToStr(Init(New Tuple, 1, 2&, 3#, 4@))
+    Assert.AreEqual "Variant()", ToStr(Array())
     
     Assert.AreEqual "42%", Dump(42)
     Assert.AreEqual "42&", Dump(42&)

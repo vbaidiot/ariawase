@@ -293,6 +293,8 @@ Public Function ToStr(ByVal x As Variant) As String
         On Error GoTo Err438
         ToStr = x.ToStr()
         On Error GoTo 0
+    ElseIf IsArray(x) Then
+        ToStr = TypeName(x)
     Else
         ToStr = x
     End If
