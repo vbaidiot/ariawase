@@ -213,14 +213,14 @@ Public Sub AreEqualArr( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone True, ArrEquals(exp, act), msg, exp, act
+    AssertDone True, ArrEquals(exp, act, True), msg, exp, act
 End Sub
 
 Public Sub AreNotEqualArr( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone False, ArrEquals(exp, act), msg, exp, act
+    AssertDone False, ArrEquals(exp, act, True), msg, exp, act
 End Sub
 
 Public Sub Fail(Optional ByVal msg As String = "")
