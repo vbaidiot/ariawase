@@ -490,38 +490,22 @@ End Function
 
 ''' @param arr1 As Variant(Of Array(Of T))
 ''' @param arr2 As Variant(Of Array(Of T))
-''' @return As Variant(Of Boolean Or Null)
+''' @return As Variant(Of Boolean Or Null Or Empty)
 Public Function ArrEquals(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
     If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
     
-    Dim alen1 As Long: alen1 = ArrLen(arr1)
-    Dim alen2 As Long: alen2 = ArrLen(arr2)
-    Dim cmpLen As Integer: cmpLen = Compare(alen1, alen2)
+    Dim lb1 As Long, alen1 As Long: lb1 = LBound(arr1): alen1 = UBound(arr1) - lb1 + 1
+    Dim lb2 As Long, alen2 As Long: lb2 = LBound(arr2): alen2 = UBound(arr2) - lb2 + 1
+    Dim complen As Integer: complen = Compare(alen1, alen2)
     
-    Dim ix0 As Long: ix0 = LBound(arr1)
-    Dim pad As Long: pad = LBound(arr2) - ix0
-    Dim alenMin As Long: alenMin = IIf(cmpLen < 0, alen1, alen2)
-    
-    Dim i As Long, ret As Variant
-    For i = ix0 To ix0 + alenMin - 1
-        ret = Equals(arr1(i), arr2(pad + i))
-        If ret Then Else GoTo Ending
-    Next
-    
-    ret = Null
-    Select Case cmpLen
-    Case Is > 0
-        For i = ix0 + alenMin To ix0 + alen1 - 1
-            If IsNull(arr1(i)) Then GoTo Ending
-        Next
-    Case Is < 0
-        For i = ix0 + alenMin To ix0 + alen2 - 1
-            If IsNull(arr2(pad + i)) Then GoTo Ending
-        Next
-    End Select
-    ret = Not CBool(cmpLen)
-    
-Ending:
+    Dim ret As Variant: ret = True
+    Dim i As Long: i = 0
+    Dim alen As Long: alen = IIf(complen < 1, alen1, alen2)
+    While ret And (i < alen)
+        ret = Equals(arr1(lb1 + i), arr2(lb2 + i))
+        i = i + 1
+    Wend
+    If ret Then ret = (complen = 0)
     ArrEquals = ret
 End Function
 
@@ -531,34 +515,18 @@ End Function
 Public Function ArrCompare(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
     If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
     
-    Dim alen1 As Long: alen1 = ArrLen(arr1)
-    Dim alen2 As Long: alen2 = ArrLen(arr2)
-    Dim cmpLen As Integer: cmpLen = Compare(alen1, alen2)
+    Dim lb1 As Long, alen1 As Long: lb1 = LBound(arr1): alen1 = UBound(arr1) - lb1 + 1
+    Dim lb2 As Long, alen2 As Long: lb2 = LBound(arr2): alen2 = UBound(arr2) - lb2 + 1
+    Dim complen As Integer: complen = Compare(alen1, alen2)
     
-    Dim ix0 As Long: ix0 = LBound(arr1)
-    Dim pad As Long: pad = LBound(arr2) - ix0
-    Dim alenMin As Long: alenMin = IIf(cmpLen < 0, alen1, alen2)
-    
-    Dim i As Long, ret As Variant
-    For i = ix0 To ix0 + alenMin - 1
-        ret = Compare(arr1(i), arr2(pad + i))
-        If ret = 0 Then Else GoTo Ending
-    Next
-    
-    ret = Null
-    Select Case cmpLen
-    Case Is > 0
-        For i = ix0 + alenMin To ix0 + alen1 - 1
-            If IsNull(arr1(i)) Then GoTo Ending
-        Next
-    Case Is < 0
-        For i = ix0 + alenMin To ix0 + alen2 - 1
-            If IsNull(arr2(pad + i)) Then GoTo Ending
-        Next
-    End Select
-    ret = cmpLen
-    
-Ending:
+    Dim ret As Variant: ret = 0
+    Dim i As Long: i = 0
+    Dim alen As Long: alen = IIf(complen < 1, alen1, alen2)
+    While ret = 0 And (i < alen)
+        ret = Compare(arr1(lb1 + i), arr2(lb2 + i))
+        i = i + 1
+    Wend
+    If ret = 0 Then ret = complen
     ArrCompare = ret
 End Function
 
