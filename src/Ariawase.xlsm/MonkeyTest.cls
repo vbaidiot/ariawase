@@ -162,6 +162,9 @@ Public Sub CoreEnumr_Test()
     Assert.AreEqual False, ArrEquals(Array(), Array(Empty))
     Assert.AreEqual True, ArrEquals(Array(0, 1&, "2"), Array(0, 1&, "2"))
     
+    Assert.AreEqual True, ArrEquals(Array(0, Null, 2), Array(0, Null, 2), True)
+    Assert.AreEqual Empty, ArrEquals(Array(Null, "1", 2, 3), Array(Null, 1, 2), True)
+    
     Assert.AreEqual 0, ArrCompare(Array(), Array())
     Assert.AreEqual -1, ArrCompare(Array(0, 1, 2), Array(2, 1, 0))
     Assert.AreEqual 0, ArrCompare(Array(0, 1, 2), Array(0, 1, 2))
