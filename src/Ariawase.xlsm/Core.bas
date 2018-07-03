@@ -704,7 +704,7 @@ Private Sub ObjArrISort(arr As Variant, lb As Long, orderAsc As Boolean)
     For i = lb + 1 To UBound(arr)
         j = i
         Do While j > lb
-            If Compare(arr(j - 1), arr(j)) * (Abs(orderAsc) * 2 - 1) <= 0 Then Exit Do
+            If Compare(arr(j - 1), arr(j), True) * (Abs(orderAsc) * 2 - 1) <= 0 Then Exit Do
             Set x = arr(j): Set arr(j) = arr(j - 1): Set arr(j - 1) = x
             j = j - 1
         Loop
@@ -715,7 +715,7 @@ Private Sub ValArrISort(arr As Variant, lb As Long, orderAsc As Boolean)
     For i = lb + 1 To UBound(arr)
         j = i
         Do While j > lb
-            If Compare(arr(j - 1), arr(j)) * (Abs(orderAsc) * 2 - 1) <= 0 Then Exit Do
+            If Compare(arr(j - 1), arr(j), True) * (Abs(orderAsc) * 2 - 1) <= 0 Then Exit Do
             Let x = arr(j): Let arr(j) = arr(j - 1): Let arr(j - 1) = x
             j = j - 1
         Loop
@@ -729,7 +729,7 @@ Private Function ArrMergeSw( _
     
     If i1 > ub1 Then ArrMergeSw = False Else _
     If i2 > ub2 Then ArrMergeSw = True Else _
-    ArrMergeSw = Compare(arr1(i1), arr2(i2)) * (Abs(orderAsc) * 2 - 1) < 1
+    ArrMergeSw = Compare(arr1(i1), arr2(i2), True) * (Abs(orderAsc) * 2 - 1) < 1
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))

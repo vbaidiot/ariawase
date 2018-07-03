@@ -214,6 +214,9 @@ Public Sub CoreEnumr_Test()
     arr = Array(2, 4, 3, 5, 6, 7, 0, 1, 9, 8)
     ArrSort arr, False
     Assert.AreEqualArr Array(9, 8, 7, 6, 5, 4, 3, 2, 1, 0), arr
+    arr = Array(2, 1, 0, Null)
+    ArrSort arr
+    Assert.AreEqualArr Array(Null, 0, 1, 2), arr
     
     Assert.AreEqualArr Array(6, 5, 3), ArrUniq(Array(6, 5, 5, 3, 6))
     
