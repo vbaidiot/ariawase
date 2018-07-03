@@ -176,16 +176,6 @@ Private Sub AssertError()
     IncrPre xAssertIx
 End Sub
 
-Public Sub IsNullVal(ByVal x As Variant, Optional ByVal msg As String = "")
-    xAssertMsg = msg
-    AssertDone True, IsNull(x), Null, x
-End Sub
-
-Public Sub IsNotNullVal(ByVal x As Variant, Optional ByVal msg As String = "")
-    xAssertMsg = msg
-    AssertDone False, IsNull(x), Null, x
-End Sub
-
 Public Sub IsInstanceOfTypeName( _
     ByVal expType As String, ByVal x As Variant, Optional ByVal msg As String = "" _
     )
