@@ -197,6 +197,7 @@ Public Sub CoreEnumr_Test()
     Assert.AreEqual 1&, ArrIndexOf(Array("I", "I", "f"), "I", 1)
     Assert.AreEqual -1&, ArrIndexOf(Array("I", "I", "f"), "f", 0, 2)
     Assert.AreEqual 2&, ArrIndexOf(Array("I", "I", "f"), "f", 1, 9)
+    Assert.AreEqual 3&, ArrIndexOf(Array(0, 1, 2, Null, 4, 5), Null)
     
     Dim arr As Variant
     

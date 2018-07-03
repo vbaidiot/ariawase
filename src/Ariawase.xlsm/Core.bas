@@ -582,7 +582,7 @@ Public Function ArrIndexOf( _
     
     Dim i As Long
     For i = ixStart To ixStart + cnt - 1
-        If Equals(arr(i), val) Then
+        If Equals(arr(i), val, True) Then
             ArrIndexOf = i
             GoTo Escape
         End If
