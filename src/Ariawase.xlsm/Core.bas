@@ -69,14 +69,16 @@ Private Function GetMissing(Optional ByVal mss As Variant) As Variant
     GetMissing = mss
 End Function
 
-''' @param n As Long
-''' @return As Long
+''' @param n As Variant
+''' @param stepVal As Variant
+''' @return As Variant
 Public Function IncrPre(ByRef n As Variant, Optional ByVal stepVal As Variant = 1) As Variant
     n = n + stepVal: IncrPre = n
 End Function
 
-''' @param n As Long
-''' @return As Long
+''' @param n As Variant
+''' @param stepVal As Variant
+''' @return As Variant
 Public Function IncrPst(ByRef n As Variant, Optional ByVal stepVal As Variant = 1) As Variant
     IncrPst = n: n = n + stepVal
 End Function
@@ -482,6 +484,7 @@ Public Function ArrRank(ByVal arr As Variant) As Integer
 End Function
 
 ''' @param arr As Variant(Of Array(Of T))
+''' @param dimen As Integer
 ''' @return As Long
 Public Function ArrLen(ByVal arr As Variant, Optional ByVal dimen As Integer = 1) As Long
     If Not IsArray(arr) Then Err.Raise 13
@@ -490,6 +493,7 @@ End Function
 
 ''' @param arr1 As Variant(Of Array(Of T))
 ''' @param arr2 As Variant(Of Array(Of T))
+''' @param swAllowNull As Boolean
 ''' @return As Variant(Of Boolean Or Null Or Empty)
 Public Function ArrEquals( _
     ByVal arr1 As Variant, ByVal arr2 As Variant, _
