@@ -395,45 +395,60 @@ End Function
 
 ''' @param x As Variant(Of T)
 ''' @param y As Variant(Of T)
+''' @param swAllowNull As Boolean
 ''' @return As Variant(Of Boolean Or Null Or Empty)
-Public Function Equals(ByVal x As Variant, ByVal y As Variant) As Variant
+Public Function Equals( _
+    ByVal x As Variant, ByVal y As Variant, _
+    Optional ByVal swAllowNull As Boolean = False _
+    ) As Variant
+    
     Dim xIsObj As Boolean: xIsObj = IsObject(x)
     Dim yIsObj As Boolean: yIsObj = IsObject(y)
-    If xIsObj Xor yIsObj Then
-        Equals = Empty
-    ElseIf xIsObj And yIsObj Then
-        Equals = x.Equals(y)
+    If xIsObj Or yIsObj Then
+        If xIsObj And yIsObj Then Equals = x.Equals(y) Else Equals = Empty
     Else
-        If TypeName(x) = TypeName(y) Then
-            Equals = x = y
-        ElseIf IsNull(x) Or IsNull(y) Then
-            Equals = Null
+        Dim xIsNul As Boolean: xIsNul = IsNull(x)
+        Dim yIsNul As Boolean: yIsNul = IsNull(y)
+        If xIsNul Or yIsNul Then
+            If swAllowNull Then Equals = xIsNul And yIsNul Else Equals = Null
         Else
-            Equals = Empty
+            If TypeName(x) = TypeName(y) Then Equals = x = y Else Equals = Empty
         End If
     End If
 End Function
 
 ''' @param x As Variant(Of T)
 ''' @param y As Variant(Of T)
+''' @param swAllowNull As Boolean
 ''' @return As Variant(Of Integer Or Null)
-Public Function Compare(ByVal x As Variant, ByVal y As Variant) As Variant
+Public Function Compare( _
+    ByVal x As Variant, ByVal y As Variant, _
+    Optional ByVal swAllowNull As Boolean = False _
+    ) As Variant
+    
     Dim xIsObj As Boolean: xIsObj = IsObject(x)
     Dim yIsObj As Boolean: yIsObj = IsObject(y)
-    If xIsObj Xor yIsObj Then
-        Err.Raise 13
-    ElseIf xIsObj And yIsObj Then
-        Compare = x.Compare(y)
+    If xIsObj Or yIsObj Then
+        If xIsObj And yIsObj Then Compare = x.Compare(y) Else Err.Raise 13
     Else
-        If TypeName(x) = TypeName(y) Then
-            If x = y Then Compare = 0 Else _
-            If x < y Then Compare = -1 Else _
-            If x > y Then Compare = 1 Else _
-            Compare = Null
-        ElseIf IsNull(x) Or IsNull(y) Then
-            Compare = Null
+        Dim xIsNul As Boolean: xIsNul = IsNull(x)
+        Dim yIsNul As Boolean: yIsNul = IsNull(y)
+        If xIsNul Or yIsNul Then
+            If swAllowNull Then
+                If xIsNul And yIsNul Then Compare = 0 Else _
+                If xIsNul Then Compare = -1 Else _
+                Compare = 1
+            Else
+                Compare = Null
+            End If
         Else
-            Err.Raise 13
+            If TypeName(x) = TypeName(y) Then
+                If x = y Then Compare = 0 Else _
+                If x < y Then Compare = -1 Else _
+                Compare = 1
+            Else
+                Err.Raise 13
+            End If
         End If
     End If
 End Function
