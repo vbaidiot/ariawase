@@ -227,7 +227,7 @@ Public Sub AreEqual( _
     )
     
     xAssertMsg = msg
-    AssertDone True, Equals(exp, act), exp, act
+    AssertDone True, Equals(exp, act, True), exp, act
 End Sub
 
 Public Sub AreNotEqual( _
@@ -235,7 +235,7 @@ Public Sub AreNotEqual( _
     )
     
     xAssertMsg = msg
-    AssertDone False, Equals(exp, act), exp, act
+    AssertDone False, Equals(exp, act, True), exp, act
 End Sub
 
 Public Sub AreEqualArr( _
