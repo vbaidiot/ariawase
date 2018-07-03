@@ -22,6 +22,7 @@ Private xSuccSubCount As Long
 Private xFailSubCount As Long
 
 Private xAssertIx As Long
+Private xAssertMsg As String
 Private xFailMsgs As Collection
 
 Private Property Get VBProject() As Object
@@ -85,7 +86,11 @@ Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)
     xAssertIx = 1
     Set xFailMsgs = New Collection
     
+    On Error GoTo Catch
+    
     CallByName obj, proc, VbMethod
+    
+    On Error GoTo 0
     
     If xFailMsgs.Count < 1 Then
         WriteResult "+ " & proc
@@ -95,6 +100,13 @@ Private Sub RunTestSub(ByVal obj As Object, ByVal proc As String)
         WriteResult "  " & Join(ClctToArr(xFailMsgs), vbCrLf & "  ")
         IncrPre xFailSubCount
     End If
+    GoTo Escape
+    
+Catch:
+    AssertError
+    Resume Next
+    
+Escape:
 End Sub
 
 Public Sub RunTestOf(ByVal clsObj As Object)
@@ -146,86 +158,107 @@ Public Sub TestRunnerGenerate()
 End Sub
 
 Private Sub AssertDone( _
-    ByVal isa As Boolean, ByVal cond As Boolean, ByVal msg As String, ByVal exp As Variant, ByVal act As Variant _
+    ByVal isa As Boolean, ByVal cond As Boolean, ByVal exp As Variant, ByVal act As Variant _
     )
     
     If isa <> cond Then
-        Push xFailMsgs, "[" & xAssertIx & "] " & msg & ":"
+        Push xFailMsgs, "[" & xAssertIx & "] " & xAssertMsg & ":"
         Push xFailMsgs, "  Expected: " & IIf(isa, "", "Not ") & "<" & Dump(exp) & ">"
         Push xFailMsgs, "  But was:  <" & Dump(act) & ">"
     End If
     IncrPre xAssertIx
 End Sub
 
+Private Sub AssertError()
+    Push xFailMsgs, "[" & xAssertIx & "] " & xAssertMsg & ":"
+    Push xFailMsgs, "  Assert error!"
+    Push xFailMsgs, "> Stopped the following assertion in this method!"
+    IncrPre xAssertIx
+End Sub
+
 Public Sub IsNullVal(ByVal x As Variant, Optional ByVal msg As String = "")
-    AssertDone True, IsNull(x), msg, Null, x
+    xAssertMsg = msg
+    AssertDone True, IsNull(x), Null, x
 End Sub
 
 Public Sub IsNotNullVal(ByVal x As Variant, Optional ByVal msg As String = "")
-    AssertDone False, IsNull(x), msg, Null, x
+    xAssertMsg = msg
+    AssertDone False, IsNull(x), Null, x
 End Sub
 
 Public Sub IsInstanceOfTypeName( _
     ByVal expType As String, ByVal x As Variant, Optional ByVal msg As String = "" _
     )
     
+    xAssertMsg = msg
+    
     Dim t As String: t = TypeName(x)
-    AssertDone True, expType = t, msg, expType, t
+    AssertDone True, expType = t, expType, t
 End Sub
 
 Public Sub IsNotInstanceOfTypeName( _
     ByVal expType As String, ByVal x As Variant, Optional ByVal msg As String = "" _
     )
     
+    xAssertMsg = msg
+    
     Dim t As String: t = TypeName(x)
-    AssertDone False, expType = t, msg, expType, t
+    AssertDone False, expType = t, expType, t
 End Sub
 
 Public Sub AreEq( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone True, Eq(exp, act), msg, exp, act
+    xAssertMsg = msg
+    AssertDone True, Eq(exp, act), exp, act
 End Sub
 
 Public Sub AreNotEq( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone False, Eq(exp, act), msg, exp, act
+    xAssertMsg = msg
+    AssertDone False, Eq(exp, act), exp, act
 End Sub
 
 Public Sub AreEqual( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone True, Equals(exp, act), msg, exp, act
+    xAssertMsg = msg
+    AssertDone True, Equals(exp, act), exp, act
 End Sub
 
 Public Sub AreNotEqual( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone False, Equals(exp, act), msg, exp, act
+    xAssertMsg = msg
+    AssertDone False, Equals(exp, act), exp, act
 End Sub
 
 Public Sub AreEqualArr( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone True, ArrEquals(exp, act, True), msg, exp, act
+    xAssertMsg = msg
+    AssertDone True, ArrEquals(exp, act, True), exp, act
 End Sub
 
 Public Sub AreNotEqualArr( _
     ByVal exp As Variant, ByVal act As Variant, Optional ByVal msg As String = "" _
     )
     
-    AssertDone False, ArrEquals(exp, act, True), msg, exp, act
+    xAssertMsg = msg
+    AssertDone False, ArrEquals(exp, act, True), exp, act
 End Sub
 
 Public Sub Fail(Optional ByVal msg As String = "")
+    xAssertMsg = msg
+    
     If Len(msg) > 0 Then
-        Err.Raise 1004, AssertModule, msg
+        Err.Raise 1004, AssertModule, xAssertMsg
     Else
         Err.Raise 1004, AssertModule
     End If
@@ -237,6 +270,8 @@ Public Sub IsErrFunc( _
     Optional ByVal msg As String = "" _
     )
     
+    xAssertMsg = msg
+    
     If Not (IsEmpty(errnum) Or IsNumeric(errnum)) Then Err.Raise 5
     If Not IsArray(params) Then Err.Raise 5
     
@@ -246,7 +281,7 @@ Public Sub IsErrFunc( _
     
     Dim buf As Variant, ret As Boolean
     fun.CallByPtr buf, params
-    AssertDone True, ret, msg, errnum, act
+    AssertDone True, ret, errnum, act
     GoTo Escape
     
 Catch:
@@ -262,6 +297,8 @@ Public Sub IsErrMethod( _
     ByVal obj As Object, ByVal proc As String, ByVal params As Variant, _
     Optional ByVal msg As String = "" _
     )
+    
+    xAssertMsg = msg
     
     If Not (IsEmpty(errnum) Or IsNumeric(errnum)) Then Err.Raise 5
     If Not IsArray(params) Then Err.Raise 5
@@ -283,7 +320,7 @@ Public Sub IsErrMethod( _
     Next
     rtcCallByName obj, StrPtr(proc), VbMethod, ps
     
-    AssertDone True, ret, msg, errnum, act
+    AssertDone True, ret, errnum, act
     GoTo Escape
     
 Catch:
