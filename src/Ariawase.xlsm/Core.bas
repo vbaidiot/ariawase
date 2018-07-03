@@ -515,13 +515,6 @@ Public Function ArrEquals( _
     Optional ByVal swAllowNull As Boolean = False _
     ) As Variant
     
-    If Not swAllowNull Then
-        ArrEquals = ArrEqualsDefault(arr1, arr2)
-    Else
-        ArrEquals = ArrEqualsHasNull(arr1, arr2)
-    End If
-End Function
-Private Function ArrEqualsDefault(arr1 As Variant, arr2 As Variant) As Variant
     If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
     
     Dim lb1 As Long, alen1 As Long: lb1 = LBound(arr1): alen1 = UBound(arr1) - lb1 + 1
@@ -532,35 +525,21 @@ Private Function ArrEqualsDefault(arr1 As Variant, arr2 As Variant) As Variant
     Dim i As Long: i = 0
     Dim alen As Long: alen = IIf(compLen < 1, alen1, alen2)
     While ret And (i < alen)
-        ret = Equals(arr1(lb1 + i), arr2(lb2 + i))
+        ret = Equals(arr1(lb1 + i), arr2(lb2 + i), swAllowNull)
         i = i + 1
     Wend
     If ret Then ret = (compLen = 0)
-    ArrEqualsDefault = ret
-End Function
-Private Function ArrEqualsHasNull(arr1 As Variant, arr2 As Variant) As Variant
-    If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
-    
-    Dim lb1 As Long, alen1 As Long: lb1 = LBound(arr1): alen1 = UBound(arr1) - lb1 + 1
-    Dim lb2 As Long, alen2 As Long: lb2 = LBound(arr2): alen2 = UBound(arr2) - lb2 + 1
-    Dim compLen As Integer: compLen = Compare(alen1, alen2)
-    
-    Dim ret As Variant: ret = True
-    Dim i As Long: i = 0
-    Dim alen As Long: alen = IIf(compLen < 1, alen1, alen2)
-    While ret And (i < alen)
-        ret = Equals(arr1(lb1 + i), arr2(lb2 + i))
-        If IsNull(arr1(lb1 + i)) And IsNull(arr2(lb2 + i)) Then ret = True
-        i = i + 1
-    Wend
-    If ret Then ret = (compLen = 0)
-    ArrEqualsHasNull = ret
+    ArrEquals = ret
 End Function
 
 ''' @param arr1 As Variant(Of Array(Of T))
 ''' @param arr2 As Variant(Of Array(Of T))
 ''' @return As Variant(Of Integer Or Null)
-Public Function ArrCompare(ByVal arr1 As Variant, ByVal arr2 As Variant) As Variant
+Public Function ArrCompare( _
+    ByVal arr1 As Variant, ByVal arr2 As Variant, _
+    Optional ByVal swAllowNull As Boolean = False _
+    ) As Variant
+    
     If Not (IsArray(arr1) And IsArray(arr2)) Then Err.Raise 13
     
     Dim lb1 As Long, alen1 As Long: lb1 = LBound(arr1): alen1 = UBound(arr1) - lb1 + 1
@@ -571,7 +550,7 @@ Public Function ArrCompare(ByVal arr1 As Variant, ByVal arr2 As Variant) As Vari
     Dim i As Long: i = 0
     Dim alen As Long: alen = IIf(compLen < 1, alen1, alen2)
     While ret = 0 And (i < alen)
-        ret = Compare(arr1(lb1 + i), arr2(lb2 + i))
+        ret = Compare(arr1(lb1 + i), arr2(lb2 + i), swAllowNull)
         i = i + 1
     Wend
     If ret = 0 Then ret = compLen

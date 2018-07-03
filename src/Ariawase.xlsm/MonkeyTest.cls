@@ -163,6 +163,7 @@ Public Sub CoreEnumr_Test()
     Assert.AreEqual True, ArrEquals(Array(0, 1&, "2"), Array(0, 1&, "2"))
     
     Assert.AreEqual True, ArrEquals(Array(0, Null, 2), Array(0, Null, 2), True)
+    Assert.AreEqual False, ArrEquals(Array(Null, 1, 2), Array(0, 1, 2), True)
     Assert.AreEqual Empty, ArrEquals(Array(Null, "1", 2, 3), Array(Null, 1, 2), True)
     
     Assert.AreEqual 0, ArrCompare(Array(), Array())
@@ -184,6 +185,12 @@ Public Sub CoreEnumr_Test()
     Assert.AreEqual 0, ArrCompare(Array(), Array())
     Assert.AreEqual -1, ArrCompare(Array(), Array(Empty))
     Assert.AreEqual 0, ArrCompare(Array(0, 1&, "2"), Array(0, 1&, "2"))
+    
+    Assert.AreEqual 0, ArrCompare(Array(0, Null, 2), Array(0, Null, 2), True)
+    Assert.AreEqual -1, ArrCompare(Array(Null, 1, 2), Array(0, 1, 2), True)
+    Assert.IsErrFunc 13, _
+        Init(New Func, vbVariant, AddressOf ArrCompare, vbVariant, vbVariant), _
+        Array(Array(Null, "1", 2, 3), Array(Null, 1, 2), True)
     
     Assert.AreEqual 2&, ArrIndexOf(Array("V", "B", "A"), "A")
     Assert.AreEqual -1&, ArrIndexOf(Array("V", "B", "A"), "Z")
