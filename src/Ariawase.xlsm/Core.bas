@@ -493,10 +493,10 @@ End Function
 ''' @return As Variant(Of Boolean Or Null Or Empty)
 Public Function ArrEquals( _
     ByVal arr1 As Variant, ByVal arr2 As Variant, _
-    Optional ByVal hasNullElem As Boolean = False _
+    Optional ByVal swAllowNull As Boolean = False _
     ) As Variant
     
-    If Not hasNullElem Then
+    If Not swAllowNull Then
         ArrEquals = ArrEqualsDefault(arr1, arr2)
     Else
         ArrEquals = ArrEqualsHasNull(arr1, arr2)
@@ -507,16 +507,16 @@ Private Function ArrEqualsDefault(arr1 As Variant, arr2 As Variant) As Variant
     
     Dim lb1 As Long, alen1 As Long: lb1 = LBound(arr1): alen1 = UBound(arr1) - lb1 + 1
     Dim lb2 As Long, alen2 As Long: lb2 = LBound(arr2): alen2 = UBound(arr2) - lb2 + 1
-    Dim complen As Integer: complen = Compare(alen1, alen2)
+    Dim compLen As Integer: compLen = Compare(alen1, alen2)
     
     Dim ret As Variant: ret = True
     Dim i As Long: i = 0
-    Dim alen As Long: alen = IIf(complen < 1, alen1, alen2)
+    Dim alen As Long: alen = IIf(compLen < 1, alen1, alen2)
     While ret And (i < alen)
         ret = Equals(arr1(lb1 + i), arr2(lb2 + i))
         i = i + 1
     Wend
-    If ret Then ret = (complen = 0)
+    If ret Then ret = (compLen = 0)
     ArrEqualsDefault = ret
 End Function
 Private Function ArrEqualsHasNull(arr1 As Variant, arr2 As Variant) As Variant
@@ -524,17 +524,17 @@ Private Function ArrEqualsHasNull(arr1 As Variant, arr2 As Variant) As Variant
     
     Dim lb1 As Long, alen1 As Long: lb1 = LBound(arr1): alen1 = UBound(arr1) - lb1 + 1
     Dim lb2 As Long, alen2 As Long: lb2 = LBound(arr2): alen2 = UBound(arr2) - lb2 + 1
-    Dim complen As Integer: complen = Compare(alen1, alen2)
+    Dim compLen As Integer: compLen = Compare(alen1, alen2)
     
     Dim ret As Variant: ret = True
     Dim i As Long: i = 0
-    Dim alen As Long: alen = IIf(complen < 1, alen1, alen2)
+    Dim alen As Long: alen = IIf(compLen < 1, alen1, alen2)
     While ret And (i < alen)
         ret = Equals(arr1(lb1 + i), arr2(lb2 + i))
         If IsNull(arr1(lb1 + i)) And IsNull(arr2(lb2 + i)) Then ret = True
         i = i + 1
     Wend
-    If ret Then ret = (complen = 0)
+    If ret Then ret = (compLen = 0)
     ArrEqualsHasNull = ret
 End Function
 
@@ -546,16 +546,16 @@ Public Function ArrCompare(ByVal arr1 As Variant, ByVal arr2 As Variant) As Vari
     
     Dim lb1 As Long, alen1 As Long: lb1 = LBound(arr1): alen1 = UBound(arr1) - lb1 + 1
     Dim lb2 As Long, alen2 As Long: lb2 = LBound(arr2): alen2 = UBound(arr2) - lb2 + 1
-    Dim complen As Integer: complen = Compare(alen1, alen2)
+    Dim compLen As Integer: compLen = Compare(alen1, alen2)
     
     Dim ret As Variant: ret = 0
     Dim i As Long: i = 0
-    Dim alen As Long: alen = IIf(complen < 1, alen1, alen2)
+    Dim alen As Long: alen = IIf(compLen < 1, alen1, alen2)
     While ret = 0 And (i < alen)
         ret = Compare(arr1(lb1 + i), arr2(lb2 + i))
         i = i + 1
     Wend
-    If ret = 0 Then ret = complen
+    If ret = 0 Then ret = compLen
     ArrCompare = ret
 End Function
 
