@@ -4,6 +4,25 @@ Attribute VB_Name = "Assert"
 '''|                Ariawase is free library for VBA cowboys.                |
 '''|          The Project Page: https://github.com/vbaidiot/Ariawase         |
 '''+--                                                                   ----+
+'''
+''' A simple unit testing library.
+'''
+''' @usage
+'''   Write a test class following the MonkeyTest included in Ariawase.
+'''   A test class name is given `Test` suffix.
+'''   A test method name is given `_Test` suffix.
+'''   And then, execute following code in Immediate Window and run the test.
+'''
+'''   * For run a test class.
+'''     Assert.RunTestOf New YourTest
+'''
+'''   * For run all test class in this project.
+'''     ' Refresh test runner
+'''     Assert.TestRunnerClear
+'''     Assert.TestRunnerGenerate
+'''     ' Run all test
+'''     Assert.RunTest
+'''
 Option Explicit
 Option Private Module
 
