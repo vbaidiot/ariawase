@@ -593,8 +593,11 @@ End Function
 
 ''' @param arr As Variant(Of Array(Of T))
 Public Sub ArrRev(ByRef arr As Variant)
+    If Not IsArray(arr) Then Err.Raise 13
+    
     Dim ixL As Long: ixL = LBound(arr)
     Dim ixU As Long: ixU = UBound(arr)
+    If ixU - ixL < 1 Then GoTo Escape
     
     Dim x As Variant
     If IsObject(arr(ixL)) Then
