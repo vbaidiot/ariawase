@@ -18,7 +18,7 @@ Attribute VB_Exposed = False
 '''***                                                                     ***
 Option Explicit
 
-#If VBA7 And Win64 Then
+#If VBA7 Then
 Private Declare PtrSafe _
 Function DispCallFunc Lib "OleAut32.dll" ( _
     ByVal pvInstance As LongPtr, _
@@ -61,7 +61,7 @@ End Enum
 Private Const S_OK = &H0
 
 Private xreturnTyp As VbVarType
-#If VBA7 And Win64 Then
+#If VBA7 Then
 Private xAddr As LongPtr
 #Else
 Private xAddr As Long
@@ -107,7 +107,7 @@ Private Sub LateBindParamTypes(ByVal params As Variant)
     xParamTypeBinding = True
 End Sub
 
-#If VBA7 And Win64 Then
+#If VBA7 Then
 Public Sub Init( _
     ByVal returnTyp As VbVarType, ByVal addr As LongPtr, ParamArray paramTypes() As Variant _
     )
@@ -125,7 +125,7 @@ End Sub
 Public Sub CallByPtr(ByRef returnVal As Variant, ByVal params As Variant)
 '    If Not IsArray(params) Then Err.Raise 5
     
-#If VBA7 And Win64 Then
+#If VBA7 Then
     Dim lpParams() As LongPtr
 #Else
     Dim lpParams() As Long

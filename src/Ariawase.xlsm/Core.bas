@@ -14,7 +14,6 @@ Option Private Module
 ''' @param [in] SAFEARRAY(VARIANT)* Args
 ''' @param [in, lcid] long lcid
 #If VBA7 Then
-#If Win64 Then
 Public Declare PtrSafe _
 Function rtcCallByName Lib "VBE7.DLL" ( _
     ByVal Object As Object, _
@@ -23,16 +22,6 @@ Function rtcCallByName Lib "VBE7.DLL" ( _
     ByRef Args() As Any, _
     Optional ByVal lcid As Long _
     ) As Variant
-#Else
-Public Declare _
-Function rtcCallByName Lib "VBE7.DLL" ( _
-    ByVal Object As Object, _
-    ByVal ProcName As Long, _
-    ByVal CallType As VbCallType, _
-    ByRef Args() As Any, _
-    Optional ByVal lcid As Long _
-    ) As Variant
-#End If
 #Else
 Public Declare _
 Function rtcCallByName Lib "VBE6.DLL" ( _
@@ -321,7 +310,7 @@ Public Function Dump(ByVal x As Variant) As String
     Case "Boolean":     Dump = x
     Case "Integer":     Dump = x & "%"
     Case "Long":        Dump = x & "&"
-    #If VBA7 And Win64 Then
+    #If Win64 Then
     Case "LongLong":    Dump = x & "^"
     #End If
     Case "Single":      Dump = x & "!"
