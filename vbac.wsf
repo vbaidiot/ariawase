@@ -48,8 +48,12 @@ var wdFormatXMLTemplateMacroEnabled = 15 //.dotm
 // XlFileFormat
 var xlExcel9795 = 43; //.xls 97-2003 format in Excel 2003 or prev
 var xlExcel8    = 56; //.xls 97-2003 format in Excel 2007
+var xlTemplate  = 17; //.xlt
+var xlAddIn     = 18; //.xla
 var xlExcel12   = 50; //.xlsb
 var xlOpenXMLWorkbookMacroEnabled = 52; //.xlsm
+var xlOpenXMLTemplateMacroEnabled = 53; //.xltm
+var xlOpenXMLAddIn                = 55; //.xlam
 
 // AcNewDatabaseFormat
 var acNewDatabaseFormatAccess2000 =  9; //.mdb
@@ -592,19 +596,23 @@ Excel.prototype.createOpenFile = function(xlApp, path) {
     var xlFileFormat;
     var vernum = parseInt(xlApp.Version);
     switch (fso.GetExtensionName(path)) {
-    case 'xls':  case 'xla':  case 'xlt':
-        xlFileFormat = (vernum < 12) ? xlExcel9795 : xlExcel8;
-        break;
-    case 'xlsb':
-        xlFileFormat = xlExcel12;
-        break;
-    case 'xlsm': case 'xlam': case 'xltm':
-        xlFileFormat = xlOpenXMLWorkbookMacroEnabled;
-        break;
-    default:
-        xlFileFormat = (vernum < 12) ? xlExcel9795 : xlOpenXMLWorkbookMacroEnabled;
-        path        += (vernum < 12) ? '.xls'      : '.xlsm';
-        break;
+    case 'xls':  xlFileFormat = (vernum < 12) ? xlExcel9795 : xlExcel8;
+                 break;
+    case 'xlt':  xlFileFormat = xlTemplate;
+                 break;
+    case 'xla':  xlFileFormat = xlAddIn;
+                 break;
+    case 'xlsb': xlFileFormat = xlExcel12;
+                 break;
+    case 'xlsm': xlFileFormat = xlOpenXMLWorkbookMacroEnabled;
+                 break;
+    case 'xltm': xlFileFormat = xlOpenXMLTemplateMacroEnabled;
+                 break;
+    case 'xlam': xlFileFormat = xlOpenXMLAddIn;
+                 break;
+    default:     xlFileFormat = (vernum < 12) ? xlExcel9795 : xlOpenXMLWorkbookMacroEnabled;
+                 path        += (vernum < 12) ? '.xls'      : '.xlsm';
+                 break;
     }
     
     var xlBook;
@@ -614,6 +622,7 @@ Excel.prototype.createOpenFile = function(xlApp, path) {
         }
         else {
             xlBook = xlApp.Workbooks.Add();
+            xlBook.IsAddin = (xlFileFormat == xlAddIn) || (xlFileFormat == xlOpenXMLAddIn);
             xlBook.SaveAs(path, xlFileFormat);
         }
     }
