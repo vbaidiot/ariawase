@@ -26,6 +26,32 @@ Attribute VB_Name = "Assert"
 Option Explicit
 Option Private Module
 
+''' @return VARIANT
+''' @param [in] IDispatch* Object
+''' @param [in] BSTR ProcName
+''' @param [in] VbCallType CallType
+''' @param [in] SAFEARRAY(VARIANT)* Args
+''' @param [in, lcid] long lcid
+#If VBA7 Then
+Private Declare PtrSafe _
+Function rtcCallByName Lib "VBE7.DLL" ( _
+    ByVal Object As Object, _
+    ByVal ProcName As LongPtr, _
+    ByVal CallType As VbCallType, _
+    ByRef Args() As Any, _
+    Optional ByVal lcid As Long _
+    ) As Variant
+#Else
+Private Declare _
+Function rtcCallByName Lib "VBE6.DLL" ( _
+    ByVal Object As Object, _
+    ByVal ProcName As Long, _
+    ByVal CallType As VbCallType, _
+    ByRef Args() As Any, _
+    Optional ByVal lcid As Long _
+    ) As Variant
+#End If
+
 Private Const TestClassSuffix As String = "Test"
 Private Const TestProcSuffix As String = "_Test"
 

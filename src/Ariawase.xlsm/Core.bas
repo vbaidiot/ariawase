@@ -7,32 +7,6 @@ Attribute VB_Name = "Core"
 Option Explicit
 Option Private Module
 
-''' @return VARIANT
-''' @param [in] IDispatch* Object
-''' @param [in] BSTR ProcName
-''' @param [in] VbCallType CallType
-''' @param [in] SAFEARRAY(VARIANT)* Args
-''' @param [in, lcid] long lcid
-#If VBA7 Then
-Public Declare PtrSafe _
-Function rtcCallByName Lib "VBE7.DLL" ( _
-    ByVal Object As Object, _
-    ByVal ProcName As LongPtr, _
-    ByVal CallType As VbCallType, _
-    ByRef Args() As Any, _
-    Optional ByVal lcid As Long _
-    ) As Variant
-#Else
-Public Declare _
-Function rtcCallByName Lib "VBE6.DLL" ( _
-    ByVal Object As Object, _
-    ByVal ProcName As Long, _
-    ByVal CallType As VbCallType, _
-    ByRef Args() As Any, _
-    Optional ByVal lcid As Long _
-    ) As Variant
-#End If
-
 ''' @seealso WScript.Shell http://msdn.microsoft.com/en-us/library/aew9yb99.aspx (/ja-jp/library/cc364436.aspx)
 ''' @seealso WbemScripting.SWbemLocator http://msdn.microsoft.com/en-us/library/windows/desktop/aa393719.aspx
 ''' @seealso VBScript.RegExp http://msdn.microsoft.com/en-us/library/yab2dx62.aspx (/ja-jp/library/cc392403.aspx)
@@ -254,25 +228,27 @@ End Function
 ''' @param obj As Object Is T
 ''' @param params As Variant()
 ''' @return As Object Is T
-Public Function Init(ByVal obj As Object, ParamArray params() As Variant) As Object
-    Dim ub As Long: ub = UBound(params)
+Public Function Init( _
+    ByVal obj As Object, _
+    Optional ByRef arg1 As Variant, _
+    Optional ByRef arg2 As Variant, _
+    Optional ByRef arg3 As Variant, _
+    Optional ByRef arg4 As Variant, _
+    Optional ByRef arg5 As Variant, _
+    Optional ByRef arg6 As Variant, _
+    Optional ByRef arg7 As Variant, _
+    Optional ByRef arg8 As Variant _
+    ) As Object
     
-    If ub < 0 Then
-        obj.Init
-    Else
-        Dim ps() As Variant: ReDim ps(ub)
-        
-        Dim i As Long
-        For i = 0 To ub
-            If IsObject(params(i)) Then
-                Set ps(i) = params(i)
-            Else
-                Let ps(i) = params(i)
-            End If
-        Next
-        
-        rtcCallByName obj, StrPtr("Init"), VbMethod, ps
-    End If
+    If IsMissing(arg1) Then obj.Init Else _
+    If IsMissing(arg2) Then obj.Init arg1 Else _
+    If IsMissing(arg3) Then obj.Init arg1, arg2 Else _
+    If IsMissing(arg4) Then obj.Init arg1, arg2, arg3 Else _
+    If IsMissing(arg5) Then obj.Init arg1, arg2, arg3, arg4 Else _
+    If IsMissing(arg6) Then obj.Init arg1, arg2, arg3, arg4, arg5 Else _
+    If IsMissing(arg7) Then obj.Init arg1, arg2, arg3, arg4, arg5, arg6 Else _
+    If IsMissing(arg8) Then obj.Init arg1, arg2, arg3, arg4, arg5, arg6, arg7 Else _
+    obj.Init arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8
     
     Set Init = obj
 End Function
