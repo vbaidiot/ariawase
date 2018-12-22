@@ -510,7 +510,7 @@ Word.prototype.progID1 = "Word";
 Word.prototype.createOpenFile = function(wdApp, path) {
     var wdSaveFormat;
     var vernum = parseInt(wdApp.Version);
-    switch (fso.GetExtensionName(path)) {
+    switch (fso.GetExtensionName(path).toLowerCase()) {
     case 'doc':  wdSaveFormat = wdFormatDocument97;
                  break;
     case 'dot':  wdSaveFormat = wdFormatTemplate97;
@@ -595,7 +595,7 @@ Excel.prototype.progID1 = "Excel";
 Excel.prototype.createOpenFile = function(xlApp, path) {
     var xlFileFormat;
     var vernum = parseInt(xlApp.Version);
-    switch (fso.GetExtensionName(path)) {
+    switch (fso.GetExtensionName(path).toLowerCase()) {
     case 'xls':  xlFileFormat = (vernum < 12) ? xlExcel9795 : xlExcel8;
                  break;
     case 'xlt':  xlFileFormat = xlTemplate;
@@ -702,7 +702,7 @@ Access.prototype.progID1 = "Access";
 Access.prototype.createOpenFile = function(acApp, path) {
     var dbFormat;
     var vernum = parseInt(acApp.SysCmd(acSysCmdAccessVer));
-    switch (fso.GetExtensionName(path)) {
+    switch (fso.GetExtensionName(path).toLowerCase()) {
     case 'mdb':   dbFormat = acNewDatabaseFormatAccess2000;
                   break;
     case 'accdb': dbFormat = acNewDatabaseFormatAccess2007;
@@ -1032,7 +1032,7 @@ var CommandHelper = function(param) {
     this.command = new Command(this);
 };
 CommandHelper.prototype.getAppName = function(fname) {
-    switch (fso.GetExtensionName(fname)) {
+    switch (fso.GetExtensionName(fname).toLowerCase()) {
     case 'doc': case 'dot': case 'docm': case 'dotm':
         return 'Word';
     case 'xls': case 'xlsm': case 'xla': case 'xlam': case 'xlt': case 'xltm': case 'xlsb':
