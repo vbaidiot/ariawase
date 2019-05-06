@@ -225,7 +225,7 @@ Public Function ChangeLineSeparator( _
     If TypeName(strm) <> "Stream" Then Err.Raise 13
     If strm.Type <> adTypeText Then Err.Raise 5
     
-    Dim strmZ As Object: Set strmZ = CreateAdoDbStream(strm.Charset, linsep)
+    Dim strmZ As Object: Set strmZ = CreateAdoDbStream(adTypeText, strm.Charset, linsep)
     strmZ.Open
     
     If strm.State = adStateClosed Then strm.Open
@@ -242,7 +242,7 @@ Public Sub ChangeFileLineSeparator( _
     ByVal crrLinsep As LineSeparatorsEnum, ByVal chgLinsep As LineSeparatorsEnum _
     )
     
-    Dim strm As Object: Set strm = CreateAdoDbStream(chrset, crrLinsep)
+    Dim strm As Object: Set strm = CreateAdoDbStream(adTypeText, chrset, crrLinsep)
     strm.Open
     strm.LoadFromFile fpath
     Set strm = ChangeLineSeparator(strm, chgLinsep)
