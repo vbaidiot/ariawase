@@ -184,7 +184,7 @@ Public Sub RemoveBom( _
     ByVal fpath As String, ByVal chrset As String, ByVal linsep As LineSeparatorsEnum _
     )
     
-    Dim strm As Object: Set strm = CreateAdoDbStream(chrset, linsep)
+    Dim strm As Object: Set strm = CreateAdoDbStream(adTypeText, chrset, linsep)
     strm.Open
     strm.LoadFromFile fpath
     SaveToFileWithoutBom strm, fpath, adSaveCreateOverWrite
