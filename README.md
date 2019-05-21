@@ -1,7 +1,5 @@
 ﻿# What is Ariawase?
 
-[![Join the chat at https://gitter.im/vbaidiot/ariawase](https://badges.gitter.im/vbaidiot/ariawase.svg)](https://gitter.im/vbaidiot/ariawase?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 Ariawase is an open source VBA library.
 
 ## Quick Start
