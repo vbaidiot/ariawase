@@ -146,6 +146,22 @@ Public Function CreateAdoDbStream( _
     End With
 End Function
 
+Public Sub CopyAdoDbStream(ByVal srcStream As Object, ByVal dstStream As Object)
+    If TypeName(srcStream) <> "Stream" Then Err.Raise 13
+    If srcStream.Type <> adTypeText Then Err.Raise 5
+    If TypeName(dstStream) <> "Stream" Then Err.Raise 13
+    If dstStream.Type <> adTypeText Then Err.Raise 5
+    
+    If srcStream.State = adStateClosed Then srcStream.Open
+    If dstStream.State = adStateClosed Then dstStream.Open
+    
+    If srcStream.LineSeparator = dstStream.LineSeparator Then
+        srcStream.CopyTo dstStream
+    Else
+        While Not srcStream.EOS: dstStream.WriteText srcStream.ReadText(adReadLine), adWriteLine: Wend
+    End If
+End Sub
+
 Public Function BomSize(ByVal chrset As String) As Integer
     Select Case LCase(chrset)
         Case "utf-8":             BomSize = 3
@@ -178,65 +194,6 @@ Public Sub SaveToFileWithoutBom( _
     strm.Type = adTypeText
     strm.Charset = chrset
     strm.LineSeparator = lnsep
-End Sub
-
-Public Function ChangeCharset(ByVal strm As Object, ByVal chrset As String) As Object
-    If TypeName(strm) <> "Stream" Then Err.Raise 13
-    If strm.Type <> adTypeText Then Err.Raise 5
-    
-    Dim strmZ As Object: Set strmZ = CreateAdoDbStream(adTypeText, chrset, strm.LineSeparator)
-    strmZ.Open
-    
-    If strm.State = adStateClosed Then strm.Open
-    strm.CopyTo strmZ
-    strm.Close
-    
-    strmZ.Position = 0
-    Set ChangeCharset = strmZ
-End Function
-
-Public Sub ChangeFileCharset( _
-    ByVal fpath As String, ByVal crrChrset As String, ByVal chgChrset As String _
-    )
-    
-    Dim strm As Object: Set strm = CreateAdoDbStream(adTypeText, crrChrset)
-    strm.Open
-    strm.LoadFromFile fpath
-    Set strm = ChangeCharset(strm, chgChrset)
-    strm.SaveToFile fpath, adSaveCreateOverWrite
-    strm.Close
-End Sub
-
-Public Function ChangeLineSeparator( _
-    ByVal strm As Object, ByVal linsep As LineSeparatorsEnum _
-    ) As Object
-    
-    If TypeName(strm) <> "Stream" Then Err.Raise 13
-    If strm.Type <> adTypeText Then Err.Raise 5
-    
-    Dim strmZ As Object: Set strmZ = CreateAdoDbStream(strm.Charset, linsep)
-    strmZ.Open
-    
-    If strm.State = adStateClosed Then strm.Open
-    strm.Position = 0
-    While Not strm.EOS: strmZ.WriteText strm.ReadText(adReadLine), adWriteLine: Wend
-    strm.Close
-    
-    strmZ.Position = 0
-    Set ChangeLineSeparator = strmZ
-End Function
-
-Public Sub ChangeFileLineSeparator( _
-    ByVal fpath As String, ByVal chrset As String, _
-    ByVal crrLinsep As LineSeparatorsEnum, ByVal chgLinsep As LineSeparatorsEnum _
-    )
-    
-    Dim strm As Object: Set strm = CreateAdoDbStream(chrset, crrLinsep)
-    strm.Open
-    strm.LoadFromFile fpath
-    Set strm = ChangeLineSeparator(strm, chgLinsep)
-    strm.SaveToFile fpath, adSaveCreateOverWrite
-    strm.Close
 End Sub
 
 Public Function IsPathRooted(ByVal fpath As String) As Boolean
