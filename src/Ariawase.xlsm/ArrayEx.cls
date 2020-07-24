@@ -22,13 +22,13 @@ Private Sub Class_Initialize()
     ReDim xItems(31)
 End Sub
 
-Public Function AddVal(ByVal val As Variant)
+Public Sub AddVal(ByVal val As Variant)
     ArrResizeLet xItems, IncrPre(xIndex), val
-End Function
+End Sub
 
-Public Function AddObj(ByVal obj As Variant)
+Public Sub AddObj(ByVal obj As Variant)
     ArrResizeSet xItems, IncrPre(xIndex), obj
-End Function
+End Sub
 
 Public Function ToArray() As Variant
     If xIndex > -1 Then
