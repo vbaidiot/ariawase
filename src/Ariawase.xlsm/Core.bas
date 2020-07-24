@@ -568,7 +568,7 @@ End Sub
 ''' @param arr As Variant(Of Array(Of T))
 ''' @param idx As Long
 ''' @param val As Variant(Of T)
-Public Sub ArrResizeLet(ByRef arr As Variant, ByVal idx As Long, ByRef val As Variant)
+Public Sub ArrResizeLet(ByRef arr As Variant, ByVal idx As Long, ByVal val As Variant)
     If Not IsArray(arr) Then Err.Raise 13
     
     ArrResizeAs arr, idx
