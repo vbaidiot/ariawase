@@ -569,6 +569,8 @@ End Sub
 ''' @param idx As Long
 ''' @param val As Variant(Of T)
 Public Sub ArrResizeLet(ByRef arr As Variant, ByVal idx As Long, ByRef val As Variant)
+    If Not IsArray(arr) Then Err.Raise 13
+    
     ArrResizeAs arr, idx
     Let arr(idx) = val
 End Sub
@@ -577,6 +579,8 @@ End Sub
 ''' @param idx As Long
 ''' @param val As Object
 Public Sub ArrResizeSet(ByRef arr As Variant, ByVal idx As Long, ByVal obj As Object)
+    If Not IsArray(arr) Then Err.Raise 13
+    
     ArrResizeAs arr, idx
     Set arr(idx) = obj
 End Sub
