@@ -215,6 +215,7 @@ Private Sub AssertDone( _
 End Sub
 
 Private Sub AssertError()
+    xAssertMsg = "(Could Not Get)"
     Push xFailMsgs, "[" & xAssertIx & "] " & xAssertMsg & ":"
     Push xFailMsgs, "  Assert error!"
     Push xFailMsgs, "> Stopped the following assertion in this method!"
