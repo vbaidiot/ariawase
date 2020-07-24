@@ -295,7 +295,7 @@ Public Sub CoreXLib_Test()
         "WScript.Echo(""Hello!"")", _
         ReTrim(vbTab & "WScript.Echo(""Hello!"");" & vbCrLf, "[\s;]")
     
-    Assert.AreEqual "7", EvalVBS("""3"" + 4")
+    'Assert.AreEqual "7", EvalVBS("""3"" + 4") ' VBScript is now disabled by default in Internet Explorer 11
     Assert.AreEqual "34", EvalJS("""3"" + 4")
     
     Dim s As String
