@@ -556,6 +556,31 @@ Public Function ArrIndexOf( _
 Escape:
 End Function
 
+Private Sub ArrResizeAs(ByRef arr As Variant, ByVal idx As Long)
+    Dim ub As Long: ub = UBound(arr)
+    If idx > ub Then
+        Dim lb As Long: lb = LBound(arr)
+        Dim alen As Long: alen = ub - lb + 1
+        ReDim Preserve arr(lb To ub + alen)
+    End If
+End Sub
+
+''' @param arr As Variant(Of Array(Of T))
+''' @param idx As Long
+''' @param val As Variant(Of T)
+Public Sub ArrResizeLet(ByRef arr As Variant, ByVal idx As Long, ByRef val As Variant)
+    ArrResizeAs arr, idx
+    Let arr(idx) = val
+End Sub
+
+''' @param arr As Variant(Of Array(Of Object))
+''' @param idx As Long
+''' @param val As Object
+Public Sub ArrResizeSet(ByRef arr As Variant, ByVal idx As Long, ByVal obj As Object)
+    ArrResizeAs arr, idx
+    Set arr(idx) = obj
+End Sub
+
 ''' @param arr As Variant(Of Array(Of T))
 Public Sub ArrRev(ByRef arr As Variant)
     If Not IsArray(arr) Then Err.Raise 13
