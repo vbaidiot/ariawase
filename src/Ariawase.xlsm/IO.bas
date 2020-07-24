@@ -180,17 +180,6 @@ Public Sub SaveToFileWithoutBom( _
     strm.LineSeparator = lnsep
 End Sub
 
-Public Sub RemoveBom( _
-    ByVal fpath As String, ByVal chrset As String, ByVal linsep As LineSeparatorsEnum _
-    )
-    
-    Dim strm As Object: Set strm = CreateAdoDbStream(chrset, linsep)
-    strm.Open
-    strm.LoadFromFile fpath
-    SaveToFileWithoutBom strm, fpath, adSaveCreateOverWrite
-    strm.Close
-End Sub
-
 Public Function ChangeCharset(ByVal strm As Object, ByVal chrset As String) As Object
     If TypeName(strm) <> "Stream" Then Err.Raise 13
     If strm.Type <> adTypeText Then Err.Raise 5
