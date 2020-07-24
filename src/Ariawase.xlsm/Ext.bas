@@ -48,17 +48,23 @@ End Function
 ''' @param enumr As Enumerator(Of T)
 ''' @return As Variant(Of Array(Of T))
 Public Function EnumeratorToArr(ByVal enumr As Object) As Variant
-    Dim arrx As ArrayEx: Set arrx = New ArrayEx
+    ReDim arr(31) As Variant
+    Dim i As Long: i = 0
     
-    Dim x As Object
-    For Each x In enumr: Exit For: Next
+    Dim x As Object: For Each x In enumr: Exit For: Next
     If IsObject(x) Then
-        For Each x In enumr: arrx.AddObj x: Next
+        For Each x In enumr: ArrResizeSet arr, IncrPst(i), x: Next
     Else
-        For Each x In enumr: arrx.AddVal x: Next
+        For Each x In enumr: ArrResizeLet arr, IncrPst(i), x: Next
     End If
     
-    EnumeratorToArr = arrx.ToArray()
+    If i > 0 Then
+        ReDim Preserve arr(i - 1)
+    Else
+        arr = Array()
+    End If
+    
+    EnumeratorToArr = arr
 End Function
 
 ''' @param fromVal As Variant(Of T)
@@ -71,22 +77,29 @@ Public Function ArrRange( _
     
     If Not (IsNumeric(fromVal) And IsNumeric(toVal) And IsNumeric(stepVal)) Then Err.Raise 13
     
-    Dim arrx As ArrayEx: Set arrx = New ArrayEx
+    ReDim ret(31) As Variant
+    Dim i As Long: i = 0
     
     Select Case stepVal
     Case Is > 0
         While fromVal <= toVal
-            arrx.AddVal IncrPst(fromVal, stepVal)
+            ArrResizeLet ret, IncrPst(i), IncrPst(fromVal, stepVal)
         Wend
     Case Is < 0
         While fromVal >= toVal
-            arrx.AddVal IncrPst(fromVal, stepVal)
+            ArrResizeLet ret, IncrPst(i), IncrPst(fromVal, stepVal)
         Wend
     Case Else
         Err.Raise 5
     End Select
     
-    ArrRange = arrx.ToArray()
+    If i > 0 Then
+        ReDim Preserve ret(i - 1)
+    Else
+        ret = Array()
+    End If
+    
+    ArrRange = ret
 End Function
 
 ''' @param fun As Func(Of T, U)
@@ -184,48 +197,48 @@ End Function
 ''' @return As Variant(Of Array(Of Tuple`2(Of K, T)))
 Public Function ArrGroupBy(ByVal fun As Func, ByVal arr As Variant) As Variant
     If Not IsArray(arr) Then Err.Raise 13
-    Dim lb As Long: lb = LBound(arr)
-    Dim ub As Long: ub = UBound(arr)
-    Dim ixRet As Long: ixRet = -1
+    Dim lb As Long:    lb = LBound(arr)
+    Dim ubArr As Long: ubArr = UBound(arr)
+    Dim ubRet As Long: ubRet = -1
     Dim ret As Variant
-    If ub - lb < 0 Then
+    If ubArr - lb < 0 Then
         ret = Array()
         GoTo Ending
     End If
     
-    ReDim ret(ub - lb)
+    ReDim ret(lb To ubArr)
     
-    Dim k As Variant, i As Long, j As Long
+    Dim k As Variant, ixArr As Long, ixRet As Long
     If IsObject(arr(lb)) Then
-        For i = lb To ub
-            fun.FastApply k, arr(i)
-            For j = ixRet To 0 Step -1
-                If Equals(k, ret(j)(0)) Then Exit For
+        For ixArr = lb To ubArr
+            fun.FastApply k, arr(ixArr)
+            For ixRet = ubRet To 0 Step -1
+                If Equals(k, ret(ixRet)(0)) Then Exit For
             Next
-            If j < 0 Then
-                j = IncrPre(ixRet)
-                ret(j) = Array(k, New ArrayEx)
+            If ixRet < 0 Then
+                ixRet = IncrPre(ubRet)
+                ret(ixRet) = Array(k, New ArrayEx)
             End If
-            ret(j)(1).AddObj arr(i)
+            ret(ixRet)(1).AddObj arr(ixArr)
         Next
     Else
-        For i = lb To ub
-            fun.FastApply k, arr(i)
-            For j = ixRet To 0 Step -1
-                If Equals(k, ret(j)(0)) Then Exit For
+        For ixArr = lb To ubArr
+            fun.FastApply k, arr(ixArr)
+            For ixRet = ubRet To 0 Step -1
+                If Equals(k, ret(ixRet)(0)) Then Exit For
             Next
-            If j < 0 Then
-                j = IncrPre(ixRet)
-                ret(j) = Array(k, New ArrayEx)
+            If ixRet < 0 Then
+                ixRet = IncrPre(ubRet)
+                ret(ixRet) = Array(k, New ArrayEx)
             End If
-            ret(j)(1).AddVal arr(i)
+            ret(ixRet)(1).AddVal arr(ixArr)
         Next
     End If
     
-    ReDim Preserve ret(ixRet)
+    ReDim Preserve ret(lb To ubRet)
     
-    For i = 0 To ixRet
-        Set ret(i) = Init(New Tuple, ret(i)(0), ret(i)(1).ToArray())
+    For ixRet = lb To ubRet
+        Set ret(ixRet) = Init(New Tuple, ret(ixRet)(0), ret(ixRet)(1).ToArray())
     Next
     
 Ending:
@@ -233,8 +246,7 @@ Ending:
 End Function
 
 Private Sub ArrFoldPrep( _
-    arr As Variant, seedv As Variant, i As Long, stat As Variant, _
-    Optional isObj As Boolean _
+    arr As Variant, seedv As Variant, i As Long, stat As Variant _
     )
     
     If IsObject(seedv) Then
@@ -244,8 +256,7 @@ Private Sub ArrFoldPrep( _
     End If
     
     If IsMissing(stat) Then
-        isObj = IsObject(arr(i))
-        If isObj Then
+        If IsObject(arr(i)) Then
             Set stat = arr(i)
         Else
             Let stat = arr(i)
@@ -289,57 +300,65 @@ Public Function ArrScan( _
     
     If Not IsArray(arr) Then Err.Raise 13
     
-    Dim isObj As Boolean
-    Dim stat As Variant
-    Dim i As Long: i = LBound(arr)
-    ArrFoldPrep arr, seedv, i, stat, isObj
+    Dim lb As Long: lb = LBound(arr)
+    Dim ub As Long: ub = UBound(arr)
+    ReDim stats(lb To ub + 1) As Variant
     
-    Dim stats As ArrayEx: Set stats = New ArrayEx
-    If isObj Then
-        stats.AddObj stat
-        For i = i To UBound(arr)
+    Dim stat As Variant
+    Dim i As Long: i = lb
+    ArrFoldPrep arr, seedv, i, stat
+    
+    If IsObject(stat) Then
+        Set stats(i) = stat
+        For i = i To ub
             fun.FastApply stat, stat, arr(i)
-            stats.AddObj stat
+            Set stats(i + 1) = stat
         Next
     Else
-        stats.AddVal stat
-        For i = i To UBound(arr)
+        Let stats(i) = stat
+        For i = i To ub
             fun.FastApply stat, stat, arr(i)
-            stats.AddVal stat
+            Let stats(i + 1) = stat
         Next
     End If
     
-    ArrScan = stats.ToArray
+    ArrScan = stats
 End Function
 
 ''' @param fun As Func
 ''' @param seedv As Variant(Of T)
 ''' @return As Variant(Of Array(Of U))
 Public Function ArrUnfold(ByVal fun As Func, ByVal seedv As Variant) As Variant
-    Dim arrx As ArrayEx: Set arrx = New ArrayEx
+    ReDim ret(31) As Variant
+    Dim i As Long: i = 0
     
     Dim stat As Variant '(Of Tuple`2 Or Missing)
     fun.FastApply stat, seedv
-    If IsMissing(stat) Then GoTo Ending
+    If IsMissing(stat) Then
+        ret = Array()
+        GoTo Ending
+    End If
     
     If IsObject(stat.Item1) Then
-        arrx.AddObj stat.Item1
+        ArrResizeSet ret, IncrPst(i), stat.Item1
         
         fun.FastApply stat, stat.Item2
         While Not IsMissing(stat)
-            arrx.AddObj stat.Item1
+            ArrResizeSet ret, IncrPst(i), stat.Item1
             fun.FastApply stat, stat.Item2
         Wend
     Else
-        arrx.AddVal stat.Item1
+        ArrResizeLet ret, IncrPst(i), stat.Item1
         
         fun.FastApply stat, stat.Item2
         While Not IsMissing(stat)
-            arrx.AddVal stat.Item1
+            ArrResizeLet ret, IncrPst(i), stat.Item1
             fun.FastApply stat, stat.Item2
         Wend
     End If
     
+    ReDim Preserve ret(i - 1)
+    
 Ending:
-    ArrUnfold = arrx.ToArray()
+    ArrUnfold = ret
 End Function
